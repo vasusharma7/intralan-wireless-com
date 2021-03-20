@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Button, Alert } from "react-native";
 const socketIOClient = require("socket.io-client");
 const Netmask = require("netmask").Netmask;
-
+import Home from "./screens/Home";
 export default function App() {
   const [connections, setConnections] = useState({});
   const [info, setInfo] = useState({});
@@ -26,7 +26,7 @@ export default function App() {
       if (!info[ip])
         connections[ip].on("broadcast", (data) => {
           console.log("receiving broadcast data", data);
-          setInfo({ ...info, ip: data });
+          setInfo({ ...info, [ip]: data });
           connections[ip].off("broadcast");
         });
     }
@@ -51,8 +51,11 @@ export default function App() {
       const socket = await socketIOClient(`http://${ip}:5000`);
       socket.on("connect", () => {
         console.log(socket.id, socket.connected);
-        setConnections({ ...connections, ip: socket });
+        setConnections({ ...connections, [ip]: socket });
       });
+      // socket.on("disconnect", () => {
+      //   console.log("disconnected");
+      // });
       resolve(ip);
     });
   };
@@ -82,9 +85,12 @@ export default function App() {
     };
   }, []);
   return (
-    <View style={styles.container}>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      {/* <View style={styles.container}>
+        <StatusBar style="auto" />
+      </View> */}
+      <Home connections={info} />
+    </>
   );
 }
 

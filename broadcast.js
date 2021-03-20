@@ -19,7 +19,11 @@ const emit = setInterval(() => {
 io.sockets.on("connection", (client) => {
   //setTimeout(() => clearInterval(emit), 1000);
 
-  io.emit("broadcast", { ip: "10.1.1.1", port: 12 });
+  io.emit("broadcast", {
+    ip: "192.158.1.12",
+    port: 5000,
+    username: "Vasu Sharma",
+  });
   console.log(client.id);
 });
 
