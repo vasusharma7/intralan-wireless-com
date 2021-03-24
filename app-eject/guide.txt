@@ -1,0 +1,11 @@
+download NDK from here - 
+
+https://github.com/JaneaSystems/nodejs-mobile/issues/297#issuecomment-762907659
+
+extract it in /home/<user>/Android/Sdk/ndk/
+
+
+follow everything given here - 
+
+https://www.npmjs.com/package/nodejs-mobile-react-native
+
