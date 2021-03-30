@@ -1,0 +1,28 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.vasusharma7.intralancom">
+
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+  <application android:name="com.vasusharma7.intralancom.MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="false" android:theme="@style/AppTheme">
+    <activity android:name="com.vasusharma7.intralancom.MainActivity" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:windowSoftInputMode="adjustResize">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+    <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+    <service android:name="com.janeasystems.rn_nodejs_mobile.NodeService" android:enabled="true" android:exported="false">
+    </service>
+    <service android:name="com.janeasystems.rn_nodejs_mobile.NodeServiceEvent">
+    </service>
+    <receiver android:name="com.janeasystems.rn_nodejs_mobile.BootUpReceiver" android:enabled="true" android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+      <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+        <category android:name="android.intent.category.DEFAULT" />
+      </intent-filter>
+    </receiver>
+  </application>
+
+</manifest>

@@ -1,0 +1,21 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/commons-cli-1.3.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/asm-commons-6.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/asm-6.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/asm-util-6.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/jetifier-processor-1.0.0-beta09.jar!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/asm-tree-6.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/gson-2.8.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/jetifier-standalone.jar!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/kotlin-stdlib-common-1.3.60.jar!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/annotations-13.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/kotlin-stdlib-1.3.60.jar!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/jdom2-2.0.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/jetifier/lib/jetifier-core-1.0.0-beta09.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

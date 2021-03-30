@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="classes2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/nodejs-mobile/android/build/intermediates/compile_library_classes/debug/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

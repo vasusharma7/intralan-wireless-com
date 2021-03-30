@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="R1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/node_modules/nodejs-mobile-react-native/android/build/intermediates/compile_only_not_namespaced_r_class_jar/debug/generateDebugRFile/R.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

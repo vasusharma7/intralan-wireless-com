@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/react-native-background-actions/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/aapt.iml" filepath="$PROJECT_DIR$/react-native-background-actions/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/aapt.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nodejs-mobile/android/src/android.iml" filepath="$PROJECT_DIR$/nodejs-mobile/android/src/android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/react-native-background-actions/android/src/android1.iml" filepath="$PROJECT_DIR$/react-native-background-actions/android/src/android1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/app/src/app.iml" filepath="$PROJECT_DIR$/android/app/src/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/react-native-background-actions/android/build/build.iml" filepath="$PROJECT_DIR$/react-native-background-actions/android/build/build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nodejs-mobile/android/build/build1.iml" filepath="$PROJECT_DIR$/nodejs-mobile/android/build/build1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/app/build/intermediates/bundle_manifest/debug/processDebugManifest/bundle-manifest/bundle-manifest.iml" filepath="$PROJECT_DIR$/android/app/build/intermediates/bundle_manifest/debug/processDebugManifest/bundle-manifest/bundle-manifest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/react-native-background-actions/android/build/intermediates/library_manifest/debug/debug.iml" filepath="$PROJECT_DIR$/react-native-background-actions/android/build/intermediates/library_manifest/debug/debug.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/app/build/generated/source/generated.iml" filepath="$PROJECT_DIR$/android/app/build/generated/source/generated.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/app/build/generated/not_namespaced_r_class_sources/not_namespaced_r_class_sources.iml" filepath="$PROJECT_DIR$/android/app/build/generated/not_namespaced_r_class_sources/not_namespaced_r_class_sources.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/app/build/generated/rncli/rncli.iml" filepath="$PROJECT_DIR$/android/app/build/generated/rncli/rncli.iml" />
+    </modules>
+  </component>
+</project>

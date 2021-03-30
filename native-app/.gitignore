@@ -1,0 +1,17 @@
+ios/*
+node_modules/*
+
+android/local.properties
+android/app/build/
+android/.idea/
+android/*.iml
+android/.gradle/*android/app/app.iml
+android/app/app.iml
+
+# CocoaPods
+/ios/Pods/
+
+
+# Ignore gradle files
+.gradle/
+build/
