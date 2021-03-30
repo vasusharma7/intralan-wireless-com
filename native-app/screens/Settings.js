@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
-import { connect } from "react-redux";
-import NodeService from "./Service";
+import NodeService from "../Service";
 import nodejs from "nodejs-mobile-react-native";
 
 class Settings extends Component {

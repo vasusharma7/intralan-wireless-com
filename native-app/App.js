@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import {
   StyleSheet,
   Button,
@@ -10,9 +11,16 @@ import {
 } from "react-native";
 import nodejs from "nodejs-mobile-react-native";
 import Home from "./screens/Home";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+
+import Settings from "./screens/Settings";
+import Connections from "./screens/Connections";
 
 const socketIOClient = require("socket.io-client");
 const Netmask = require("netmask").Netmask;
+const Tab = createMaterialBottomTabNavigator();
+
 import "./config.js";
 
 const options = {
@@ -132,18 +140,39 @@ class App extends Component {
   async componentDidMount() {
     this.setState({ block: "192.168.1.0/24" }, this.handleBlockChange);
   }
+
   render() {
     return (
-      <SafeAreaView>
-        <>
-          {/* <Button
-          title="Message Node"
-          onPress={() => nodejs.channel.send("A message!")}
-        /> */}
-          <Home connections={this.state.info} />
-        </>
-      </SafeAreaView>
+      <Tab.Navigator
+        initialRouteName="Connections"
+        activeColor="#f0edf6"
+        inactiveColor="#3e2465"
+        barStyle={{ backgroundColor: "lime" }}
+        key={this.state.connections.length}
+      >
+        <Tab.Screen
+          name="Connections"
+          component={() => <Connections connections={this.state.info} />}
+          options={{
+            tabBarLabel: "Connections",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="network" color={color} size={26} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Settings"
+          component={Settings}
+          options={{
+            tabBarLabel: "Settings",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="tools" color={color} size={26} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
     );
   }
 }
+
 export default App;

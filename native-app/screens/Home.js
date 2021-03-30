@@ -1,46 +1,39 @@
 import React, { Component } from "react";
-import { Platform, View, Text, Alert } from "react-native";
-import { Appbar, List } from "react-native-paper";
+import Connections from "./Connections";
+import Settings from "./Settings";
 
 export default class Home extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      index: 0,
+      routes: [
+        { key: "connections", title: "Connections", icon: "network" },
+        { key: "settings", title: "Settings", icon: "settings" },
+      ],
+    };
   }
   componentDidUpdate(prevProps, prevState) {
     if (JSON.stringify(prevProps) === JSON.stringify(this.props)) return;
-    console.log("props", this.props);
+    console.log("received new props in Home:) -> ", this.props);
   }
-  render() {
-    // return (
-    //   <>
-    //     <View>
-    //       <Text>This is Home Component</Text>
-    //     </View>
-    //   </>
-    // );
-    return (
-      <>
-        <Appbar.Header>
-          <Appbar.Content
-            title="IntraLAN Wireless Communication"
-            subtitle="Under Developement :)"
-          />
-        </Appbar.Header>
-        <View>
-          {Object.keys(this.props?.connections).map((ip) => {
-            return (
-              <List.Item
-                key={ip}
-                title={this.props.connections[ip]["username"]}
-                description={this.props.connections[ip]["ip"]}
-                left={(props) => <List.Icon {...props} icon="network" />}
-                onPress={() => Alert.alert("Pending Work", "WIP")}
-              />
-            );
-          })}
-        </View>
-      </>
+  // renderScene = BottomNavigation.SceneMap({
+  //   connections: Connections,
+  //   settings: Settings,
+  // });
+  setIndex = (ind) => this.setState({ index: ind });
+  bottomNavigation = () =>
+    createMaterialBottomTabNavigator(
+      {
+        settings: { screen: Settings, icon: "settings" },
+        connections: { screen: Connections, icon: "network" },
+      },
+      {
+        initialRouteName: "connections",
+        activeColor: "#F44336",
+      }
     );
+  render() {
+    return <></>;
   }
 }
