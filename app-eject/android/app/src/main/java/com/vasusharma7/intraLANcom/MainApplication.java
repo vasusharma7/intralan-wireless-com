@@ -6,6 +6,7 @@ import android.net.Uri;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.asterinet.react.bgactions.BackgroundActionsPackage;
 import me.alwx.HttpServer.HttpServerReactPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.facebook.react.ReactInstanceManager;

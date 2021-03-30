@@ -25,4 +25,6 @@ target 'intraLANcom' do
 
   pod 'react-native-webview', :path => '../node_modules/react-native-webview'
 
+  pod 'react-native-background-actions', :path => '../node_modules/react-native-background-actions'
+
 end

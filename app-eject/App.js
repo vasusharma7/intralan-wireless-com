@@ -13,8 +13,37 @@ import Home from "./screens/Home";
 
 const socketIOClient = require("socket.io-client");
 const Netmask = require("netmask").Netmask;
-
+import Service from "./Service";
 import "./config.js";
+import BackgroundService from "react-native-background-actions";
+
+// You can do anything in your task such as network requests, timers and so on,
+// as long as it doesn't touch UI. Once your task completes (i.e. the promise is resolved),
+// React Native will go into "paused" mode (unless there are other tasks running,
+// or there is a foreground app).
+const veryIntensiveTask = async () => {
+  // Example of an infinite loop task
+  await new Promise(async (resolve) => {
+    for (let i = 0; BackgroundService.isRunning(); i++) {
+      console.log(i);
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+  });
+};
+
+const options = {
+  taskName: "Example",
+  taskTitle: "ExampleTask title",
+  taskDesc: "ExampleTask description",
+  taskIcon: {
+    name: "ic_launcher",
+    type: "mipmap",
+  },
+  color: "#ff00ff",
+  parameters: {
+    delay: 1000,
+  },
+};
 
 class App extends Component {
   constructor(props) {
@@ -124,18 +153,22 @@ class App extends Component {
     clearInterval(this.state.interval);
   }
 
-  componentDidMount() {
-    this.setState({ block: "192.168.1.0/24" }, this.handleBlockChange);
+  async componentDidMount() {
+    // this.setState({ block: "192.168.1.0/24" }, this.handleBlockChange);
+    // await BackgroundService.start(veryIntensiveTask, options);
   }
   render() {
     return (
-      <SafeAreaView>
+      // <SafeAreaView>
+      <>
         {/* <Button
           title="Message Node"
           onPress={() => nodejs.channel.send("A message!")}
         /> */}
-        <Home connections={this.state.info} />
-      </SafeAreaView>
+        {/* <Home connections={this.state.info} /> */}
+        <Service />
+      </>
+      // </SafeAreaView>
     );
   }
 }

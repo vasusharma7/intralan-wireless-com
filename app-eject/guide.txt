@@ -9,3 +9,5 @@ follow everything given here -
 
 https://www.npmjs.com/package/nodejs-mobile-react-native
 
+
+https://stackoverflow.com/a/42064719/10567235
