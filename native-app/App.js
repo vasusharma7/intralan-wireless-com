@@ -1,18 +1,18 @@
 import React, { Component } from "react";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import {
-  StyleSheet,
-  Button,
-  Alert,
-  SafeAreaView,
-  Text,
-  View,
-} from "react-native";
-import nodejs from "nodejs-mobile-react-native";
-import Home from "./screens/Home";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+// import {
+//   StyleSheet,
+//   Button,
+//   Alert,
+//   SafeAreaView,
+//   Text,
+//   View,
+// } from "react-native";
+// import nodejs from "nodejs-mobile-react-native";
+// import Home from "./screens/Home";
+// import { NavigationContainer } from "@react-navigation/native";
+// import { createStackNavigator } from "@react-navigation/stack";
 
 import Settings from "./screens/Settings";
 import Connections from "./screens/Connections";
@@ -22,6 +22,8 @@ const Netmask = require("netmask").Netmask;
 const Tab = createMaterialBottomTabNavigator();
 
 import "./config.js";
+
+const { PeerClient } = require("./peer.js");
 
 const options = {
   taskName: "Example",
@@ -95,12 +97,13 @@ class App extends Component {
       const socket = await socketIOClient(`http://${ip}:5000`);
       socket.on("connect", () => {
         console.log(socket.id, socket.connected);
-        this.setState(
-          {
-            connections: { ...this.state.connections, [ip]: socket },
-          },
-          this.handleConnectionChange
-        );
+        !Object.keys(this.state.connections).includes(ip) &&
+          this.setState(
+            {
+              connections: { ...this.state.connections, [ip]: socket },
+            },
+            this.handleConnectionChange
+          );
       });
       // socket.on("disconnect", () => {
       //   console.log("disconnected");
@@ -153,6 +156,7 @@ class App extends Component {
         <Tab.Screen
           name="Connections"
           component={() => <Connections connections={this.state.info} />}
+          // component={Connections}
           options={{
             tabBarLabel: "Connections",
             tabBarIcon: ({ color }) => (

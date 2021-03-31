@@ -1,6 +1,6 @@
 const cors = require("cors");
 const express = require("express");
-
+// require("./config");
 const app = express();
 
 const port = process.env.PORT || 5000;
@@ -11,12 +11,25 @@ app.options("*", cors());
 const http = require("http").Server(app);
 var io = require("socket.io")(http);
 
+const ip = Object.values(require("os").networkInterfaces()).reduce(
+  (r, list) =>
+    r.concat(
+      list.reduce(
+        (rr, i) =>
+          rr.concat((i.family === "IPv4" && !i.internal && i.address) || []),
+        []
+      )
+    ),
+  []
+)[0];
+
 //io.origins('*//*:*');
 io.sockets.on("connection", (client) => {
   io.emit("broadcast", {
-    ip: "192.158.1.12",
+    ip: ip,
     port: 5000,
     username: "Vasu Sharma",
+    peerId: global.config.metadata["localPeerId"],
   });
   console.log(client.id);
 });
@@ -28,3 +41,10 @@ app.get("/", (req, res) =>
 http.listen(port, () => {
   console.log(`Broadcasting on port ${port}`);
 });
+
+app.use(
+  "/peerjs",
+  require("peer").ExpressPeerServer(http, {
+    debug: true,
+  })
+);
