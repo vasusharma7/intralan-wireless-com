@@ -2,9 +2,8 @@
 // The main.js file will be overwritten in updates/reinstalls.
 require("./config");
 const broadcast = require("./broadcast.js");
-const utils = require("./utils.js");
-var rn_bridge = require("rn-bridge");
 const utils = require("./utils");
+var rn_bridge = require("rn-bridge");
 
 // Echo every message received from react-native.
 rn_bridge.channel.on("message", (msg) => {
