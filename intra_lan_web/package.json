@@ -6,9 +6,17 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "baseui": "^9.112.0",
+    "material-ui": "^0.20.2",
+    "material-ui-community-icons": "^0.15.0",
+    "netmask": "^2.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-icons": "^4.2.0",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
+    "styletron-engine-atomic": "^1.4.7",
+    "styletron-react": "^5.2.7",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
