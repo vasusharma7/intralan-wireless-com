@@ -1,21 +1,12 @@
 import React, { Component } from "react";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-// import {
-//   StyleSheet,
-//   Button,
-//   Alert,
-//   SafeAreaView,
-//   Text,
-//   View,
-// } from "react-native";
-// import nodejs from "nodejs-mobile-react-native";
-// import Home from "./screens/Home";
-// import { NavigationContainer } from "@react-navigation/native";
-// import { createStackNavigator } from "@react-navigation/stack";
-
+import { PermissionsAndroid } from "react-native";
+import { connect } from "react-redux";
 import Settings from "./screens/Settings";
 import Connections from "./screens/Connections";
+
+import { updateConnections, updateInfo } from "./redux/dataRedux/dataAction";
 
 const socketIOClient = require("socket.io-client");
 const Netmask = require("netmask").Netmask;
@@ -50,6 +41,13 @@ class App extends Component {
       block: "",
       ips: [],
       waitTime: 1000,
+      permissions: [
+        { permission: PermissionsAndroid.PERMISSIONS.CAMERA, title: "Camera" },
+        {
+          permission: PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          title: "Microphone",
+        },
+      ],
     };
   }
   handleBlockChange = () => {
@@ -60,6 +58,7 @@ class App extends Component {
   };
 
   handleConnectionChange = () => {
+    this.props.updateConnections(this.connections);
     console.log(
       "connections found : ",
       Object.keys(this.state.connections).length
@@ -80,6 +79,7 @@ class App extends Component {
   };
 
   handleInfoChnage = () => {
+    this.props.updateInfo(this.state.info);
     console.log("info found : ", Object.keys(this.state.info).length);
   };
   sleep = (milliseconds) => {
@@ -139,8 +139,25 @@ class App extends Component {
   componentWillUnmount() {
     clearInterval(this.state.interval);
   }
-
+  requestPermission = async ({ permission, title }) => {
+    try {
+      const granted = await PermissionsAndroid.request(permission, {
+        title: title,
+        buttonNeutral: "Ask Me Later",
+        buttonNegative: "Cancel",
+        buttonPositive: "OK",
+      });
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log("You can use the camera");
+      } else {
+        console.log("Camera permission denied");
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
   async componentDidMount() {
+    this.state.permissions.forEach((obj) => this.requestPermission(obj));
     this.setState({ block: "192.168.1.0/24" }, this.handleBlockChange);
   }
 
@@ -155,8 +172,8 @@ class App extends Component {
       >
         <Tab.Screen
           name="Connections"
-          component={() => <Connections connections={this.state.info} />}
-          // component={Connections}
+          // component={() => <Connections connections={this.state.info} />}
+          component={Connections}
           options={{
             tabBarLabel: "Connections",
             tabBarIcon: ({ color }) => (
@@ -166,6 +183,7 @@ class App extends Component {
         />
         <Tab.Screen
           name="Settings"
+          // component={() => <Settings connections={this.state.info} />}
           component={Settings}
           options={{
             tabBarLabel: "Settings",
@@ -178,5 +196,22 @@ class App extends Component {
     );
   }
 }
+const mapStateToProps = (state) => {
+  return {
+    connections: state.data.connections,
+    info: state.data.info,
+  };
+};
 
-export default App;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateConnections: (connections) =>
+      dispatch(updateConnections(connections)),
+    updateInfo: (info) => dispatch(updateInfo(info)),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);

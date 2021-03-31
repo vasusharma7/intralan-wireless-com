@@ -7,10 +7,13 @@ import {
   Image,
   Alert,
 } from "react-native";
+import { connect } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NodeService from "../Service";
 import nodejs from "nodejs-mobile-react-native";
 import { PeerClient } from "../peer";
+import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
+import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
 
 class Settings extends Component {
   constructor(props) {
@@ -23,6 +26,7 @@ class Settings extends Component {
       case "firedUp": {
         const localPeer = new PeerClient();
         await AsyncStorage.setItem("localPeer", JSON.stringify(localPeer));
+        this.state.setLocalPeer(localPeer);
         Alert.alert("From node: " + msg[event]);
         nodejs.channel.send(
           JSON.stringify("localPeerId", localPeer.getPeerId())
@@ -47,8 +51,17 @@ class Settings extends Component {
     );
   };
   startConnection = () => {
-    const remotePeer = new PeerClient(this.props.connections[0]);
-    remotePeer.connect();
+    // console.log(this.props.connections);
+    // const remotePeer = new PeerClient(
+    //   this.props.connections[Object.keys(this.props.connections)[0]]
+    // );
+    const remotePeer = new PeerClient({
+      ip: "192.168.1.7",
+      username: "Vasu",
+      peerId: "peer9",
+    });
+
+    this.state.remotePeer(remotePeer);
   };
   render() {
     return (
@@ -84,7 +97,28 @@ class Settings extends Component {
   }
 }
 
-export default Settings;
+const mapStateToProps = (state) => {
+  return {
+    connections: state.data.connections,
+    info: state.data.info,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateConnections: (connections) =>
+      dispatch(updateConnections(connections)),
+    updateInfo: (info) => dispatch(updateInfo(info)),
+
+    setLocalPeer: (peer) => dispatch(setLocalPeer(peer)),
+    setRemotePeer: (peer) => dispatch(setRemotePeer(peer)),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Settings);
 
 const styles = StyleSheet.create({
   container: {
