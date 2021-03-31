@@ -5,8 +5,9 @@ import { PermissionsAndroid } from "react-native";
 import { connect } from "react-redux";
 import Settings from "./screens/Settings";
 import Connections from "./screens/Connections";
-
+import Stream from "./screens/Stream";
 import { updateConnections, updateInfo } from "./redux/dataRedux/dataAction";
+import { setLocalPeer, setRemotePeer } from "./redux/streamRedux/streamAction";
 
 const socketIOClient = require("socket.io-client");
 const Netmask = require("netmask").Netmask;
@@ -139,26 +140,30 @@ class App extends Component {
   componentWillUnmount() {
     clearInterval(this.state.interval);
   }
-  requestPermission = async ({ permission, title }) => {
+  requestPermissions = async () => {
     try {
-      const granted = await PermissionsAndroid.request(permission, {
-        title: title,
-        buttonNeutral: "Ask Me Later",
-        buttonNegative: "Cancel",
-        buttonPositive: "OK",
-      });
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        {
+          title: "Microphone Permission",
+          buttonNeutral: "Ask Me Later",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK",
+        }
+      );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log("You can use the camera");
+        console.log("You can use the Microphone");
       } else {
-        console.log("Camera permission denied");
+        console.log("Microphone permission denied");
       }
     } catch (err) {
       console.warn(err);
     }
   };
   async componentDidMount() {
-    this.state.permissions.forEach((obj) => this.requestPermission(obj));
-    this.setState({ block: "192.168.1.0/24" }, this.handleBlockChange);
+    this.requestPermissions();
+    // this.props.setLocalPeer(new PeerClient());
+    // this.setState({ block: "192.168.1.0/24" }, this.handleBlockChange);
   }
 
   render() {
@@ -192,6 +197,21 @@ class App extends Component {
             ),
           }}
         />
+        <Tab.Screen
+          name="Stream"
+          // component={() => <Settings connections={this.state.info} />}
+          component={Stream}
+          options={{
+            tabBarLabel: "Stream",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons
+                name="volume-source"
+                color={color}
+                size={26}
+              />
+            ),
+          }}
+        />
       </Tab.Navigator>
     );
   }
@@ -208,6 +228,9 @@ const mapDispatchToProps = (dispatch) => {
     updateConnections: (connections) =>
       dispatch(updateConnections(connections)),
     updateInfo: (info) => dispatch(updateInfo(info)),
+
+    setLocalPeer: (peer) => dispatch(setLocalPeer(peer)),
+    setRemotePeer: (peer) => dispatch(setRemotePeer(peer)),
   };
 };
 

@@ -26,7 +26,7 @@ class Settings extends Component {
       case "firedUp": {
         const localPeer = new PeerClient();
         await AsyncStorage.setItem("localPeer", JSON.stringify(localPeer));
-        this.state.setLocalPeer(localPeer);
+        this.props.setLocalPeer(localPeer);
         Alert.alert("From node: " + msg[event]);
         nodejs.channel.send(
           JSON.stringify("localPeerId", localPeer.getPeerId())
@@ -58,10 +58,10 @@ class Settings extends Component {
     const remotePeer = new PeerClient({
       ip: "192.168.1.7",
       username: "Vasu",
-      peerId: "peer9",
+      peerId: "peer8",
     });
 
-    this.state.remotePeer(remotePeer);
+    this.props.setRemotePeer(remotePeer);
   };
   render() {
     return (

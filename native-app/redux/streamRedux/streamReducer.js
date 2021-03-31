@@ -11,19 +11,19 @@ export const streamReducer = (state = initalState, action) => {
     case LOCAL_PEER: {
       return {
         ...state,
-        localPeer: state.payload,
+        localPeer: action.payload,
       };
     }
     case REMOTE_PEER: {
       return {
         ...state,
-        remotePeer: state.payload,
+        remotePeer: action.payload,
       };
     }
     case AV_STREAM: {
       return {
         ...state,
-        stream: state.payload,
+        stream: action.payload,
       };
     }
     default:

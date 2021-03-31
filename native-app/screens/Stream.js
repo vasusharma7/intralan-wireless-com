@@ -1,26 +1,22 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import Player from "react-native-streaming-audio-player";
-import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
-import {} from "../redux/streamRedux/streamAction";
+import { View, Button, StyleSheet } from "react-native";
+import { RTCView } from "react-native-webrtc";
 
+import {} from "../redux/streamRedux/streamAction";
 export class Stream extends Component {
   constructor(props) {
     super(props);
     this.state = { currentTime: 0 };
-    this.onUpdatePosition = this.onUpdatePosition.bind(this);
   }
 
   onPlay() {
-    Player.play(this.props.stream, {
-      title: source,
-      artist: source.artist,
-      album_art_uri: source.arworkUrl,
-    });
+    console.log(this.props.stream);
+    this.setState({ play: true });
   }
 
   onPause() {
-    Player.pause();
+    this.setState({ play: false });
   }
 
   render() {
@@ -35,12 +31,19 @@ export class Stream extends Component {
         >
           <Button title="Play" onPress={() => this.onPlay()} color="red" />
           <Button title="Pause" onPress={() => this.onPause()} color="red" />
+          {this.state.play && <RTCView streamURL={this.props.stream.toURL()} />}
         </View>
       </View>
     );
   }
 }
-
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
 const mapStateToProps = (state) => ({
   stream: state.stream.stream,
 });

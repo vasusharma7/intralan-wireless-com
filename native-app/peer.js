@@ -3,6 +3,7 @@ import { mediaDevices } from "react-native-webrtc";
 require("react-native-webrtc");
 import Peer from "react-native-peerjs";
 import { store } from "./redux/store";
+import { setAVStream } from "./redux/streamRedux/streamAction";
 class PeerClient {
   constructor(connection) {
     this.connection = connection;
@@ -54,6 +55,7 @@ class PeerClient {
         // Store a global reference of the other user stream
         // window.peer_stream = stream;
         console.log("call answer", stream);
+        store.dispatch(setAVStream(stream));
         // Display the stream of the other user in the peer-camera video element !
         // onReceiveStream(stream, "peer-camera");
       });
@@ -70,34 +72,31 @@ class PeerClient {
     return this.peerId;
   };
   startVideo = () => {
-    let isFront = true;
     mediaDevices.enumerateDevices().then((sourceInfos) => {
       console.log(sourceInfos);
-      let videoSourceId;
+      let audioSourceId;
       for (let i = 0; i < sourceInfos.length; i++) {
         const sourceInfo = sourceInfos[i];
-        if (
-          sourceInfo.kind == "videoinput" &&
-          sourceInfo.facing == (isFront ? "front" : "environment")
-        ) {
-          videoSourceId = sourceInfo.deviceId;
+        if (sourceInfo.kind == "audioinput") {
+          audioSourceId = sourceInfo.deviceId;
         }
       }
       mediaDevices
         .getUserMedia({
           audio: true,
-          video: {
-            width: 640,
-            height: 480,
-            frameRate: 30,
-            facingMode: isFront ? "user" : "environment",
-            deviceId: videoSourceId,
-          },
+          // video: {
+          //   width: 640,
+          //   height: 480,
+          //   frameRate: 30,
+          //   facingMode: isFront ? "user" : "environment",
+          //   deviceId: videoSourceId,
+          // },
         })
         .then((stream) => {
           // Got stream!
           console.log("console media", stream);
           const call = this.peer.call(this.connection.peerId, stream);
+          // store.dispatch(setAVStream(stream));
 
           call.on("stream", function(stream) {
             console.log("peer is streaming", this.peerId, stream);
