@@ -58,7 +58,7 @@ class Settings extends Component {
     const remotePeer = new PeerClient({
       ip: "192.168.1.7",
       username: "Vasu",
-      peerId: "peer8",
+      peerId: "141cc394-7069-4a03-8acd-a306d668074d",
     });
 
     this.props.setRemotePeer(remotePeer);

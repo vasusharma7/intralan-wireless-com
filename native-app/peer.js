@@ -14,11 +14,36 @@ class PeerClient {
         port: 5000,
         path: "/peerjs",
         secure: false,
+        debug: true,
       });
       console.log("firing listeners");
       this.fireEventListeners();
+      this.getMediaSource();
     });
   }
+  getMediaSource = () => {
+    mediaDevices.enumerateDevices().then((sourceInfos) => {
+      // console.log(sourceInfos);
+      let audioSourceId;
+      for (let i = 0; i < sourceInfos.length; i++) {
+        const sourceInfo = sourceInfos[i];
+        if (sourceInfo.kind == "audioinput") {
+          audioSourceId = sourceInfo.deviceId;
+        }
+      }
+      mediaDevices
+        .getUserMedia({
+          audio: true,
+        })
+        .then((stream) => {
+          this.stream = stream;
+        })
+        .catch((error) => {
+          console.log("error in getting media media", error);
+          // Log error
+        });
+    });
+  };
   fireEventListeners = () => {
     this.peer.on("error", (err) => {
       console.log("listen", err);
@@ -47,11 +72,10 @@ class PeerClient {
         conn.send("Hello, this is the LOCAL peer!");
       });
     });
-    this.peer.on("call", function(call) {
-      call.answer(window.localStream);
-
+    this.peer.on("call", (call) => {
       // Receive data
       call.on("stream", function(stream) {
+        call.answer(this.stream);
         // Store a global reference of the other user stream
         // window.peer_stream = stream;
         console.log("call answer", stream);
@@ -71,43 +95,15 @@ class PeerClient {
   getPeerId = () => {
     return this.peerId;
   };
-  startVideo = () => {
-    mediaDevices.enumerateDevices().then((sourceInfos) => {
-      console.log(sourceInfos);
-      let audioSourceId;
-      for (let i = 0; i < sourceInfos.length; i++) {
-        const sourceInfo = sourceInfos[i];
-        if (sourceInfo.kind == "audioinput") {
-          audioSourceId = sourceInfo.deviceId;
-        }
-      }
-      mediaDevices
-        .getUserMedia({
-          audio: true,
-          // video: {
-          //   width: 640,
-          //   height: 480,
-          //   frameRate: 30,
-          //   facingMode: isFront ? "user" : "environment",
-          //   deviceId: videoSourceId,
-          // },
-        })
-        .then((stream) => {
-          // Got stream!
-          console.log("console media", stream);
-          const call = this.peer.call(this.connection.peerId, stream);
-          // store.dispatch(setAVStream(stream));
+  startCall = () => {
+    console.log("console media", this.stream);
+    const call = this.peer.call(this.connection.peerId, this.stream);
+    // store.dispatch(setAVStream(stream));
 
-          call.on("stream", function(stream) {
-            console.log("peer is streaming", this.peerId, stream);
-
-            // onReceiveStream(stream, "peer-camera");
-          });
-        })
-        .catch((error) => {
-          console.log("error media", error);
-          // Log error
-        });
+    call.on("stream", function(stream) {
+      console.log("peer is streaming", this.peerId, stream);
+      store.dispatch(setAVStream(stream));
+      // onReceiveStream(stream, "peer-camera");
     });
   };
 
@@ -115,16 +111,16 @@ class PeerClient {
     console.log("receiving data from peer ", data);
   };
   connect = () => {
-    this.startVideo();
-    // const conn = this.peer.connect(this.connection.peerId, {
-    //   metadata: {
-    //     username: this.connection.username,
-    //   },
-    // });
-    // conn.on("error", (err) => {
-    //   console.log("conn", err);
-    // });
-    // conn.on("data", this.handleMessage);
+    const conn = this.peer.connect(this.connection.peerId, {
+      metadata: {
+        username: this.connection.username,
+      },
+    });
+    conn.on("error", (err) => {
+      console.log("conn", err);
+    });
+    conn.on("data", this.handleMessage);
+    this.startCall();
   };
 }
 

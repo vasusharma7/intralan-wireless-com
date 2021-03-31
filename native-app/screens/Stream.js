@@ -30,8 +30,10 @@ export class Stream extends Component {
           }}
         >
           <Button title="Play" onPress={() => this.onPlay()} color="red" />
+          <RTCView
+            streamURL={this.state.play ? this.props.stream.toURL() : ""}
+          />
           <Button title="Pause" onPress={() => this.onPause()} color="red" />
-          {this.state.play && <RTCView streamURL={this.props.stream.toURL()} />}
         </View>
       </View>
     );
