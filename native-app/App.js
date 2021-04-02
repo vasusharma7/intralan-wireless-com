@@ -4,12 +4,14 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { PermissionsAndroid, AppState } from "react-native";
 import { connect } from "react-redux";
 import Settings from "./screens/Settings";
+import CallModal from "./CallModal";
 import Connections from "./screens/Connections";
 import Stream from "./screens/Stream";
 import { updateConnections, updateInfo } from "./redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "./redux/streamRedux/streamAction";
 import BackgroundService from "react-native-background-actions";
 const socketIOClient = require("socket.io-client");
+
 const Netmask = require("netmask").Netmask;
 const Tab = createMaterialBottomTabNavigator();
 
@@ -141,7 +143,7 @@ class App extends Component {
     }
     if (!this.state.ips.length) return;
 
-    this.state.count < 50 &&
+    if (this.state.count < 50) {
       this.setState(
         {
           interval: setTimeout(async () => {
@@ -158,10 +160,13 @@ class App extends Component {
         },
         () => {
           this.setState({
-            count: this.state.count + 10,
+            count: this.state.count + 12,
           });
         }
       );
+    } else {
+      // this.props.toggleSearch()
+    }
   };
 
   handleIpsChange = () => {
@@ -173,7 +178,7 @@ class App extends Component {
     clearInterval(this.state.interval);
   }
   shouldComponentUpdate(props, state) {
-    if (this.state.search !== props.search) {
+    if (this.state.search !== props.search && props.search === true) {
       console.log("changing things");
       this.setState({ search: props.search }, () => this.startSearch());
     }
@@ -239,7 +244,7 @@ class App extends Component {
     return (
       <Tab.Navigator
         initialRouteName="Connections"
-        activeColor="#f0edf6"
+        activeColor="#00203f"
         inactiveColor="#3e2465"
         barStyle={{ backgroundColor: "lime" }}
         key={this.state.connections.length}
@@ -290,6 +295,7 @@ const mapStateToProps = (state) => {
     connections: state.data.connections,
     info: state.data.info,
     search: state.data.search,
+    callStatus: state.data.callStatus,
   };
 };
 

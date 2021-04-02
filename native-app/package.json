@@ -24,6 +24,7 @@
     "react-native-background-actions": "^2.6.0",
     "react-native-background-timer": "^2.4.1",
     "react-native-gesture-handler": "^1.10.3",
+    "react-native-modal": "^11.7.0",
     "react-native-network-info": "^5.2.1",
     "react-native-paper": "^4.7.2",
     "react-native-peerjs": "^1.0.4",

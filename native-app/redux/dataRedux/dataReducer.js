@@ -1,9 +1,15 @@
-import { CONNECTION, METADATA, TOGGLE_SEARCH } from "./dataActionTypes";
+import {
+  CONNECTION,
+  METADATA,
+  TOGGLE_SEARCH,
+  CALL_STATUS,
+} from "./dataActionTypes";
 
 const initalState = {
   connections: {},
   info: {},
   search: false,
+  callStatus: "terminated",
 };
 
 export const dataReducer = (state = initalState, action) => {
@@ -22,6 +28,12 @@ export const dataReducer = (state = initalState, action) => {
       return {
         ...state,
         search: !state.search,
+      };
+
+    case CALL_STATUS:
+      return {
+        ...state,
+        callStatus: action.payload,
       };
     default:
       return state;

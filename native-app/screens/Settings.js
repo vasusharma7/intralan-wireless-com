@@ -8,16 +8,16 @@ import {
   Alert,
 } from "react-native";
 import { connect } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import NodeService from "../Service";
-import nodejs from "nodejs-mobile-react-native";
-import { PeerClient } from "../peer";
 import {
   toggleSearch,
   updateConnections,
   updateInfo,
 } from "../redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import NodeService from "../Service";
+import nodejs from "nodejs-mobile-react-native";
+import { PeerClient } from "../peer";
 import BackgroundService from "react-native-background-actions";
 class Settings extends Component {
   constructor(props) {
@@ -104,8 +104,12 @@ class Settings extends Component {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              this.props.remotePeer.endCall();
-              this.props.localPeer.endCall();
+              try {
+                this.props.localPeer?.endCall();
+                this.props.remotePeer?.endCall();
+              } catch {
+                console.log("igonoring some errros");
+              }
             }}
           >
             <Text style={styles.instructions}>Disconnect Call</Text>

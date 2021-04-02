@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
 import { PeerClient } from "../peer";
+import CallModal from "../CallModal";
 class Connections extends Component {
   constructor(props) {
     super(props);
@@ -16,12 +17,11 @@ class Connections extends Component {
 
     this.props.setRemotePeer(remotePeer);
   };
-  // shouldComponentUpdate(nextProps) {
-  // return false;
-  // if (nextProps.info === this.props.info) return false;
-  // }
+
   render() {
-    return (
+    return this.props.callStatus === "ringing" ? (
+      <CallModal />
+    ) : (
       <>
         <Appbar.Header>
           <Appbar.Content
@@ -53,6 +53,7 @@ const mapStateToProps = (state) => {
     info: state.data.info,
     localPeer: state.stream.localPeer,
     remotePeer: state.stream.remotePeer,
+    callStatus: state.data.callStatus,
   };
 };
 

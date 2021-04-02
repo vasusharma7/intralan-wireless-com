@@ -1,4 +1,9 @@
-import { CONNECTION, METADATA, TOGGLE_SEARCH } from "./dataActionTypes";
+import {
+  CONNECTION,
+  METADATA,
+  TOGGLE_SEARCH,
+  CALL_STATUS,
+} from "./dataActionTypes";
 
 export const updateConnections = (data) => {
   return {
@@ -17,5 +22,12 @@ export const updateInfo = (data) => {
 export const toggleSearch = () => {
   return {
     type: TOGGLE_SEARCH,
+  };
+};
+
+export const setCallStatus = (status) => {
+  return {
+    type: CALL_STATUS,
+    payload: status,
   };
 };

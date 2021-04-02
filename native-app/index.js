@@ -14,8 +14,8 @@ const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: "crimson",
-    accent: "gray",
+    primary: "#00203f",
+    accent: "#adf0d1",
   },
 };
 
