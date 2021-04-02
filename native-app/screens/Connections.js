@@ -4,23 +4,23 @@ import { Platform, View, Alert } from "react-native";
 import { Appbar, List } from "react-native-paper";
 import { connect } from "react-redux";
 import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
+import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
+import { PeerClient } from "../peer";
 class Connections extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
-  componentDidUpdate(prevProps, prevState) {
-    if (JSON.stringify(prevProps) === JSON.stringify(this.props)) return;
-    // console.log("received new props in Connections:) -> ", this.props);
-  }
+  startCall = (connection) => {
+    const remotePeer = new PeerClient(connection);
+
+    this.props.setRemotePeer(remotePeer);
+  };
+  // shouldComponentUpdate(nextProps) {
+  // return false;
+  // if (nextProps.info === this.props.info) return false;
+  // }
   render() {
-    // return (
-    //   <>
-    //     <View>
-    //       <Text>This is Home Component</Text>
-    //     </View>
-    //   </>
-    // );
     return (
       <>
         <Appbar.Header>
@@ -38,7 +38,7 @@ class Connections extends Component {
                   title={this.props.info[ip]["username"]}
                   description={this.props.info[ip]["ip"]}
                   left={(props) => <List.Icon {...props} icon="network" />}
-                  onPress={() => Alert.alert("Pending Work", "WIP")}
+                  onPress={() => this.startCall(this.props.info[ip])}
                 />
               );
             })}
@@ -51,6 +51,8 @@ const mapStateToProps = (state) => {
   return {
     connections: state.data.connections,
     info: state.data.info,
+    localPeer: state.stream.localPeer,
+    remotePeer: state.stream.remotePeer,
   };
 };
 
@@ -59,6 +61,8 @@ const mapDispatchToProps = (dispatch) => {
     updateConnections: (connections) =>
       dispatch(updateConnections(connections)),
     updateInfo: (info) => dispatch(updateInfo(info)),
+    setLocalPeer: (info) => dispatch(setLocalPeer(info)),
+    setRemotePeer: (info) => dispatch(setRemotePeer(info)),
   };
 };
 

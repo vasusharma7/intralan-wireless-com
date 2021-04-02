@@ -4,18 +4,20 @@ require("react-native-webrtc");
 import Peer from "react-native-peerjs";
 import { store } from "./redux/store";
 import { setAVStream } from "./redux/streamRedux/streamAction";
+import nodejs from "nodejs-mobile-react-native";
 class PeerClient {
   constructor(connection) {
     this.connection = connection;
     NetworkInfo.getIPV4Address().then((ip) => {
-      this.ip = connection ? connection.ip : ip;
-      this.peer = new Peer("", {
+      this.ip = connection?.ip ? connection.ip : ip;
+      this.peer = new Peer(null, {
         host: this.ip,
         port: 5000,
         path: "/peerjs",
         secure: false,
         debug: true,
       });
+
       console.log("firing listeners");
       this.fireEventListeners();
       this.getMediaSource();
@@ -54,7 +56,11 @@ class PeerClient {
     this.peer.on("open", (peerId) => {
       this.peerId = peerId;
       console.log("Local peer open with ID", peerId, this.connection);
-      this.connection && this.connect();
+      if (this.connection) {
+        this.connect();
+      } else {
+        nodejs.channel.send(JSON.stringify({ localPeerId: peerId }));
+      }
     });
 
     this.peer.on("connection", (conn) => {
@@ -73,31 +79,44 @@ class PeerClient {
       });
     });
     this.peer.on("call", (call) => {
+      console.log("call received");
+      call.answer(this.stream);
+      this.call = call;
       // Receive data
-      call.on("stream", function(stream) {
+      call.on("stream", (stream) => {
         call.answer(this.stream);
         // Store a global reference of the other user stream
         // window.peer_stream = stream;
         console.log("call answer", stream);
         store.dispatch(setAVStream(stream));
+        // call.answer(this.stream);
+
         // Display the stream of the other user in the peer-camera video element !
         // onReceiveStream(stream, "peer-camera");
       });
 
       // Handle when the call finishes
-      // call.on("close", function() {
-      //   console.log("The videocall has finished");
-      // });
+      call.on("close", function() {
+        console.log("The call is closed");
+      });
 
       // use call.close() to finish a call
     });
   };
+  endCall = () => {
+    console.log("endCall");
+    this?.call && this.call.close();
+  };
+
   getPeerId = () => {
     return this.peerId;
   };
   startCall = () => {
-    console.log("console media", this.stream);
+    console.log("console media", this.stream, this.connection.peerId);
+
     const call = this.peer.call(this.connection.peerId, this.stream);
+    this.call = call;
+
     // store.dispatch(setAVStream(stream));
 
     call.on("stream", function(stream) {
@@ -105,22 +124,25 @@ class PeerClient {
       store.dispatch(setAVStream(stream));
       // onReceiveStream(stream, "peer-camera");
     });
+    call.on("close", function() {
+      console.log("The call is closed");
+    });
   };
 
   handleMessage = (data) => {
     console.log("receiving data from peer ", data);
   };
   connect = () => {
-    const conn = this.peer.connect(this.connection.peerId, {
-      metadata: {
-        username: this.connection.username,
-      },
-    });
-    conn.on("error", (err) => {
-      console.log("conn", err);
-    });
-    conn.on("data", this.handleMessage);
     this.startCall();
+    // const conn = this.peer.connect(this.connection.peerId, {
+    //   metadata: {
+    //     username: this.connection.username,
+    //   },
+    // });
+    // conn.on("error", (err) => {
+    //   console.log("conn", err);
+    // });
+    // conn.on("data", this.handleMessage);
   };
 }
 

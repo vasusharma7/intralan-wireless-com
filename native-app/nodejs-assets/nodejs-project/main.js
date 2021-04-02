@@ -7,6 +7,7 @@ var rn_bridge = require("rn-bridge");
 
 // Echo every message received from react-native.
 rn_bridge.channel.on("message", (msg) => {
+  msg = JSON.parse(msg);
   utils.appEventHandler(msg);
   rn_bridge.channel.send(msg);
 });

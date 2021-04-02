@@ -14,7 +14,7 @@ import nodejs from "nodejs-mobile-react-native";
 import { PeerClient } from "../peer";
 import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
-
+import BackgroundService from "react-native-background-actions";
 class Settings extends Component {
   constructor(props) {
     super(props);
@@ -28,9 +28,6 @@ class Settings extends Component {
         await AsyncStorage.setItem("localPeer", JSON.stringify(localPeer));
         this.props.setLocalPeer(localPeer);
         Alert.alert("From node: " + msg[event]);
-        nodejs.channel.send(
-          JSON.stringify("localPeerId", localPeer.getPeerId())
-        );
         return;
       }
       default:
@@ -44,7 +41,9 @@ class Settings extends Component {
     nodejs.channel.addListener(
       "message",
       (msg) => {
-        msg = JSON.parse(msg);
+        if (typeof msg == "string") {
+          msg = JSON.parse(msg);
+        }
         this.handleNodeEvents(msg);
       },
       this
@@ -55,10 +54,11 @@ class Settings extends Component {
     // const remotePeer = new PeerClient(
     //   this.props.connections[Object.keys(this.props.connections)[0]]
     // );
+    //testing
     const remotePeer = new PeerClient({
-      ip: "192.168.1.7",
+      ip: "192.168.1.8",
       username: "Vasu",
-      peerId: "141cc394-7069-4a03-8acd-a306d668074d",
+      peerId: "peer8",
     });
 
     this.props.setRemotePeer(remotePeer);
@@ -75,7 +75,11 @@ class Settings extends Component {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => NodeService.stopService()}
+            onPress={async () => {
+              NodeService.stopService();
+              BackgroundService.stop();
+              await AsyncStorage.removeItem("localPeer");
+            }}
           >
             <Text style={styles.instructions}>Stop</Text>
           </TouchableOpacity>
@@ -84,6 +88,15 @@ class Settings extends Component {
             onPress={() => this.startConnection()}
           >
             <Text style={styles.instructions}>Connect</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              this.props.remotePeer.endCall();
+              this.props.localPeer.endCall();
+            }}
+          >
+            <Text style={styles.instructions}>Disconnect</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
@@ -101,6 +114,8 @@ const mapStateToProps = (state) => {
   return {
     connections: state.data.connections,
     info: state.data.info,
+    remotePeer: state.stream.remotePeer,
+    localPeer: state.stream.localPeer,
   };
 };
 

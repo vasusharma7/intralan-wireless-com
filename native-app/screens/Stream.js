@@ -7,7 +7,7 @@ import {} from "../redux/streamRedux/streamAction";
 export class Stream extends Component {
   constructor(props) {
     super(props);
-    this.state = { currentTime: 0 };
+    this.state = { currentTime: 0, play: false };
   }
 
   onPlay() {

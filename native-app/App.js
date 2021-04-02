@@ -1,35 +1,50 @@
 import React, { Component } from "react";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { PermissionsAndroid } from "react-native";
+import { PermissionsAndroid, AppState } from "react-native";
 import { connect } from "react-redux";
 import Settings from "./screens/Settings";
 import Connections from "./screens/Connections";
 import Stream from "./screens/Stream";
 import { updateConnections, updateInfo } from "./redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "./redux/streamRedux/streamAction";
-
+import BackgroundService from "react-native-background-actions";
 const socketIOClient = require("socket.io-client");
 const Netmask = require("netmask").Netmask;
 const Tab = createMaterialBottomTabNavigator();
 
 import "./config.js";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const { PeerClient } = require("./peer.js");
+const sleep = async (delay) => await new Promise((r) => setTimeout(r, delay));
+const veryIntensiveTask = async (taskDataArguments) => {
+  // Example of an infinite loop task
+  const { delay } = taskDataArguments;
+  await new Promise(async (resolve) => {
+    for (let i = 0; BackgroundService.isRunning(); i++) {
+      // console.log("running", i);
+      await sleep(delay);
+    }
+  });
+};
 
 const options = {
-  taskName: "Example",
-  taskTitle: "ExampleTask title",
-  taskDesc: "ExampleTask description",
+  taskName: "IntraLAN Comm",
+  taskTitle: "Synching with peers",
+  taskDesc: "",
   taskIcon: {
     name: "ic_launcher",
     type: "mipmap",
   },
-  color: "#ff00ff",
+  color: "#ffffff",
+  linkingURI: "intralancom://call",
   parameters: {
-    delay: 1000,
+    delay: 10000,
   },
 };
+const rangeString = "192.168.29.0/24";
 
 class App extends Component {
   constructor(props) {
@@ -39,6 +54,7 @@ class App extends Component {
       info: {},
       search: true,
       interval: -1,
+      appState: AppState.currentState,
       block: "",
       ips: [],
       waitTime: 1000,
@@ -65,17 +81,17 @@ class App extends Component {
       Object.keys(this.state.connections).length
     );
     for (let ip in this.state.connections) {
-      if (!this.state.info[ip])
-        this.state.connections[ip].on("broadcast", (data) => {
-          console.log("receiving broadcast data", data);
-          this.setState(
-            {
-              info: { ...this.state.info, [ip]: data },
-            },
-            this.handleInfoChnage
-          );
-          this.state.connections[ip].off("broadcast");
-        });
+      // if (!this.state.info[ip])
+      this.state.connections[ip].on("broadcast", (data) => {
+        console.log("receiving broadcast data", data);
+        this.setState(
+          {
+            info: { ...this.state.info, [ip]: data },
+          },
+          this.handleInfoChnage
+        );
+        this.state.connections[ip].off("broadcast");
+      });
     }
   };
 
@@ -116,6 +132,10 @@ class App extends Component {
   startSearch = async () => {
     if (!this.state.ips.length) return;
     // console.log("I am starting an interval");
+    console.log("Search Starting....", this.state.ips.length);
+    await Promise.all(this.state.ips.map(async (ip) => await this.connect(ip)))
+      .then((res) => console.log(res.length))
+      .catch((ips) => console.log(ips));
     let int = setInterval(async () => {
       if (!this.state.search) {
         clearInterval(this.state.interval);
@@ -130,7 +150,8 @@ class App extends Component {
       )
         .then((res) => console.log(res.length))
         .catch((ips) => console.log(ips));
-    }, 10000);
+    }, 15000);
+    // setTimeout(() => clearInterval(this.state.interval), 90000);
   };
   handleIpsChange = () => {
     if (this.state.interval !== -1) clearInterval(this.state.interval);
@@ -160,11 +181,41 @@ class App extends Component {
       console.warn(err);
     }
   };
+  connectWithPeerJS = async () => {
+    await AsyncStorage.getItem("localPeer").then((localPeer) => {
+      if (localPeer) {
+        const peer = new PeerClient();
+        this.props.setLocalPeer(peer);
+      }
+    });
+  };
   async componentDidMount() {
     this.requestPermissions();
-    // this.props.setLocalPeer(new PeerClient());
-    // this.setState({ block: "192.168.1.0/24" }, this.handleBlockChange);
+    await BackgroundService.start(veryIntensiveTask, options);
+    this.connectWithPeerJS();
+
+    this.setState({ block: rangeString }, this.handleBlockChange);
+    AppState.addEventListener("change", this._handleAppStateChange);
   }
+
+  componentWillUnmount() {
+    AppState.removeEventListener("change", this._handleAppStateChange);
+  }
+
+  _handleAppStateChange = (nextAppState) => {
+    if (
+      this.state.appState.match(/inactive|background/) &&
+      nextAppState === "active"
+    ) {
+      console.log("App has come to the foreground!");
+      this.setState({ block: rangeString }, this.handleBlockChange);
+    } else {
+      console.log("App has gone to background !");
+      clearInterval(this.state.interval);
+      this.setState({ interval: -1 });
+    }
+    this.setState({ appState: nextAppState });
+  };
 
   render() {
     return (
