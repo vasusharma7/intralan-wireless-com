@@ -12,7 +12,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NodeService from "../Service";
 import nodejs from "nodejs-mobile-react-native";
 import { PeerClient } from "../peer";
-import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
+import {
+  toggleSearch,
+  updateConnections,
+  updateInfo,
+} from "../redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
 import BackgroundService from "react-native-background-actions";
 class Settings extends Component {
@@ -71,7 +75,15 @@ class Settings extends Component {
             style={styles.button}
             onPress={() => this.startNode()}
           >
-            <Text style={styles.instructions}>Start</Text>
+            <Text style={styles.instructions}>Start NodeJS</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => this.props.toggleSearch()}
+          >
+            <Text style={styles.instructions}>
+              {this.props.search ? "Stop Search" : "Start Search"}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
@@ -81,14 +93,14 @@ class Settings extends Component {
               await AsyncStorage.removeItem("localPeer");
             }}
           >
-            <Text style={styles.instructions}>Stop</Text>
+            <Text style={styles.instructions}>Stop NodeJS</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.button}
             onPress={() => this.startConnection()}
           >
             <Text style={styles.instructions}>Connect</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
@@ -96,14 +108,15 @@ class Settings extends Component {
               this.props.localPeer.endCall();
             }}
           >
-            <Text style={styles.instructions}>Disconnect</Text>
+            <Text style={styles.instructions}>Disconnect Call</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+
+          {/* <TouchableOpacity
             style={styles.button}
             onPress={() => nodejs.channel.send("A message!")}
           >
             <Text style={styles.instructions}>Invoke</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     );
@@ -116,6 +129,7 @@ const mapStateToProps = (state) => {
     info: state.data.info,
     remotePeer: state.stream.remotePeer,
     localPeer: state.stream.localPeer,
+    search: state.data.search,
   };
 };
 
@@ -124,7 +138,7 @@ const mapDispatchToProps = (dispatch) => {
     updateConnections: (connections) =>
       dispatch(updateConnections(connections)),
     updateInfo: (info) => dispatch(updateInfo(info)),
-
+    toggleSearch: () => dispatch(toggleSearch()),
     setLocalPeer: (peer) => dispatch(setLocalPeer(peer)),
     setRemotePeer: (peer) => dispatch(setRemotePeer(peer)),
   };

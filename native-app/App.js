@@ -52,8 +52,9 @@ class App extends Component {
     this.state = {
       connections: {},
       info: {},
-      search: true,
       interval: -1,
+      count: 0,
+      search: false,
       appState: AppState.currentState,
       block: "",
       ips: [],
@@ -110,6 +111,10 @@ class App extends Component {
   };
 
   connect = async (ip) => {
+    if (ip === global.config.info.ip) {
+      console.log("self IP");
+      return;
+    }
     return new Promise(async (resolve, reject) => {
       const socket = await socketIOClient(`http://${ip}:5000`);
       socket.on("connect", () => {
@@ -130,29 +135,35 @@ class App extends Component {
   };
 
   startSearch = async () => {
+    if (!this.props.search) {
+      this.setState({ count: 0 });
+      return;
+    }
     if (!this.state.ips.length) return;
-    // console.log("I am starting an interval");
-    console.log("Search Starting....", this.state.ips.length);
-    await Promise.all(this.state.ips.map(async (ip) => await this.connect(ip)))
-      .then((res) => console.log(res.length))
-      .catch((ips) => console.log(ips));
-    let int = setInterval(async () => {
-      if (!this.state.search) {
-        clearInterval(this.state.interval);
-        this.setState({ interval: -1 });
-        return;
-      }
-      if (this.state.interval == -1) this.setState({ interval: int });
 
-      console.log("Search Starting....", this.state.ips.length);
-      await Promise.all(
-        this.state.ips.map(async (ip) => await this.connect(ip))
-      )
-        .then((res) => console.log(res.length))
-        .catch((ips) => console.log(ips));
-    }, 15000);
-    // setTimeout(() => clearInterval(this.state.interval), 90000);
+    this.state.count < 50 &&
+      this.setState(
+        {
+          interval: setTimeout(async () => {
+            console.log("Search Starting....", this.state.ips.length);
+            await Promise.all(
+              this.state.ips.map(async (ip) => await this.connect(ip))
+            )
+              .then((res) => {
+                console.log("success", res.length);
+                this.startSearch();
+              })
+              .catch((ips) => console.log(ips));
+          }, this.state.count * 1000),
+        },
+        () => {
+          this.setState({
+            count: this.state.count + 10,
+          });
+        }
+      );
   };
+
   handleIpsChange = () => {
     if (this.state.interval !== -1) clearInterval(this.state.interval);
     this.startSearch();
@@ -160,6 +171,13 @@ class App extends Component {
 
   componentWillUnmount() {
     clearInterval(this.state.interval);
+  }
+  shouldComponentUpdate(props, state) {
+    if (this.state.search !== props.search) {
+      console.log("changing things");
+      this.setState({ search: props.search }, () => this.startSearch());
+    }
+    return true;
   }
   requestPermissions = async () => {
     try {
@@ -208,11 +226,11 @@ class App extends Component {
       nextAppState === "active"
     ) {
       console.log("App has come to the foreground!");
-      this.setState({ block: rangeString }, this.handleBlockChange);
+      // this.setState({ block: rangeString }, this.handleBlockChange);
     } else {
       console.log("App has gone to background !");
-      clearInterval(this.state.interval);
-      this.setState({ interval: -1 });
+      // clearInterval(this.state.interval);
+      // this.setState({ interval: -1 });
     }
     this.setState({ appState: nextAppState });
   };
@@ -271,6 +289,7 @@ const mapStateToProps = (state) => {
   return {
     connections: state.data.connections,
     info: state.data.info,
+    search: state.data.search,
   };
 };
 

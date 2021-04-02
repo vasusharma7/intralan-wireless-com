@@ -5,7 +5,6 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
-import com.reactlibrary.RNThreadPackage;
 import com.pusherman.networkinfo.RNNetworkInfoPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
@@ -28,7 +27,6 @@ public class MainApplication extends Application implements ReactApplication {
         @SuppressWarnings("UnnecessaryLocalVariable")
         List<ReactPackage> packages = new PackageList(this).getPackages();
         packages.add(new RNNodeJsMobilePackage());
-        packages.add(new RNThreadPackage(mReactNativeHost));
         return packages;
       }
 
