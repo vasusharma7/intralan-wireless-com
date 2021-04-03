@@ -1,8 +1,9 @@
-import { BottomNavigation, FAB, Text } from "react-native-paper";
+import { FAB, Text } from "react-native-paper";
 import React, { Component } from "react";
-import { Platform, View, Alert, StyleSheet } from "react-native";
+import { Button, Platform, View, Alert, StyleSheet } from "react-native";
 import { Appbar, List } from "react-native-paper";
 import { connect } from "react-redux";
+import Modal from "react-native-modal";
 import {
   setConnStatus,
   setScreenStatus,
@@ -16,16 +17,42 @@ import Stream from "./Stream";
 class Connections extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      modalOpen: false,
+      connection: null,
+    };
   }
-  startCall = (connection) => {
-    const remotePeer = new PeerClient({ ...connection, operation: "file" });
+  exec = (connection, operation) => {
+    const remotePeer = new PeerClient({ ...connection, operation: operation });
     this.props.setRemotePeer(remotePeer);
+    this.setState({ modalOpen: false });
   };
 
   render() {
     return (
       <>
+        <Modal isVisible={this.state.modalOpen}>
+          <View
+            style={{
+              backgroundColor: "rgba(1,1,1,0.7)",
+            }}
+          />
+          <Button
+            title="Call"
+            icon="phone"
+            onPress={() => {
+              this.exec(this.state.connection, "call");
+            }}
+          />
+          <View style={{ margin: 10 }} />
+          <Button
+            title="File Transfer"
+            icon="file"
+            onPress={() => {
+              this.exec(this.state.connection, "file");
+            }}
+          />
+        </Modal>
         {this.props.connStatus !== null && <Stream />}
         <View>
           {this.props?.info &&
@@ -36,7 +63,11 @@ class Connections extends Component {
                   title={this.props.info[ip]["username"]}
                   description={this.props.info[ip]["ip"]}
                   left={(props) => <List.Icon {...props} icon="network" />}
-                  onPress={() => this.startCall(this.props.info[ip])}
+                  onPress={() =>
+                    this.setState({ connection: this.props.info[ip] }, () =>
+                      this.setState({ modalOpen: true })
+                    )
+                  }
                 />
               );
             })}

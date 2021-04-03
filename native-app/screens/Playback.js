@@ -12,7 +12,15 @@ class Playback extends Component {
     super(props);
     this.state = { currentTime: 0, play: false };
   }
-
+  sleep = (milliseconds) => {
+    let timeStart = new Date().getTime();
+    while (true) {
+      let elapsedTime = new Date().getTime() - timeStart;
+      if (elapsedTime > milliseconds) {
+        break;
+      }
+    }
+  };
   async pick() {
     try {
       const res = await DocumentPicker.pick({
@@ -27,26 +35,35 @@ class Playback extends Component {
       );
       const dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
       const fileLocation = `${dirLocation}/${res.name}`;
-
+      const chunksize = 65535;
       const file = await RNFS.readFile(res.uri, "base64");
-      console.log(RNFS.DocumentDirectoryPath);
-      RNFetchBlob.fs.isDir(dirLocation).then(async (isDir) => {
-        if (!isDir) {
-          try {
-            await RNFetchBlob.fs.mkdir(dirLocation);
-          } catch {
-            console.log("something went wrong in creating folder");
-          }
-        }
-      });
-      try {
-        RNFetchBlob.fs.writeFile(fileLocation, file, "base64").then((rslt) => {
-          console.log("File written successfully", rslt);
-        });
-      } catch (err) {
-        console.log(err);
+      let test = [];
+      for (let i = 0; i < file.length; i += chunksize) {
+        // console.log(file.slice(i, i + chunksize));
+        test.push(file.slice(i, i + chunksize));
+        // console.log("\n");
+        // sleep(2000);
       }
-      await FileViewer.open(fileLocation);
+      test = test.join("");
+      console.log("end", test.slice(-15, -1), test === file);
+      // console.log(RNFS.DocumentDirectoryPath);
+      // RNFetchBlob.fs.isDir(dirLocation).then(async (isDir) => {
+      //   if (!isDir) {
+      //     try {
+      //       await RNFetchBlob.fs.mkdir(dirLocation);
+      //     } catch {
+      //       console.log("something went wrong in creating folder");
+      //     }
+      //   }
+      // });
+      // try {
+      //   RNFetchBlob.fs.writeFile(fileLocation, file, "base64").then((rslt) => {
+      //     console.log("File written successfully", rslt);
+      //   });
+      // } catch (err) {
+      //   console.log(err);
+      // }
+      // await FileViewer.open(fileLocation);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker, exit any dialogs or menus and move on

@@ -24,6 +24,8 @@ class PeerClient {
         secure: false,
         debug: true,
       });
+      this.fileBuffer = [];
+      this.chunksize = 65535;
       this.state = store.getState();
       console.log("firing listeners");
       this.fireEventListeners();
@@ -72,6 +74,7 @@ class PeerClient {
           case "file": {
             //add one more state - maybe change previous one to searching and this one to connecting !!
             this.fileTransfer();
+            break;
           }
           default: {
             store.dispatch(setConnStatus(null));
@@ -90,8 +93,10 @@ class PeerClient {
       conn.on("open", () => {
         console.log("Local peer has opened connection.", this.peerId);
         // console.log("conn", conn);
+        this.fileBuffer = [];
         conn.on("data", (data) => {
           if (data?.operation === "file") {
+            // console.log(data);
             this.saveFile(data);
           } else {
             console.log("Local peer sending some data.");
@@ -131,30 +136,48 @@ class PeerClient {
     });
   };
   async saveFile(res) {
-    const dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
-    const fileLocation = `${dirLocation}/${res.name}`;
+    if (res.file === "EOF") {
+      // await new Promise((r) => setTimeout(r, 1000));
 
-    // console.log(RNFS.DocumentDirectoryPath);
-    RNFetchBlob.fs.isDir(dirLocation).then(async (isDir) => {
-      if (!isDir) {
-        try {
-          await RNFetchBlob.fs.mkdir(dirLocation);
-        } catch {
-          console.log("something went wrong in creating folder");
+      this.fileBuffer = this.fileBuffer.join("");
+      const dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
+      const fileLocation = `${dirLocation}/${res.name}`;
+
+      // console.log(RNFS.DocumentDirectoryPath);
+      // console.log(this.fileBuffer )
+      RNFetchBlob.fs.isDir(dirLocation).then(async (isDir) => {
+        if (!isDir) {
+          try {
+            await RNFetchBlob.fs.mkdir(dirLocation);
+          } catch {
+            console.log("something went wrong in creating folder");
+          }
         }
+      });
+      try {
+        RNFetchBlob.fs
+          .writeFile(fileLocation, this.fileBuffer, "base64")
+          .then((rslt) => {
+            // console.log(this.fileBuffer);
+            console.log(
+              "File written successfully",
+              rslt,
+              this.fileBuffer.length
+            );
+            Alert.alert("File saved successfully");
+          });
+      } catch (err) {
+        console.log(err);
       }
-    });
-    try {
-      RNFetchBlob.fs
-        .writeFile(fileLocation, res.file, "base64")
-        .then((rslt) => {
-          Alert.alert("File saved successfully");
-          console.log("File written successfully", rslt);
-        });
-    } catch (err) {
-      console.log(err);
+      // await FileViewer.open(fileLocation);
+    } else {
+      this.fileBuffer.push(res.file);
+      console.log(
+        "chunk length",
+        this.fileBuffer.join("").length,
+        this.fileBuffer.length
+      );
     }
-    await FileViewer.open(fileLocation);
   }
   async sendFile(conn) {
     try {
@@ -170,8 +193,22 @@ class PeerClient {
       );
       const file = await RNFS.readFile(res.uri, "base64");
       console.log(file);
-      conn.send({ ...res, file: file, operation: "file" });
       console.log("sending file");
+      let j = 0;
+      for (let i = 0; i < res.size; i += this.chunksize) {
+        j += 1;
+        conn.send({
+          ...res,
+          file: file.slice(i, i + this.chunksize),
+          operation: "file",
+        });
+        console.log("sending chunk ", j);
+      }
+      conn.send({
+        ...res,
+        file: "EOF",
+        operation: "file",
+      });
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker, exit any dialogs or menus and move on
@@ -209,7 +246,7 @@ class PeerClient {
     const call = this.peer.call(this.connection.peerId, this.stream);
     store.dispatch(setConnStatus("ringing"));
     setTimeout(() => {
-      if (state.data.connStatus === "ringing") {
+      if (this.state.data.connStatus === "ringing") {
         store.dispatch(setConnStatus(null));
         Alert.alert("User declined your call or went offline :(");
       }
