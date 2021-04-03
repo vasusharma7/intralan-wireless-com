@@ -1,20 +1,16 @@
 import React, { Component } from "react";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { PermissionsAndroid, AppState } from "react-native";
 import { connect } from "react-redux";
-import Settings from "./screens/Settings";
-import CallModal from "./CallModal";
-import Connections from "./screens/Connections";
-import Stream from "./screens/Stream";
 import { updateConnections, updateInfo } from "./redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "./redux/streamRedux/streamAction";
 import BackgroundService from "react-native-background-actions";
+import Home from "./screens/Home";
 const socketIOClient = require("socket.io-client");
 
 const Netmask = require("netmask").Netmask;
-const Tab = createMaterialBottomTabNavigator();
 
+// const Tab = createMaterialBottomTabNavigator();
 import "./config.js";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -241,53 +237,7 @@ class App extends Component {
   };
 
   render() {
-    return (
-      <Tab.Navigator
-        initialRouteName="Connections"
-        activeColor="#00203f"
-        inactiveColor="#3e2465"
-        barStyle={{ backgroundColor: "lime" }}
-        key={this.state.connections.length}
-      >
-        <Tab.Screen
-          name="Connections"
-          // component={() => <Connections connections={this.state.info} />}
-          component={Connections}
-          options={{
-            tabBarLabel: "Connections",
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name="network" color={color} size={26} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Settings"
-          // component={() => <Settings connections={this.state.info} />}
-          component={Settings}
-          options={{
-            tabBarLabel: "Settings",
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name="tools" color={color} size={26} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Stream"
-          // component={() => <Settings connections={this.state.info} />}
-          component={Stream}
-          options={{
-            tabBarLabel: "Stream",
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons
-                name="volume-source"
-                color={color}
-                size={26}
-              />
-            ),
-          }}
-        />
-      </Tab.Navigator>
-    );
+    return <Home />;
   }
 }
 const mapStateToProps = (state) => {

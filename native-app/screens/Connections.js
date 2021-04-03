@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
 import { PeerClient } from "../peer";
-import CallModal from "../CallModal";
+import Stream from "./Stream";
 class Connections extends Component {
   constructor(props) {
     super(props);
@@ -20,15 +20,9 @@ class Connections extends Component {
 
   render() {
     return this.props.callStatus === "ringing" ? (
-      <CallModal />
+      <Stream />
     ) : (
       <>
-        <Appbar.Header>
-          <Appbar.Content
-            title="IntraLAN Communication"
-            subtitle="Under Developement :)"
-          />
-        </Appbar.Header>
         <View>
           {this.props?.info &&
             Object.keys(this.props?.info).map((ip) => {
