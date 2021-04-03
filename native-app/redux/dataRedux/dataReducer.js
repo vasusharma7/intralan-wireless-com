@@ -3,13 +3,15 @@ import {
   METADATA,
   TOGGLE_SEARCH,
   CALL_STATUS,
+  SCREEN_STATUS,
 } from "./dataActionTypes";
 
 const initalState = {
   connections: {},
   info: {},
   search: false,
-  callStatus: "terminated",
+  connStatus: null,
+  screenStatus: null,
 };
 
 export const dataReducer = (state = initalState, action) => {
@@ -33,7 +35,12 @@ export const dataReducer = (state = initalState, action) => {
     case CALL_STATUS:
       return {
         ...state,
-        callStatus: action.payload,
+        connStatus: action.payload,
+      };
+    case SCREEN_STATUS:
+      return {
+        ...state,
+        screenStatus: action.payload,
       };
     default:
       return state;

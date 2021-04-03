@@ -6,9 +6,8 @@ import { updateConnections, updateInfo } from "./redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "./redux/streamRedux/streamAction";
 import BackgroundService from "react-native-background-actions";
 import Home from "./screens/Home";
-const socketIOClient = require("socket.io-client");
-
-const Netmask = require("netmask").Netmask;
+import { startSearch, initSearch } from "./redux/searchRedux/searchAction";
+// const socketIOClient = require("socket.io-client");
 
 // const Tab = createMaterialBottomTabNavigator();
 import "./config.js";
@@ -42,7 +41,7 @@ const options = {
     delay: 10000,
   },
 };
-const rangeString = "192.168.29.0/24";
+const rangeString = "192.168.1.0/24";
 
 class App extends Component {
   constructor(props) {
@@ -66,120 +65,18 @@ class App extends Component {
       ],
     };
   }
-  handleBlockChange = () => {
-    const generator = new Netmask(this.state.block);
-    const collector = [];
-    generator.forEach((ip) => collector.push(ip));
-    this.setState({ ips: collector }, this.handleIpsChange);
-  };
-
-  handleConnectionChange = () => {
-    this.props.updateConnections(this.connections);
-    console.log(
-      "connections found : ",
-      Object.keys(this.state.connections).length
-    );
-    for (let ip in this.state.connections) {
-      // if (!this.state.info[ip])
-      this.state.connections[ip].on("broadcast", (data) => {
-        console.log("receiving broadcast data", data);
-        this.setState(
-          {
-            info: { ...this.state.info, [ip]: data },
-          },
-          this.handleInfoChnage
-        );
-        this.state.connections[ip].off("broadcast");
-      });
-    }
-  };
-
-  handleInfoChnage = () => {
-    this.props.updateInfo(this.state.info);
-    console.log("info found : ", Object.keys(this.state.info).length);
-  };
-  sleep = (milliseconds) => {
-    let timeStart = new Date().getTime();
-    while (true) {
-      let elapsedTime = new Date().getTime() - timeStart;
-      if (elapsedTime > milliseconds) {
-        break;
-      }
-    }
-  };
-
-  connect = async (ip) => {
-    if (ip === global.config.info.ip) {
-      console.log("self IP");
-      return;
-    }
-    return new Promise(async (resolve, reject) => {
-      const socket = await socketIOClient(`http://${ip}:5000`);
-      socket.on("connect", () => {
-        console.log(socket.id, socket.connected);
-        !Object.keys(this.state.connections).includes(ip) &&
-          this.setState(
-            {
-              connections: { ...this.state.connections, [ip]: socket },
-            },
-            this.handleConnectionChange
-          );
-      });
-      // socket.on("disconnect", () => {
-      //   console.log("disconnected");
-      // });
-      resolve(ip);
-    });
-  };
-
-  startSearch = async () => {
-    if (!this.props.search) {
-      this.setState({ count: 0 });
-      return;
-    }
-    if (!this.state.ips.length) return;
-
-    if (this.state.count < 50) {
-      this.setState(
-        {
-          interval: setTimeout(async () => {
-            console.log("Search Starting....", this.state.ips.length);
-            await Promise.all(
-              this.state.ips.map(async (ip) => await this.connect(ip))
-            )
-              .then((res) => {
-                console.log("success", res.length);
-                this.startSearch();
-              })
-              .catch((ips) => console.log(ips));
-          }, this.state.count * 1000),
-        },
-        () => {
-          this.setState({
-            count: this.state.count + 12,
-          });
-        }
-      );
-    } else {
-      // this.props.toggleSearch()
-    }
-  };
-
-  handleIpsChange = () => {
-    if (this.state.interval !== -1) clearInterval(this.state.interval);
-    this.startSearch();
-  };
 
   componentWillUnmount() {
     clearInterval(this.state.interval);
   }
-  shouldComponentUpdate(props, state) {
-    if (this.state.search !== props.search && props.search === true) {
-      console.log("changing things");
-      this.setState({ search: props.search }, () => this.startSearch());
-    }
-    return true;
-  }
+
+  // shouldComponentUpdate(props, state) {
+  //   if (this.state.search !== props.search && props.search === true) {
+  //     console.log("changing things", props.search);
+  //     this.setState({ search: props.search }, () => this.startSearch());
+  //   }
+  //   return true;
+  // }
   requestPermissions = async () => {
     try {
       const granted = await PermissionsAndroid.request(
@@ -212,8 +109,7 @@ class App extends Component {
     this.requestPermissions();
     await BackgroundService.start(veryIntensiveTask, options);
     this.connectWithPeerJS();
-
-    this.setState({ block: rangeString }, this.handleBlockChange);
+    this.props.initSearch(rangeString);
     AppState.addEventListener("change", this._handleAppStateChange);
   }
 
@@ -244,8 +140,8 @@ const mapStateToProps = (state) => {
   return {
     connections: state.data.connections,
     info: state.data.info,
-    search: state.data.search,
-    callStatus: state.data.callStatus,
+    search: state.search.search,
+    connStatus: state.data.connStatus,
   };
 };
 
@@ -254,7 +150,7 @@ const mapDispatchToProps = (dispatch) => {
     updateConnections: (connections) =>
       dispatch(updateConnections(connections)),
     updateInfo: (info) => dispatch(updateInfo(info)),
-
+    initSearch: (block) => dispatch(initSearch(block)),
     setLocalPeer: (peer) => dispatch(setLocalPeer(peer)),
     setRemotePeer: (peer) => dispatch(setRemotePeer(peer)),
   };

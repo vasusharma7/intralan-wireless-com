@@ -9,10 +9,11 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 import {
-  toggleSearch,
   updateConnections,
   updateInfo,
+  setScreenStatus,
 } from "../redux/dataRedux/dataAction";
+import { stopSearch } from "../redux/searchRedux/searchAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NodeService from "../Service";
@@ -38,7 +39,6 @@ class Settings extends Component {
         Alert.alert("From node: " + msg[event]);
     }
   };
-
   startNode = () => {
     nodejs.start("main.js");
 
@@ -77,14 +77,14 @@ class Settings extends Component {
           >
             <Text style={styles.instructions}>Start NodeJS</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.button}
-            onPress={() => this.props.toggleSearch()}
+            onPress={() => this.props.stopSearch()}
           >
             <Text style={styles.instructions}>
               {this.props.search ? "Stop Search" : "Start Search"}
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             style={styles.button}
             onPress={async () => {
@@ -133,7 +133,7 @@ const mapStateToProps = (state) => {
     info: state.data.info,
     remotePeer: state.stream.remotePeer,
     localPeer: state.stream.localPeer,
-    search: state.data.search,
+    search: state.search.search,
   };
 };
 
@@ -142,9 +142,10 @@ const mapDispatchToProps = (dispatch) => {
     updateConnections: (connections) =>
       dispatch(updateConnections(connections)),
     updateInfo: (info) => dispatch(updateInfo(info)),
-    toggleSearch: () => dispatch(toggleSearch()),
+    stopSearch: () => dispatch(stopSearch()),
     setLocalPeer: (peer) => dispatch(setLocalPeer(peer)),
     setRemotePeer: (peer) => dispatch(setRemotePeer(peer)),
+    setScreenStatus: (status) => dispatch(setScreenStatus(status)),
   };
 };
 

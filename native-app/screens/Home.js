@@ -4,14 +4,16 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import Settings from "./Settings";
 import { Appbar } from "react-native-paper";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import Playback from "./Playback";
+import { connect } from "react-redux";
 const Tab = createMaterialBottomTabNavigator();
 
-export default class Home extends Component {
+class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       index: 0,
-      title: "Connections",
+      title: "I am being Developed",
       routes: [
         {
           key: "connections",
@@ -20,6 +22,12 @@ export default class Home extends Component {
           icon: "network",
         },
         { key: "settings", screen: Settings, title: "Settings", icon: "tools" },
+        {
+          key: "playback",
+          screen: Playback,
+          title: "File Select",
+          icon: "file",
+        },
       ],
     };
   }
@@ -31,12 +39,15 @@ export default class Home extends Component {
           <Appbar.Content
             title="IntraLAN Communication"
             subtitle={this.state.title}
+            style={{
+              alignItems: "center",
+            }}
           />
         </Appbar.Header>
         <Tab.Navigator
           initialRouteName="Connections"
           activeColor="#fff"
-          inactiveColor="#3e2465"
+          inactiveColor="#000"
           barStyle={{ backgroundColor: "crimson" }}
         >
           {this.state.routes.map(({ key, screen, title, icon }) => (
@@ -57,3 +68,27 @@ export default class Home extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    connections: state.data.connections,
+    info: state.data.info,
+    localPeer: state.stream.localPeer,
+    remotePeer: state.stream.remotePeer,
+    connStatus: state.data.connStatus,
+    screenStatus: state.data.screenStatus,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setLocalPeer: (info) => dispatch(setLocalPeer(info)),
+    setRemotePeer: (info) => dispatch(setRemotePeer(info)),
+    setScreenStatus: (status) => dispatch(setScreenStatus(status)),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Home);

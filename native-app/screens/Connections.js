@@ -1,10 +1,16 @@
-import { BottomNavigation, Text } from "react-native-paper";
+import { BottomNavigation, FAB, Text } from "react-native-paper";
 import React, { Component } from "react";
-import { Platform, View, Alert } from "react-native";
+import { Platform, View, Alert, StyleSheet } from "react-native";
 import { Appbar, List } from "react-native-paper";
 import { connect } from "react-redux";
-import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
+import {
+  setConnStatus,
+  setScreenStatus,
+  updateConnections,
+  updateInfo,
+} from "../redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
+import { startSearch, stopSearch } from "../redux/searchRedux/searchAction";
 import { PeerClient } from "../peer";
 import Stream from "./Stream";
 class Connections extends Component {
@@ -13,16 +19,14 @@ class Connections extends Component {
     this.state = {};
   }
   startCall = (connection) => {
-    const remotePeer = new PeerClient(connection);
-
+    const remotePeer = new PeerClient({ ...connection, operation: "file" });
     this.props.setRemotePeer(remotePeer);
   };
 
   render() {
-    return this.props.callStatus === "ringing" ? (
-      <Stream />
-    ) : (
+    return (
       <>
+        {this.props.connStatus !== null && <Stream />}
         <View>
           {this.props?.info &&
             Object.keys(this.props?.info).map((ip) => {
@@ -37,6 +41,17 @@ class Connections extends Component {
               );
             })}
         </View>
+        <FAB
+          style={styles.fab}
+          icon="magnify"
+          onPress={() => {
+            this.props.setConnStatus("searching");
+            setTimeout(() => this.props.startSearch(), 1000);
+            // setTimeout(() => {
+            //   this.props.setConnStatus(null);
+            // }, 4000);
+          }}
+        />
       </>
     );
   }
@@ -47,17 +62,18 @@ const mapStateToProps = (state) => {
     info: state.data.info,
     localPeer: state.stream.localPeer,
     remotePeer: state.stream.remotePeer,
-    callStatus: state.data.callStatus,
+    connStatus: state.data.connStatus,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateConnections: (connections) =>
-      dispatch(updateConnections(connections)),
-    updateInfo: (info) => dispatch(updateInfo(info)),
     setLocalPeer: (info) => dispatch(setLocalPeer(info)),
     setRemotePeer: (info) => dispatch(setRemotePeer(info)),
+    setScreenStatus: (status) => dispatch(setScreenStatus(status)),
+    stopSearch: () => dispatch(stopSearch()),
+    startSearch: () => dispatch(startSearch()),
+    setConnStatus: (status) => dispatch(setConnStatus(status)),
   };
 };
 
@@ -65,3 +81,12 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(Connections);
+const styles = StyleSheet.create({
+  fab: {
+    position: "absolute",
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#0fefaa",
+  },
+});

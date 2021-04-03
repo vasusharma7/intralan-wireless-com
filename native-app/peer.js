@@ -5,13 +5,18 @@ require("react-native-webrtc");
 import Peer from "react-native-peerjs";
 import { store } from "./redux/store";
 import { setAVStream } from "./redux/streamRedux/streamAction";
-import { setCallStatus } from "./redux/dataRedux/dataAction";
+import { setConnStatus } from "./redux/dataRedux/dataAction";
 import nodejs from "nodejs-mobile-react-native";
+import RNFetchBlob from "react-native-fetch-blob";
+var RNFS = require("react-native-fs");
+import DocumentPicker from "react-native-document-picker";
+import FileViewer from "react-native-file-viewer";
 class PeerClient {
   constructor(connection) {
     this.connection = connection;
     NetworkInfo.getIPV4Address().then((ip) => {
       this.ip = connection?.ip ? connection.ip : ip;
+      if (this.connection) store.dispatch(setConnStatus("connecting"));
       this.peer = new Peer(null, {
         host: this.ip,
         port: 5000,
@@ -19,7 +24,7 @@ class PeerClient {
         secure: false,
         debug: true,
       });
-
+      this.state = store.getState();
       console.log("firing listeners");
       this.fireEventListeners();
       this.getMediaSource();
@@ -58,7 +63,20 @@ class PeerClient {
       this.peerId = peerId;
       console.log("Local peer open with ID", peerId, this.connection);
       if (this.connection) {
-        this.connect();
+        switch (this.connection.operation) {
+          case "call": {
+            store.dispatch(setConnStatus(null));
+            this.connect();
+            break;
+          }
+          case "file": {
+            //add one more state - maybe change previous one to searching and this one to connecting !!
+            this.fileTransfer();
+          }
+          default: {
+            store.dispatch(setConnStatus(null));
+          }
+        }
       } else {
         nodejs.channel.send(JSON.stringify({ localPeerId: peerId }));
       }
@@ -71,12 +89,15 @@ class PeerClient {
       });
       conn.on("open", () => {
         console.log("Local peer has opened connection.", this.peerId);
-        console.log("conn", conn);
-        conn.on("data", (data) =>
-          console.log("Received from remote peer", data)
-        );
-        console.log("Local peer sending data.");
-        conn.send("Hello, this is the LOCAL peer!");
+        // console.log("conn", conn);
+        conn.on("data", (data) => {
+          if (data?.operation === "file") {
+            this.saveFile(data);
+          } else {
+            console.log("Local peer sending some data.");
+            conn.send("Hello, this is the LOCAL peer!");
+          }
+        });
       });
     });
     this.peer.on("call", async (call) => {
@@ -90,17 +111,9 @@ class PeerClient {
             // Receive data
             call.on("stream", (stream) => {
               call.answer(this.stream);
-              // Store a global reference of the other user stream
-              // window.peer_stream = stream;
               console.log("call answer", stream);
               store.dispatch(setAVStream(stream));
-              // call.answer(this.stream);
-
-              // Display the stream of the other user in the peer-camera video element !
-              // onReceiveStream(stream, "peer-camera");
             });
-
-            // Handle when the call finishes
             call.on("close", function() {
               console.log("The call is closed");
             });
@@ -108,15 +121,80 @@ class PeerClient {
         },
         {
           text: "Decline",
-          onPress: () => {
-            //
-          },
+          onPress: () => {},
         },
       ]);
-
+      this.peer.on("data", (res) => {
+        this.saveFile(res);
+      });
       // use call.close() to finish a call
     });
   };
+  async saveFile(res) {
+    const dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
+    const fileLocation = `${dirLocation}/${res.name}`;
+
+    // console.log(RNFS.DocumentDirectoryPath);
+    RNFetchBlob.fs.isDir(dirLocation).then(async (isDir) => {
+      if (!isDir) {
+        try {
+          await RNFetchBlob.fs.mkdir(dirLocation);
+        } catch {
+          console.log("something went wrong in creating folder");
+        }
+      }
+    });
+    try {
+      RNFetchBlob.fs
+        .writeFile(fileLocation, res.file, "base64")
+        .then((rslt) => {
+          Alert.alert("File saved successfully");
+          console.log("File written successfully", rslt);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+    await FileViewer.open(fileLocation);
+  }
+  async sendFile(conn) {
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.allFiles],
+        readContent: true,
+      });
+      console.log(
+        res.uri,
+        res.type, // mime type
+        res.name,
+        res.size
+      );
+      const file = await RNFS.readFile(res.uri, "base64");
+      console.log(file);
+      conn.send({ ...res, file: file, operation: "file" });
+      console.log("sending file");
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the picker, exit any dialogs or menus and move on
+      } else {
+        throw err;
+      }
+    }
+  }
+  async fileTransfer() {
+    const conn = this.peer.connect(this.connection.peerId, {
+      metadata: {
+        username: this.connection.username,
+      },
+    });
+    conn.on("error", (err) => {
+      console.log("conn", err);
+    });
+    conn.on("open", () => {
+      store.dispatch(setConnStatus(null));
+      console.log("Remote peer has opened connection.");
+      this.sendFile(conn);
+    });
+  }
   endCall = () => {
     console.log("endCall");
     this?.call && this.call.close();
@@ -129,12 +207,12 @@ class PeerClient {
     console.log("console media", this.stream, this.connection.peerId);
 
     const call = this.peer.call(this.connection.peerId, this.stream);
-    store.dispatch(setCallStatus("ringing"));
+    store.dispatch(setConnStatus("ringing"));
     setTimeout(() => {
-      // if (store.data.callStatus !== "terminated") {
-      //   Alert.alert("User declined your call or went offline :(");
-      store.dispatch(setCallStatus("terminated"));
-      // }
+      if (state.data.connStatus === "ringing") {
+        store.dispatch(setConnStatus(null));
+        Alert.alert("User declined your call or went offline :(");
+      }
     }, 20000);
     this.call = call;
 
@@ -143,7 +221,7 @@ class PeerClient {
     call.on("stream", function(stream) {
       console.log("peer is streaming", this.peerId, stream);
       store.dispatch(setAVStream(stream));
-      store.dispatch(setCallStatus("terminated")); //change to picked-up status
+      store.dispatch(setConnStatus(null)); //change to picked-up status
       // onReceiveStream(stream, "peer-camera");
     });
     call.on("close", function() {
@@ -156,15 +234,6 @@ class PeerClient {
   };
   connect = () => {
     this.startCall();
-    // const conn = this.peer.connect(this.connection.peerId, {
-    //   metadata: {
-    //     username: this.connection.username,
-    //   },
-    // });
-    // conn.on("error", (err) => {
-    //   console.log("conn", err);
-    // });
-    // conn.on("data", this.handleMessage);
   };
 }
 
