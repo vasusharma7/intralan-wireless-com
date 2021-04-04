@@ -10,7 +10,17 @@ import nodejs from "nodejs-mobile-react-native";
 import RNFetchBlob from "react-native-fetch-blob";
 var RNFS = require("react-native-fs");
 import DocumentPicker from "react-native-document-picker";
+import { Buffer } from "buffer";
 import FileViewer from "react-native-file-viewer";
+const sleep = (milliseconds) => {
+  let timeStart = new Date().getTime();
+  while (true) {
+    let elapsedTime = new Date().getTime() - timeStart;
+    if (elapsedTime > milliseconds) {
+      break;
+    }
+  }
+};
 class PeerClient {
   constructor(connection) {
     this.connection = connection;
@@ -25,8 +35,9 @@ class PeerClient {
         debug: true,
       });
       this.fileBuffer = [];
-      this.chunksize = 65535;
+      this.chunksize = 16 * 1024;
       this.state = store.getState();
+      this.offset = 0;
       console.log("firing listeners");
       this.fireEventListeners();
       this.getMediaSource();
@@ -97,7 +108,7 @@ class PeerClient {
         conn.on("data", (data) => {
           if (data?.operation === "file") {
             // console.log(data);
-            this.saveFile(data);
+            this.saveFile(data, conn);
           } else {
             console.log("Local peer sending some data.");
             conn.send("Hello, this is the LOCAL peer!");
@@ -130,16 +141,18 @@ class PeerClient {
         },
       ]);
       this.peer.on("data", (res) => {
+        // sleep(10000);
         this.saveFile(res);
       });
       // use call.close() to finish a call
     });
   };
-  async saveFile(res) {
+  async saveFile(res, conn) {
     if (res.file === "EOF") {
       // await new Promise((r) => setTimeout(r, 1000));
 
       this.fileBuffer = this.fileBuffer.join("");
+
       const dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
       const fileLocation = `${dirLocation}/${res.name}`;
 
@@ -169,52 +182,89 @@ class PeerClient {
       } catch (err) {
         console.log(err);
       }
-      // await FileViewer.open(fileLocation);
+      await FileViewer.open(fileLocation);
     } else {
+      console.log("chunk arrived", res.chunk);
       this.fileBuffer.push(res.file);
-      console.log(
-        "chunk length",
-        this.fileBuffer.join("").length,
-        this.fileBuffer.length
-      );
+      conn.send({ success: true });
     }
   }
   async sendFile(conn) {
-    try {
-      const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles],
-        readContent: true,
-      });
-      console.log(
-        res.uri,
-        res.type, // mime type
-        res.name,
-        res.size
-      );
-      const file = await RNFS.readFile(res.uri, "base64");
-      console.log(file);
-      console.log("sending file");
-      let j = 0;
-      for (let i = 0; i < res.size; i += this.chunksize) {
-        j += 1;
-        conn.send({
-          ...res,
-          file: file.slice(i, i + this.chunksize),
-          operation: "file",
+    if (!this.file)
+      try {
+        const res = await DocumentPicker.pick({
+          type: [DocumentPicker.types.allFiles],
+          readContent: true,
         });
-        console.log("sending chunk ", j);
+        console.log(
+          res.uri,
+          res.type, // mime type
+          res.name,
+          res.size
+        );
+        this.res = res;
+        this.file = await RNFS.readFile(res.uri, "base64");
+        // console.log(this.file);
+        console.log(
+          "sending file",
+          this.offset / this.chunksize,
+          this.file.length,
+          this.res.size
+        );
+        // console.log(
+        //   "sender",
+        //   this.file.slice(this.offset, this.offset + this.chunksize)
+        // );
+        this.offset = 0;
+        // while (this.offset < this.file.length) {
+        //   conn.send({
+        //     ...this.res,
+        //     file: this.file.slice(this.offset, this.offset + this.chunksize),
+        //     operation: "file",
+        //     chunk: this.offset / this.chunksize,
+        //   });
+        //   console.log("sent", this.offset);
+        //   this.offset += this.chunksize;
+        // }
+        // conn.send({
+        //   ...this.res,
+        //   file: "EOF",
+        //   operation: "file",
+        //   chunk: this.offset / this.chunksize,
+        // });
+        conn.send({
+          ...this.res,
+          file: this.file.slice(this.offset, this.offset + this.chunksize),
+          operation: "file",
+          chunk: this.offset / this.chunksize,
+        });
+        this.offset += this.chunksize;
+        return;
+      } catch (err) {
+        if (DocumentPicker.isCancel(err)) {
+          // User cancelled the picker, exit any dialogs or menus and move on
+        } else {
+          throw err;
+        }
       }
+    console.log("sending file", this.offset / this.chunksize);
+    // let j = 0;
+    // for (let i = 0; i < res.size; i += this.chunksize) {
+    // j += 1;
+    if (this.offset > this.file.length)
       conn.send({
-        ...res,
+        ...this.res,
         file: "EOF",
         operation: "file",
       });
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        // User cancelled the picker, exit any dialogs or menus and move on
-      } else {
-        throw err;
-      }
+    else {
+      conn.send({
+        ...this.res,
+        file: this.file.slice(this.offset, this.offset + this.chunksize),
+        operation: "file",
+        chunk: this.offset / this.chunksize,
+      });
+      this.offset += this.chunksize;
     }
   }
   async fileTransfer() {
@@ -230,6 +280,12 @@ class PeerClient {
       store.dispatch(setConnStatus(null));
       console.log("Remote peer has opened connection.");
       this.sendFile(conn);
+    });
+    conn.on("data", (data) => {
+      console.log(data);
+      if (data.success) {
+        this.sendFile(conn);
+      }
     });
   }
   endCall = () => {

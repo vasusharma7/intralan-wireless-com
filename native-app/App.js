@@ -11,7 +11,6 @@ import { startSearch, initSearch } from "./redux/searchRedux/searchAction";
 
 // const Tab = createMaterialBottomTabNavigator();
 import "./config.js";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { PeerClient } = require("./peer.js");

@@ -6,7 +6,9 @@ import RNFetchBlob from "react-native-fetch-blob";
 var RNFS = require("react-native-fs");
 import DocumentPicker from "react-native-document-picker";
 import FileViewer from "react-native-file-viewer";
+import base64 from "react-native-base64";
 import {} from "../redux/streamRedux/streamAction";
+import { Buffer } from "buffer";
 class Playback extends Component {
   constructor(props) {
     super(props);
@@ -21,6 +23,7 @@ class Playback extends Component {
       }
     }
   };
+
   async pick() {
     try {
       const res = await DocumentPicker.pick({
@@ -36,16 +39,25 @@ class Playback extends Component {
       const dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
       const fileLocation = `${dirLocation}/${res.name}`;
       const chunksize = 65535;
-      const file = await RNFS.readFile(res.uri, "base64");
-      let test = [];
-      for (let i = 0; i < file.length; i += chunksize) {
-        // console.log(file.slice(i, i + chunksize));
-        test.push(file.slice(i, i + chunksize));
-        // console.log("\n");
-        // sleep(2000);
+      let file = await RNFS.readFile(res.uri, "base64");
+      while (file.length) {
+        let chunk = Buffer.from(file.slice(0, 1024));
+        file = file.slice(1024, file.length);
+        console.log(chunk);
       }
-      test = test.join("");
-      console.log("end", test.slice(-15, -1), test === file);
+      // console.log(Buffer.from(file.slice(0, 16 * 1024)));
+      // let test = [];
+      // for (let i = 0; i < file.length; i += chunksize) {
+      //   // console.log(file.slice(i, i + chunksize));
+      //   test.push(file.slice(i, i + chunksize));
+      //   // console.log("\n");
+      //   // sleep(2000);
+      // }
+      // test = test.join("");
+      // let blob = await this.base64ToBlob(file);
+      // console.log("btoB64 resp === ", blob);
+
+      // console.log("end", buffer, test === file);
       // console.log(RNFS.DocumentDirectoryPath);
       // RNFetchBlob.fs.isDir(dirLocation).then(async (isDir) => {
       //   if (!isDir) {
