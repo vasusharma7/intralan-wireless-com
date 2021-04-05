@@ -12,6 +12,7 @@ const { width, height } = Dimensions.get("screen");
 import { connect } from "react-redux";
 import end from "../assets/end.png";
 import user from "../assets/user.png";
+import decline from "../assets/decline.gif";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { store } from "../redux/store";
 import Timer from "./components/Timer";
@@ -43,27 +44,50 @@ export class InCall extends Component {
             height: 175,
           }}
         />
-        <Timer />
-        <TouchableOpacity
-          onPress={() => {
-            this.props.setConnStatus(null);
-            try {
-              this.props.localPeer.endCall();
-              this.props.remotePeer.endCall();
-            } catch (err) {
-              console.log("Something is fishy in development !", err);
-            }
-          }}
-        >
-          <Image
-            source={end}
-            style={{
-              alignSelf: "flex-start",
-              width: 100,
-              height: 100,
-            }}
-          />
-        </TouchableOpacity>
+        {/* add a call initiator check here */}
+        <Text style={{ fontSize: width / 20 }}>
+          {this.props.localPeer?.metadata?.username ||
+            this.props.remotePeer?.connection?.username}
+        </Text>
+        {this.props.connStatus === "inCall" ? (
+          <>
+            <Timer />
+            <TouchableOpacity
+              onPress={() => {
+                this.props.setConnStatus(null);
+                try {
+                  this.props.localPeer?.endCall();
+                  this.props.remotePeer?.endCall();
+                } catch (err) {
+                  console.log("Something is fishy in development !", err);
+                }
+              }}
+            >
+              <Image
+                source={end}
+                style={{
+                  alignSelf: "flex-start",
+                  width: 100,
+                  height: 100,
+                }}
+              />
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <Text style={{ color: "black", fontSize: width / 20 }}>
+              Ringing..
+            </Text>
+            <Image
+              source={decline}
+              style={{
+                alignSelf: "center",
+                width: 200,
+                height: 200,
+              }}
+            />
+          </>
+        )}
       </View>
     );
   }
@@ -72,6 +96,7 @@ export class InCall extends Component {
 const mapStateToProps = (state) => ({
   remotePeer: state.stream.remotePeer,
   localPeer: state.stream.localPeer,
+  connStatus: state.data.connStatus,
 });
 
 const mapDispatchToProps = (dispatch) => {

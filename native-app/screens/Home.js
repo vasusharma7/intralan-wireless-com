@@ -33,11 +33,12 @@ class Home extends Component {
     };
   }
   paintTheScreen() {
-    // switch (this.props.connStatus) {
-    switch ("inCall") {
+    switch (this.props.connStatus) {
+      // switch ("inCall") {
       case "incoming":
         return <IncomingCall />;
       case "inCall":
+      case "ringing":
         return <InCall />;
       default:
         return (

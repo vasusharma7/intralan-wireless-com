@@ -81,12 +81,12 @@ class PeerClient {
         switch (this.connection.operation) {
           case "call": {
             store.dispatch(setConnStatus(null));
-            this.connect();
+            this.connect("call");
             break;
           }
           case "file": {
             //add one more state - maybe change previous one to searching and this one to connecting !!
-            this.fileTransfer();
+            this.connect("file");
             break;
           }
           default: {
@@ -99,17 +99,17 @@ class PeerClient {
     });
 
     this.peer.on("connection", (conn) => {
+      this.metadata = conn.metadata;
       console.log("Local peer has received connection.");
       conn.on("error", (err) => {
         console.log("peer", err);
       });
       conn.on("open", () => {
+        console.log("data on open");
         console.log("Local peer has opened connection.", this.peerId);
-        // console.log("conn", conn);
         this.fileBuffer = [];
         conn.on("data", (data) => {
           if (data?.operation === "file") {
-            // console.log(data);
             this.saveFile(data, conn);
           } else {
             console.log("Local peer sending some data.");
@@ -122,73 +122,30 @@ class PeerClient {
       this.call = call;
       console.log("call received");
       store.dispatch(setConnStatus("incoming"));
-
-      // Alert.alert("Incoming Call", "Do you want to accept the call ? ", [
-      //   {
-      //     text: "Accept",
-      //     onPress: () => {},
-      //   },
-      //   {
-      //     text: "Decline",
-      //     onPress: () => {},
-      //   },
-      // ]);
-      // this.peer.on("data", (res) => {
-      //   // sleep(10000);
-      //   this.saveFile(res);
-      // });
-      // use call.close() to finish a call
     });
   };
   async answerCall() {
+    store.dispatch(setConnStatus("inCall"));
     this.call.answer(this.stream);
     // Receive data
     this.call.on("stream", (stream) => {
+      store.dispatch(setConnStatus("inCall"));
       this.call.answer(this.stream);
       console.log("call answer", stream);
       store.dispatch(setAVStream(stream));
     });
     this.call.on("close", function() {
+      store.dispatch(setConnStatus(null));
       console.log("The call is closed");
     });
   }
+
   async saveFile(res, conn) {
     if (res.file === "EOF") {
-      // await new Promise((r) => setTimeout(r, 1000));
-
-      // this.fileBuffer = this.fileBuffer.join("");
-
-      // console.log(RNFS.DocumentDirectoryPath);
-      // console.log(this.fileBuffer )
-
-      try {
-        // await RNFetchBlob.fs
-        //   .writeStream(
-        //     fileLocation,
-        //     // encoding, should be one of `base64`, `utf8`, `ascii`
-        //     "base64",
-        //     // should data append to existing content ?
-        //     true
-        //   )
-        //   .then((stream) =>
-        //     Promise.all(this.fileBuffer.map((chunk) => stream.write(chunk)))
-        //   )
-        //   .then(([stream]) => stream.close())
-        //   .catch(console.error);
-        // RNFetchBlob.fs
-        //   .writeFile(fileLocation, this.fileBuffer, "base64")
-        //   .then((rslt) => {
-        //     // console.log(this.fileBuffer);
-        //     console.log(
-        //       "File written successfully",
-        //       rslt,
-        //       this.fileBuffer.length
-        //     );
-        //   });
-        Alert.alert("File saved successfully");
-      } catch (err) {
-        console.log(err);
-      }
+      Alert.alert(
+        "Success",
+        `File Saved Successfully to location ${this.fileLocation}`
+      );
       await FileViewer.open(this.fileLocation);
     } else {
       if (res.chunk == 0) {
@@ -216,14 +173,10 @@ class PeerClient {
           console.log("chunk arrived", res.chunk, resp);
         })
         .catch(console.error);
-
-      // this.fileBuffer.push(res.file);
-      // this.fileBuffer = this.fileBuffer.concat(res.file);
-      // console.log(this.fileBuffer);
       conn.send({ success: true, chunk: res.chunk });
     }
   }
-  async sendFile(conn) {
+  async sendFile() {
     if (this.offset === 0)
       try {
         const res = await DocumentPicker.pick({
@@ -237,27 +190,6 @@ class PeerClient {
           res.size
         );
         this.res = res;
-        // this.file = await RNFS.readFile(res.uri, "base64");
-        // console.log(
-        //   "sender",
-        //   this.file.slice(this.offset, this.offset + this.chunksize)
-        // );
-        // while (this.offset < this.file.length) {
-        //   conn.send({
-        //     ...this.res,
-        //     file: this.file.slice(this.offset, this.offset + this.chunksize),
-        //     operation: "file",
-        //     chunk: this.offset / this.chunksize,
-        //   });
-        //   console.log("sent", this.offset);
-        //   this.offset += this.chunksize;
-        // }
-        // conn.send({
-        //   ...this.res,
-        //   file: "EOF",
-        //   operation: "file",
-        //   chunk: this.offset / this.chunksize,
-        // });
       } catch (err) {
         if (DocumentPicker.isCancel(err)) {
           // User cancelled the picker, exit any dialogs or menus and move on
@@ -266,11 +198,8 @@ class PeerClient {
         }
       }
     console.log("sending file", this.offset / this.chunksize);
-    // let j = 0;
-    // for (let i = 0; i < res.size; i += this.chunksize) {
-    // j += 1;
     if (this.offset > this.res.size)
-      conn.send({
+      this.conn.send({
         ...this.res,
         file: "EOF",
         operation: "file",
@@ -289,7 +218,7 @@ class PeerClient {
             .then(async (resp) => {
               const file = await RNFS.readFile(this.cacheLocation, "base64");
               console.log(resp);
-              conn.send({
+              this.conn.send({
                 ...this.res,
                 file: file,
                 operation: "file",
@@ -298,37 +227,11 @@ class PeerClient {
               this.offset += this.chunksize;
             });
         });
-      // console.log(this.file);
-      // console.log(
-      //   "sending file",
-      //   this.offset / this.chunksize,
-      //   this.file.length,
-      //   this.res.size
-      // );
     }
   }
-  async fileTransfer() {
-    const conn = this.peer.connect(this.connection.peerId, {
-      metadata: {
-        username: this.connection.username,
-      },
-    });
-    conn.on("error", (err) => {
-      console.log("conn", err);
-    });
-    conn.on("open", () => {
-      store.dispatch(setConnStatus(null));
-      console.log("Remote peer has opened connection.");
-      this.sendFile(conn);
-    });
-    conn.on("data", (data) => {
-      console.log(data);
-      if (data.success) {
-        this.sendFile(conn);
-      }
-    });
-  }
+
   endCall = () => {
+    store.dispatch(setConnStatus(null));
     console.log("endCall");
     this?.call && this.call.close();
   };
@@ -339,7 +242,7 @@ class PeerClient {
   startCall = () => {
     console.log("console media", this.stream, this.connection.peerId);
 
-    const call = this.peer.call(this.connection.peerId, this.stream);
+    this.call = this.peer.call(this.connection.peerId, this.stream);
     store.dispatch(setConnStatus("ringing"));
     setTimeout(() => {
       if (this.state.data.connStatus === "ringing") {
@@ -347,17 +250,17 @@ class PeerClient {
         Alert.alert("User declined your call or went offline :(");
       }
     }, 20000);
-    this.call = call;
 
     // store.dispatch(setAVStream(stream));
 
-    call.on("stream", function(stream) {
+    this.call.on("stream", function(stream) {
       console.log("peer is streaming", this.peerId, stream);
       store.dispatch(setAVStream(stream));
-      store.dispatch(setConnStatus(null)); //change to picked-up status
+      store.dispatch(setConnStatus("inCall")); //change to picked-up status
       // onReceiveStream(stream, "peer-camera");
     });
-    call.on("close", function() {
+    this.call.on("close", function() {
+      store.dispatch(setConnStatus(null));
       console.log("The call is closed");
     });
   };
@@ -365,8 +268,31 @@ class PeerClient {
   handleMessage = (data) => {
     console.log("receiving data from peer ", data);
   };
-  connect = () => {
-    this.startCall();
+  connect = (type) => {
+    const conn = this.peer.connect(this.connection.peerId, {
+      metadata: {
+        username: global.config.username,
+      },
+    });
+    this.conn = conn;
+    conn.on("error", (err) => {
+      console.log("conn", err);
+    });
+    conn.on("open", () => {
+      store.dispatch(setConnStatus(null));
+      console.log("Remote peer has opened connection.");
+      if (type === "call") {
+        this.startCall();
+      } else if (type === "file") {
+        this.sendFile();
+      }
+    });
+    conn.on("data", (data) => {
+      console.log(data);
+      if (data.success) {
+        this.sendFile();
+      }
+    });
   };
 }
 

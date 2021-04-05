@@ -45,6 +45,9 @@ export class IncomingCall extends Component {
             height: 175,
           }}
         />
+        <Text style={{ fontSize: width / 20 }}>
+          {this.props.localPeer?.metadata?.username}
+        </Text>
         <View
           style={{
             flex: 1,
