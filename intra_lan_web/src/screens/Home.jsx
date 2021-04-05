@@ -14,15 +14,22 @@ import {
     Display3,
     Display4,
   } from 'baseui/typography';
-
-export default class Home extends Component {
+  import { connect } from "react-redux";
+  import { startSearch, initSearch } from "../redux/searchRedux/searchAction";
+  import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
+  import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
+  // import {Connections} from './Connections'
+  
+class Home extends Component {
     constructor(props){
         super(props)
         this.state = {
             userName : 'Anup',
-            myip: '192.168.1.1'
+            myip: '192.168.1.1',
+            search: false,
         }
     }
+    
     render() {
         return (
             <div style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'center'}}>
@@ -38,10 +45,35 @@ export default class Home extends Component {
                         <p>
                         My IP : {this.state && this.state.myip}
                         </p>
-                        <Button kind="secondary">Start Search</Button>
                 </div>
   
             </div>
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+      connections: state.data.connections,
+      info: state.data.info,
+      localPeer: state.stream.localPeer,
+      remotePeer: state.stream.remotePeer,
+      connStatus: state.data.connStatus,
+      screenStatus: state.data.screenStatus,
+      search: state.search.search,
+    };
+  };
+  
+  const mapDispatchToProps = (dispatch) => {
+    return {
+      setLocalPeer: (info) => dispatch(setLocalPeer(info)),
+      setRemotePeer: (info) => dispatch(setRemotePeer(info)),
+    //   setScreenStatus: (status) => dispatch(setScreenStatus(status)),
+        startSearch: (info) => dispatch(startSearch(info)),
+    };
+  };
+  
+  export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Home);
