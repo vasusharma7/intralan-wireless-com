@@ -35,12 +35,14 @@ class PeerClient {
         debug: true,
       });
       this.fileBuffer = [];
-      this.chunksize = 16 * 1024;
+      this.chunksize = 32 * 1024;
       this.state = store.getState();
       this.offset = 0;
       console.log("firing listeners");
       this.fireEventListeners();
       this.getMediaSource();
+      this.dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
+      this.cacheLocation = `${RNFetchBlob.fs.dirs.CacheDir}/temp`;
     });
   }
   getMediaSource = () => {
@@ -151,46 +153,75 @@ class PeerClient {
     if (res.file === "EOF") {
       // await new Promise((r) => setTimeout(r, 1000));
 
-      this.fileBuffer = this.fileBuffer.join("");
-
-      const dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
-      const fileLocation = `${dirLocation}/${res.name}`;
+      // this.fileBuffer = this.fileBuffer.join("");
 
       // console.log(RNFS.DocumentDirectoryPath);
       // console.log(this.fileBuffer )
-      RNFetchBlob.fs.isDir(dirLocation).then(async (isDir) => {
-        if (!isDir) {
-          try {
-            await RNFetchBlob.fs.mkdir(dirLocation);
-          } catch {
-            console.log("something went wrong in creating folder");
-          }
-        }
-      });
+
       try {
-        RNFetchBlob.fs
-          .writeFile(fileLocation, this.fileBuffer, "base64")
-          .then((rslt) => {
-            // console.log(this.fileBuffer);
-            console.log(
-              "File written successfully",
-              rslt,
-              this.fileBuffer.length
-            );
-            Alert.alert("File saved successfully");
-          });
+        // await RNFetchBlob.fs
+        //   .writeStream(
+        //     fileLocation,
+        //     // encoding, should be one of `base64`, `utf8`, `ascii`
+        //     "base64",
+        //     // should data append to existing content ?
+        //     true
+        //   )
+        //   .then((stream) =>
+        //     Promise.all(this.fileBuffer.map((chunk) => stream.write(chunk)))
+        //   )
+        //   .then(([stream]) => stream.close())
+        //   .catch(console.error);
+        // RNFetchBlob.fs
+        //   .writeFile(fileLocation, this.fileBuffer, "base64")
+        //   .then((rslt) => {
+        //     // console.log(this.fileBuffer);
+        //     console.log(
+        //       "File written successfully",
+        //       rslt,
+        //       this.fileBuffer.length
+        //     );
+        //   });
+        Alert.alert("File saved successfully");
       } catch (err) {
         console.log(err);
       }
-      await FileViewer.open(fileLocation);
+      await FileViewer.open(this.fileLocation);
     } else {
-      console.log("chunk arrived", res.chunk);
-      this.fileBuffer.push(res.file);
-      conn.send({ success: true });
+      if (res.chunk == 0) {
+        RNFetchBlob.fs.isDir(this.dirLocation).then(async (isDir) => {
+          if (!isDir) {
+            try {
+              await RNFetchBlob.fs.mkdir(dirLocation);
+            } catch {
+              Alert.alert(
+                "Oops !",
+                "Could not create App Directory in Downloads folder"
+              );
+              console.log("something went wrong in creating folder");
+            }
+          }
+        });
+        this.fileLocation = `${this.dirLocation}/${res.name}`;
+        await RNFetchBlob.fs
+          .writeFile(this.fileLocation, "", "utf8")
+          .then(() => {});
+      }
+      await RNFetchBlob.fs
+        .appendFile(this.fileLocation, res.file, "base64")
+        .then((resp) => {
+          console.log("chunk arrived", res.chunk, resp);
+        })
+        .catch(console.error);
+
+      // this.fileBuffer.push(res.file);
+      // this.fileBuffer = this.fileBuffer.concat(res.file);
+      // console.log(this.fileBuffer);
+      conn.send({ success: true, chunk: res.chunk });
     }
   }
   async sendFile(conn) {
-    if (!this.file)
+    if (this.offset === 0)
       try {
         const res = await DocumentPicker.pick({
           type: [DocumentPicker.types.allFiles],
@@ -203,19 +234,11 @@ class PeerClient {
           res.size
         );
         this.res = res;
-        this.file = await RNFS.readFile(res.uri, "base64");
-        // console.log(this.file);
-        console.log(
-          "sending file",
-          this.offset / this.chunksize,
-          this.file.length,
-          this.res.size
-        );
+        // this.file = await RNFS.readFile(res.uri, "base64");
         // console.log(
         //   "sender",
         //   this.file.slice(this.offset, this.offset + this.chunksize)
         // );
-        this.offset = 0;
         // while (this.offset < this.file.length) {
         //   conn.send({
         //     ...this.res,
@@ -232,14 +255,6 @@ class PeerClient {
         //   operation: "file",
         //   chunk: this.offset / this.chunksize,
         // });
-        conn.send({
-          ...this.res,
-          file: this.file.slice(this.offset, this.offset + this.chunksize),
-          operation: "file",
-          chunk: this.offset / this.chunksize,
-        });
-        this.offset += this.chunksize;
-        return;
       } catch (err) {
         if (DocumentPicker.isCancel(err)) {
           // User cancelled the picker, exit any dialogs or menus and move on
@@ -251,20 +266,42 @@ class PeerClient {
     // let j = 0;
     // for (let i = 0; i < res.size; i += this.chunksize) {
     // j += 1;
-    if (this.offset > this.file.length)
+    if (this.offset > this.res.size)
       conn.send({
         ...this.res,
         file: "EOF",
         operation: "file",
       });
     else {
-      conn.send({
-        ...this.res,
-        file: this.file.slice(this.offset, this.offset + this.chunksize),
-        operation: "file",
-        chunk: this.offset / this.chunksize,
-      });
-      this.offset += this.chunksize;
+      await RNFetchBlob.fs
+        .writeFile(this.cacheLocation, "", "utf8")
+        .then(async () => {
+          await RNFetchBlob.fs
+            .slice(
+              this.res.uri,
+              this.cacheLocation,
+              this.offset,
+              this.offset + this.chunksize
+            )
+            .then(async (resp) => {
+              const file = await RNFS.readFile(this.cacheLocation, "base64");
+              console.log(resp);
+              conn.send({
+                ...this.res,
+                file: file,
+                operation: "file",
+                chunk: this.offset / this.chunksize,
+              });
+              this.offset += this.chunksize;
+            });
+        });
+      // console.log(this.file);
+      // console.log(
+      //   "sending file",
+      //   this.offset / this.chunksize,
+      //   this.file.length,
+      //   this.res.size
+      // );
     }
   }
   async fileTransfer() {
