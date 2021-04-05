@@ -37,37 +37,74 @@ class Playback extends Component {
         res.size
       );
       const dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
+      const cacheLocation = `${RNFetchBlob.fs.dirs.CacheDir}/temp`;
       const fileLocation = `${dirLocation}/${res.name}`;
-      const chunksize = 65535;
-      let file = await RNFS.readFile(res.uri, "base64");
-      while (file.length) {
-        let chunk = Buffer.from(file.slice(0, 1024));
-        file = file.slice(1024, file.length);
-        console.log(chunk);
-      }
-      // console.log(Buffer.from(file.slice(0, 16 * 1024)));
-      // let test = [];
-      // for (let i = 0; i < file.length; i += chunksize) {
-      //   // console.log(file.slice(i, i + chunksize));
-      //   test.push(file.slice(i, i + chunksize));
-      //   // console.log("\n");
-      //   // sleep(2000);
+      const chunksize = 16 * 1024;
+      // let file = await RNFS.readFile(res.uri, "base64");
+      // while (file.length) {
+      //   let chunk = Buffer.from(file.slice(0, 1024));
+      //   file = file.slice(1024, file.length);
+      //   console.log(chunk);
       // }
+
+      // console.log(Buffer.from(file.slice(0, 16 * 1024)));
+
+      let test = [];
+      await RNFetchBlob.fs.writeFile(fileLocation, "", "utf8").then(() => {});
+      for (let i = 0; i < res.size; i += chunksize) {
+        // console.log(file.slice(i, i + chunksize));
+        // test.push(file.slice(i, i + chunksize));
+        console.log("bytes written from", i);
+        await RNFetchBlob.fs
+          .writeFile(cacheLocation, "", "utf8")
+          .then(async () => {
+            await RNFetchBlob.fs
+              .slice(res.uri, cacheLocation, i, i + chunksize)
+              .then(async (res) => {
+                console.log(res);
+                await RNFetchBlob.fs
+                  .appendFile(fileLocation, cacheLocation, "uri")
+                  .then((res) => {
+                    console.log(res);
+                  })
+                  .catch(console.error);
+              });
+          });
+        // RNFetchBlob.fs
+        //   .appendFile(fileLocation, file.slice(i, i + chunksize), "base64")
+        //   .then((rest) => {
+        //     console.log("chunk written", rest);
+        //   })
+        //   .catch((err) => console.log(err));
+        // console.log("\n");
+        // sleep(2000);
+      }
+
       // test = test.join("");
       // let blob = await this.base64ToBlob(file);
       // console.log("btoB64 resp === ", blob);
 
       // console.log("end", buffer, test === file);
       // console.log(RNFS.DocumentDirectoryPath);
-      // RNFetchBlob.fs.isDir(dirLocation).then(async (isDir) => {
-      //   if (!isDir) {
-      //     try {
-      //       await RNFetchBlob.fs.mkdir(dirLocation);
-      //     } catch {
-      //       console.log("something went wrong in creating folder");
-      //     }
-      //   }
-      // });
+      RNFetchBlob.fs.isDir(dirLocation).then(async (isDir) => {
+        if (!isDir) {
+          try {
+            await RNFetchBlob.fs.mkdir(dirLocation);
+          } catch {
+            console.log("something went wrong in creating folder");
+          }
+        }
+      });
+      // await RNFetchBlob.fs
+      //   .writeFile(fileLocation, "", "utf8")
+      //   .then(async () => {
+      //     await RNFetchBlob.fs
+      //       .writeStream(fileLocation, "base64", true)
+      //       .then((stream) =>
+      //         Promise.all(test.map((chunk) => stream.write(chunk)))
+      //       )
+      //       .catch(console.error);
+      //   });
       // try {
       //   RNFetchBlob.fs.writeFile(fileLocation, file, "base64").then((rslt) => {
       //     console.log("File written successfully", rslt);
@@ -75,7 +112,7 @@ class Playback extends Component {
       // } catch (err) {
       //   console.log(err);
       // }
-      // await FileViewer.open(fileLocation);
+      await FileViewer.open(fileLocation);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker, exit any dialogs or menus and move on
