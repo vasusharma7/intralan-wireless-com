@@ -119,36 +119,39 @@ class PeerClient {
       });
     });
     this.peer.on("call", async (call) => {
+      this.call = call;
       console.log("call received");
-      Alert.alert("Incoming Call", "Do you want to accept the call ? ", [
-        {
-          text: "Accept",
-          onPress: () => {
-            call.answer(this.stream);
-            this.call = call;
-            // Receive data
-            call.on("stream", (stream) => {
-              call.answer(this.stream);
-              console.log("call answer", stream);
-              store.dispatch(setAVStream(stream));
-            });
-            call.on("close", function() {
-              console.log("The call is closed");
-            });
-          },
-        },
-        {
-          text: "Decline",
-          onPress: () => {},
-        },
-      ]);
-      this.peer.on("data", (res) => {
-        // sleep(10000);
-        this.saveFile(res);
-      });
+      store.dispatch(setConnStatus("incoming"));
+
+      // Alert.alert("Incoming Call", "Do you want to accept the call ? ", [
+      //   {
+      //     text: "Accept",
+      //     onPress: () => {},
+      //   },
+      //   {
+      //     text: "Decline",
+      //     onPress: () => {},
+      //   },
+      // ]);
+      // this.peer.on("data", (res) => {
+      //   // sleep(10000);
+      //   this.saveFile(res);
+      // });
       // use call.close() to finish a call
     });
   };
+  async answerCall() {
+    this.call.answer(this.stream);
+    // Receive data
+    this.call.on("stream", (stream) => {
+      this.call.answer(this.stream);
+      console.log("call answer", stream);
+      store.dispatch(setAVStream(stream));
+    });
+    this.call.on("close", function() {
+      console.log("The call is closed");
+    });
+  }
   async saveFile(res, conn) {
     if (res.file === "EOF") {
       // await new Promise((r) => setTimeout(r, 1000));

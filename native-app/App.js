@@ -12,6 +12,7 @@ import { startSearch, initSearch } from "./redux/searchRedux/searchAction";
 // const Tab = createMaterialBottomTabNavigator();
 import "./config.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { IncomingCall } from "./screens/IncomingCall";
 
 const { PeerClient } = require("./peer.js");
 const sleep = async (delay) => await new Promise((r) => setTimeout(r, delay));
@@ -99,7 +100,10 @@ class App extends Component {
   connectWithPeerJS = async () => {
     await AsyncStorage.getItem("localPeer").then((localPeer) => {
       if (localPeer) {
-        const peer = new PeerClient();
+        // localPeer = JSON.parse(localPeer);
+        // localPeer.peer.reconnect();
+        //
+        const peer = new PeerClient(localPeer.peerId);
         this.props.setLocalPeer(peer);
       }
     });

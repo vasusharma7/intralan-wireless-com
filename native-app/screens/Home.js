@@ -7,7 +7,8 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 import Playback from "./Playback";
 import { connect } from "react-redux";
 const Tab = createMaterialBottomTabNavigator();
-
+import IncomingCall from "./IncomingCall";
+import InCall from "./InCall";
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -31,41 +32,55 @@ class Home extends Component {
       ],
     };
   }
-
+  paintTheScreen() {
+    // switch (this.props.connStatus) {
+    switch ("inCall") {
+      case "incoming":
+        return <IncomingCall />;
+      case "inCall":
+        return <InCall />;
+      default:
+        return (
+          <>
+            <Appbar.Header>
+              <Appbar.Content
+                title="IntraLAN Communication"
+                subtitle={this.state.title}
+                style={{
+                  alignItems: "center",
+                }}
+              />
+            </Appbar.Header>
+            <Tab.Navigator
+              initialRouteName="Connections"
+              activeColor="#fff"
+              inactiveColor="#000"
+              barStyle={{ backgroundColor: "crimson" }}
+            >
+              {this.state.routes.map(({ key, screen, title, icon }) => (
+                <Tab.Screen
+                  name={title}
+                  component={screen}
+                  key={key}
+                  options={{
+                    tabBarLabel: title,
+                    tabBarIcon: ({ color }) => (
+                      <MaterialCommunityIcons
+                        name={icon}
+                        color={color}
+                        size={26}
+                      />
+                    ),
+                  }}
+                />
+              ))}
+            </Tab.Navigator>
+          </>
+        );
+    }
+  }
   render() {
-    return (
-      <>
-        <Appbar.Header>
-          <Appbar.Content
-            title="IntraLAN Communication"
-            subtitle={this.state.title}
-            style={{
-              alignItems: "center",
-            }}
-          />
-        </Appbar.Header>
-        <Tab.Navigator
-          initialRouteName="Connections"
-          activeColor="#fff"
-          inactiveColor="#000"
-          barStyle={{ backgroundColor: "crimson" }}
-        >
-          {this.state.routes.map(({ key, screen, title, icon }) => (
-            <Tab.Screen
-              name={title}
-              component={screen}
-              key={key}
-              options={{
-                tabBarLabel: title,
-                tabBarIcon: ({ color }) => (
-                  <MaterialCommunityIcons name={icon} color={color} size={26} />
-                ),
-              }}
-            />
-          ))}
-        </Tab.Navigator>
-      </>
-    );
+    return this.paintTheScreen();
   }
 }
 
