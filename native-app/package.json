@@ -7,16 +7,14 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint .",
-    "postinstall": "./node_modules/.bin/rn-nodeify --hack --install"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.14.1",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/material-bottom-tabs": "^5.3.14",
-    "@react-navigation/native": "^5.9.3",
+    "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.3",
-    "@tradle/react-native-http": "^2.0.1",
     "assert": "^1.5.0",
     "browserify-zlib": "^0.1.4",
     "buffer": "^6.0.3",
@@ -40,6 +38,7 @@
     "react-native-base64": "^0.2.1",
     "react-native-crypto": "^2.2.0",
     "react-native-document-picker": "^5.0.3",
+    "react-native-easy-chat-ui": "^0.4.14",
     "react-native-fetch-blob": "^0.10.8",
     "react-native-file-viewer": "^2.1.4",
     "react-native-fs": "^2.16.6",

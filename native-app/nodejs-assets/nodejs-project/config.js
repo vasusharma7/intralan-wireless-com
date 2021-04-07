@@ -1,5 +1,0 @@
-global.config = {
-  metadata: {
-    localPeerId: "",
-  },
-};

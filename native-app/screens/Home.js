@@ -5,6 +5,7 @@ import Settings from "./Settings";
 import { Appbar } from "react-native-paper";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import Playback from "./Playback";
+import Message from './Message';
 import { connect } from "react-redux";
 const Tab = createMaterialBottomTabNavigator();
 import IncomingCall from "./IncomingCall";
@@ -29,12 +30,18 @@ class Home extends Component {
           title: "File Select",
           icon: "file",
         },
+        {
+          key: "chat",
+          screen: Message,
+          title: 'My Messages',
+          icon: "message"
+        }
       ],
     };
   }
   paintTheScreen() {
     // switch (this.props.connStatus) {
-    switch ("inCall") {
+    switch ("dsa") {
       case "incoming":
         return <IncomingCall />;
       case "inCall":

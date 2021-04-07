@@ -51,6 +51,7 @@ export class InCall extends Component {
               this.props.localPeer.endCall();
               this.props.remotePeer.endCall();
             } catch (err) {
+              console.log("Call cant be ended");
               console.log("Something is fishy in development !", err);
             }
           }}
