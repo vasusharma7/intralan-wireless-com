@@ -40,7 +40,13 @@ class Settings extends Component {
     }
   };
   startNode = () => {
-    nodejs.start("main.js");
+    console.log("Starting node")
+    try {
+      // nodejs.start("main.js");
+    }
+    catch(e){
+      console.log(e)
+    }
 
     nodejs.channel.addListener(
       "message",
@@ -60,7 +66,7 @@ class Settings extends Component {
     // );
     //testing
     const remotePeer = new PeerClient({
-      ip: "192.168.1.8",
+      ip: "192.168.1.207",
       username: "Vasu",
       peerId: "peer8",
     });

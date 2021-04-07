@@ -41,7 +41,7 @@ class Home extends Component {
   }
   paintTheScreen() {
     // switch (this.props.connStatus) {
-    switch ("dsa") {
+    switch ("home") {
       case "incoming":
         return <IncomingCall />;
       case "inCall":

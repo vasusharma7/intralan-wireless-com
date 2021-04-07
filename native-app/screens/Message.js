@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { SafeAreaView, Text, Dimensions } from "react-native";
+import { SafeAreaView, Text, Dimensions,TextInput, Button } from "react-native";
 const {  height } = Dimensions.get("screen");
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { connect } from "react-redux";
@@ -7,6 +7,9 @@ import { connect } from "react-redux";
 class Message extends Component {
     constructor(props){
         super(props);
+        this.state = {
+          message : ""  
+        }
     }
  
     
@@ -14,6 +17,16 @@ class Message extends Component {
         console.log(this.props.localPeer);
     }
     
+    onChangeText = (e) => {
+        this.setState({
+          message: e
+        })
+    }
+
+    sendMessage = () => {
+      console.log(this.state.message)
+      this.props.localPeer.handleMessage(this.state.message)
+    }
     
     render() {
         return (
@@ -27,6 +40,12 @@ class Message extends Component {
             backgroundColor: "white",
           }}>
              <Text>IntraLAN Messaging</Text>
+             <TextInput
+              onChangeText={this.onChangeText}
+              placeholder="Enter a message"
+            />
+            <Button title="Sendd" onPress = {this.sendMessage}  >
+            </Button>
         </SafeAreaView>
         )
     }
