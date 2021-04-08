@@ -13,27 +13,37 @@ export class Timer extends Component {
   }
   //hours are not handled as of now
   incrementTimer() {
-    setInterval(() => {
-      this.setState({ timeElapsed: new Date() - this.state.startTime }, () => {
+    this.setState({
+      interval: setInterval(() => {
         this.setState(
-          {
-            secs: `${
-              Math.floor(this.state.timeElapsed / 1000) % 60 < 10 ? "0" : ""
-            }${Math.floor(this.state.timeElapsed / 1000) % 60}`,
-          },
-          () =>
-            this.setState({
-              mins: `${
-                Math.floor(this.state.timeElapsed / (60 * 1000)) < 10 ? "0" : ""
-              }${Math.floor(this.state.timeElapsed / (60 * 1000))}`,
-            })
+          { timeElapsed: new Date() - this.state.startTime },
+          () => {
+            this.setState(
+              {
+                secs: `${
+                  Math.floor(this.state.timeElapsed / 1000) % 60 < 10 ? "0" : ""
+                }${Math.floor(this.state.timeElapsed / 1000) % 60}`,
+              },
+              () =>
+                this.setState({
+                  mins: `${
+                    Math.floor(this.state.timeElapsed / (60 * 1000)) < 10
+                      ? "0"
+                      : ""
+                  }${Math.floor(this.state.timeElapsed / (60 * 1000))}`,
+                })
+            );
+          }
         );
-      });
-    }, 1000);
+      }, 1000),
+    });
   }
   componentDidMount() {
     this.setState({ startTime: new Date() });
     this.incrementTimer();
+  }
+  componentWillUnmount() {
+    clearInterval(this.state.interval);
   }
   render() {
     return (

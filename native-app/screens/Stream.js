@@ -14,13 +14,6 @@ import wifi from "../assets/wifi.gif";
 class Stream extends React.Component {
   paint() {
     switch (this.props.connStatus) {
-      case "ringing": {
-        return (
-          <Text style={{ color: "white", fontSize: 20, textAlign: "center" }}>
-            Ringing....
-          </Text>
-        );
-      }
       case "connecting": {
         return (
           <Text style={{ color: "white", fontSize: 20, textAlign: "center" }}>
@@ -28,13 +21,13 @@ class Stream extends React.Component {
           </Text>
         );
       }
-      case "connecting": {
-        return (
-          <Text style={{ color: "white", fontSize: 20, textAlign: "center" }}>
-            Transfering File.....
-          </Text>
-        );
-      }
+      // case "connecting": {
+      //   return (
+      //     <Text style={{ color: "white", fontSize: 20, textAlign: "center" }}>
+      //       Transfering File.....
+      //     </Text>
+      //   );
+      // }
       case "searching": {
         return (
           <View
