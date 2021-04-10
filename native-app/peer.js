@@ -279,7 +279,7 @@ class PeerClient {
 
   recieveMessage = () => {
     this.conn.on("message", (data) => {
-      console.log(data)
+      console.log("Recieved",data)
       // Dispatch data to redux and update state
     })
   }

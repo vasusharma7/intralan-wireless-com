@@ -43,6 +43,7 @@
     "react-native-file-viewer": "^2.1.4",
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "^1.10.3",
+    "react-native-gifted-chat": "^0.16.3",
     "react-native-level-fs": "^3.0.1",
     "react-native-modal": "^11.7.0",
     "react-native-network-info": "^5.2.1",
