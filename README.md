@@ -29,7 +29,7 @@ ndk.dir=/home/<user>/Android/Sdk/ndk/android-ndk-r21b
 
 Replace the <user> with your username
 ```
-- Next step is to copy the files in the `native-app/dependency` directory to the `native-app/nodejs-mobile/android/` directory. Replace the src folder with the one from dependency.
+- Next step is to copy the files in the `native-app/dependency` directory to the `native-app/node_modules/nodejs-mobile-react-native/android/` directory. Replace the src folder with the one from dependency.
 - Once all this is done, go to the `native-app/android/` folder and run the following:
 ```
 chmod +x gradlew
@@ -44,4 +44,4 @@ chmod +x gradlew
 
 ### Updates and Progress
 Implemented the calling and file sharing features. The messaging and web client are in works now. 
-It takes some time to connect to call....please be patient for a while when you initiate call/transfer....
+It takes some time to connect to call....please be patient for a while when you initiate call/transfer files....
