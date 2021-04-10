@@ -5,6 +5,16 @@ const appEventHandler = (msg) => {
       global.config.metadata["localPeerId"] = msg[event];
       return;
     }
+    case "clearId": {
+      if (
+        global.config.peerConnections !== {} &&
+        global.config.peerConnections[msg[event]]
+      ) {
+        global.config.peerConnections[msg[event]].socket.close();
+        delete global.config.peerConnections[msg[event]];
+      }
+      return;
+    }
     default:
       console.table(msg);
   }

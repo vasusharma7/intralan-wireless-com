@@ -20,39 +20,13 @@ import NodeService from "../Service";
 import nodejs from "nodejs-mobile-react-native";
 import { PeerClient } from "../peer";
 import BackgroundService from "react-native-background-actions";
+import { startNode } from "../redux/nodeRedux/nodeAction";
 class Settings extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
-  handleNodeEvents = async (msg) => {
-    const event = Object.keys(msg)[0];
-    switch (event) {
-      case "firedUp": {
-        const localPeer = new PeerClient();
-        await AsyncStorage.setItem("localPeer", JSON.stringify(localPeer));
-        this.props.setLocalPeer(localPeer);
-        Alert.alert("From node: " + msg[event]);
-        return;
-      }
-      default:
-        Alert.alert("From node: " + msg[event]);
-    }
-  };
-  startNode = () => {
-    console.log("Starting node")
-      nodejs.start("main.js");
-    nodejs.channel.addListener(
-      "message",
-      (msg) => {
-        if (typeof msg == "string") {
-          msg = JSON.parse(msg);
-        }
-        this.handleNodeEvents(msg);
-      },
-      this
-    );
-  };
+
   startConnection = () => {
     // console.log(this.props.connections);
     // const remotePeer = new PeerClient(
@@ -73,7 +47,15 @@ class Settings extends Component {
         <View style={styles.view}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => this.startNode()}
+            onPress={async () => {
+              await AsyncStorage.getItem("node").then(async (res) => {
+                await AsyncStorage.setItem(
+                  "node",
+                  JSON.stringify({ node: true })
+                );
+              });
+              this.props.startNode();
+            }}
           >
             <Text style={styles.instructions}>Start NodeJS</Text>
           </TouchableOpacity>
@@ -88,6 +70,10 @@ class Settings extends Component {
           <TouchableOpacity
             style={styles.button}
             onPress={async () => {
+              await AsyncStorage.setItem(
+                "node",
+                JSON.stringify({ node: false })
+              );
               NodeService.stopService();
               BackgroundService.stop();
               await AsyncStorage.removeItem("localPeer");
@@ -146,6 +132,7 @@ const mapDispatchToProps = (dispatch) => {
     setLocalPeer: (peer) => dispatch(setLocalPeer(peer)),
     setRemotePeer: (peer) => dispatch(setRemotePeer(peer)),
     setScreenStatus: (status) => dispatch(setScreenStatus(status)),
+    startNode: () => dispatch(startNode()),
   };
 };
 

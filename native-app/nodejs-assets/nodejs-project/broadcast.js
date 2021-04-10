@@ -10,23 +10,25 @@ app.use(cors());
 app.options("*", cors());
 const http = require("http").Server(app);
 var io = require("socket.io")(http);
-
-const ip = Object.values(require("os").networkInterfaces()).reduce(
-  (r, list) =>
-    r.concat(
-      list.reduce(
-        (rr, i) =>
-          rr.concat((i.family === "IPv4" && !i.internal && i.address) || []),
-        []
-      )
-    ),
-  []
-)[0];
+const os = require("os");
+const getIp = () => {
+  return Object.values(os.networkInterfaces()).reduce(
+    (r, list) =>
+      r.concat(
+        list.reduce(
+          (rr, i) =>
+            rr.concat((i.family === "IPv4" && !i.internal && i.address) || []),
+          []
+        )
+      ),
+    []
+  )[0];
+};
 
 //io.origins('*//*:*');
 io.sockets.on("connection", (client) => {
   io.emit("broadcast", {
-    ip: ip,
+    ip: getIp(),
     port: 5000,
     username: "Vasu Sharma",
     peerId: global.config.metadata["localPeerId"],
@@ -41,10 +43,17 @@ app.get("/", (req, res) =>
 http.listen(port, () => {
   console.log(`Broadcasting on port ${port}`);
 });
+const peerServer = require("peer").ExpressPeerServer(http, {
+  debug: true,
+});
+app.use("/peerjs", peerServer);
 
-app.use(
-  "/peerjs",
-  require("peer").ExpressPeerServer(http, {
-    debug: true,
-  })
-);
+peerServer.on("error", (err) => {
+  console.log("peerjs error", err);
+});
+
+peerServer.on("connection", (peer) => {
+  global.config.peerConnections[peer.id] = peer;
+  console.log(global.config.peerConnections);
+  console.log("peer connection");
+});

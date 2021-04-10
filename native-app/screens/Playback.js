@@ -140,7 +140,7 @@ class Playback extends Component {
     }
   };
   componentDidMount() {
-    this.requestPermissions();
+    // this.requestPermissions();
   }
   render() {
     return (

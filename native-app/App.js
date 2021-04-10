@@ -13,6 +13,7 @@ import { startSearch, initSearch } from "./redux/searchRedux/searchAction";
 import "./config.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IncomingCall } from "./screens/IncomingCall";
+import { echoNode } from "./redux/nodeRedux/nodeAction";
 
 const { PeerClient } = require("./peer.js");
 const sleep = async (delay) => await new Promise((r) => setTimeout(r, delay));
@@ -90,6 +91,20 @@ class App extends Component {
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         console.log("You can use the Microphone");
+        await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        ]).then((granted) => {
+          if (granted["android.permission.READ_EXTERNAL_STORAGE"] === "granted")
+            console.log("You can read storage");
+          else console.log("You cannot read storage");
+
+          if (
+            granted["android.permission.WRITE_EXTERNAL_STORAGE"] === "granted"
+          )
+            console.log("You can write storage");
+          else console.log("You cannot write storage");
+        });
       } else {
         console.log("Microphone permission denied");
       }
@@ -98,20 +113,33 @@ class App extends Component {
     }
   };
   connectWithPeerJS = async () => {
-    await AsyncStorage.getItem("localPeer").then((localPeer) => {
-      if (localPeer) {
-        // localPeer = JSON.parse(localPeer);
-        // localPeer.peer.reconnect();
-        //
-        const peer = new PeerClient(localPeer.peerId);
+    if (!this.props.localPeer) {
+      try {
+        console.log(this.props.localPeer);
+        const peer = new PeerClient(null, "vasu_007");
         this.props.setLocalPeer(peer);
+      } catch {
+        console.log("this is the errro");
       }
-    });
+    }
+    // await AsyncStorage.getItem("localPeer").then((localPeer) => {
+    //   if (localPeer) {
+    //     localPeer = JSON.parse(localPeer);
+    //     console.log("localpeer", localPeer);
+    //     // localPeer.peer.reconnect();
+    //     // const peer = new PeerClient(null, "vasu_007");
+    //     // this.props.setLocalPeer(peer);
+    //   }
+    // });
   };
   async componentDidMount() {
+    // AsyncStorage.clear();
+
     this.requestPermissions();
     await BackgroundService.start(veryIntensiveTask, options);
-    this.connectWithPeerJS();
+
+    this.props.echoNode();
+    // this.connectWithPeerJS();
     this.props.initSearch(rangeString);
     AppState.addEventListener("change", this._handleAppStateChange);
   }
@@ -145,6 +173,7 @@ const mapStateToProps = (state) => {
     info: state.data.info,
     search: state.search.search,
     connStatus: state.data.connStatus,
+    localPeer: state.stream.localPeer,
   };
 };
 
@@ -156,6 +185,7 @@ const mapDispatchToProps = (dispatch) => {
     initSearch: (block) => dispatch(initSearch(block)),
     setLocalPeer: (peer) => dispatch(setLocalPeer(peer)),
     setRemotePeer: (peer) => dispatch(setRemotePeer(peer)),
+    echoNode: () => dispatch(echoNode()),
   };
 };
 

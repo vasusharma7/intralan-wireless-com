@@ -4,7 +4,7 @@ import { Alert } from "react-native";
 require("react-native-webrtc");
 import Peer from "react-native-peerjs";
 import { store } from "./redux/store";
-import { setAVStream } from "./redux/streamRedux/streamAction";
+import { setAVStream, setLocalPeer } from "./redux/streamRedux/streamAction";
 import { setConnStatus } from "./redux/dataRedux/dataAction";
 import nodejs from "nodejs-mobile-react-native";
 import RNFetchBlob from "react-native-fetch-blob";
@@ -12,6 +12,8 @@ var RNFS = require("react-native-fs");
 import DocumentPicker from "react-native-document-picker";
 import { Buffer } from "buffer";
 import FileViewer from "react-native-file-viewer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { throws } from "assert";
 const sleep = (milliseconds) => {
   let timeStart = new Date().getTime();
   while (true) {
@@ -22,29 +24,36 @@ const sleep = (milliseconds) => {
   }
 };
 class PeerClient {
-  constructor(connection) {
+  constructor(connection, localPeerId) {
     this.connection = connection;
+    this.localPeerId = localPeerId;
+    this.establishConnection();
+    this.fileBuffer = [];
+    this.chunksize = 32 * 1024;
+    this.state = store.getState();
+    this.offset = 0;
+    this.getMediaSource();
+    this.dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
+    this.cacheLocation = `${RNFetchBlob.fs.dirs.CacheDir}/temp`;
+  }
+  establishConnection = () => {
     NetworkInfo.getIPV4Address().then((ip) => {
-      this.ip = connection?.ip ? connection.ip : ip;
+      this.ip = this.connection?.ip ? this.connection.ip : ip;
       if (this.connection) store.dispatch(setConnStatus("connecting"));
-      this.peer = new Peer(null, {
+      this.peer = new Peer(this.localPeerId, {
         host: this.ip,
         port: 5000,
         path: "/peerjs",
         secure: false,
         debug: true,
       });
-      this.fileBuffer = [];
-      this.chunksize = 32 * 1024;
-      this.state = store.getState();
-      this.offset = 0;
       console.log("firing listeners");
       this.fireEventListeners();
-      this.getMediaSource();
-      this.dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
-      this.cacheLocation = `${RNFetchBlob.fs.dirs.CacheDir}/temp`;
     });
-  }
+  };
+  disconnectSelf = () => {
+    nodejs.channel.send(JSON.stringify({ clearId: this.localPeerId }));
+  };
   getMediaSource = () => {
     mediaDevices.enumerateDevices().then((sourceInfos) => {
       let audioSourceId;
@@ -67,16 +76,20 @@ class PeerClient {
         });
     });
   };
+
   fireEventListeners = () => {
     this.peer.on("error", (err) => {
+      if (this.localPeerId) this.disconnectSelf();
+      this.establishConnection();
       console.log("listen", err);
     });
-    this.peer.on("signal", (data) => {
-      if (data.renegotiate || data.transceiverRequest) return;
-    });
-    this.peer.on("open", (peerId) => {
+    // this.peer.on("signal", (data) => {
+    //   if (data.renegotiate || data.transceiverRequest) return;
+    // });
+    this.peer.on("open", async (peerId) => {
       this.peerId = peerId;
       console.log("Local peer open with ID", peerId, this.connection);
+
       if (this.connection) {
         switch (this.connection.operation) {
           case "call": {
@@ -90,7 +103,7 @@ class PeerClient {
             break;
           }
           case "message": {
-            this.connect("message")
+            this.connect("message");
             break;
           }
           default: {
@@ -98,7 +111,12 @@ class PeerClient {
           }
         }
       } else {
+        // await AsyncStorage.setItem(
+        //   "localPeer",
+        //   JSON.stringify(this.state.stream.localPeer)
+        // );
         nodejs.channel.send(JSON.stringify({ localPeerId: peerId }));
+        store.dispatch(setLocalPeer(this));
       }
     });
 
@@ -271,7 +289,7 @@ class PeerClient {
 
   sendMessage = (data) => {
     console.log("receiving data from peer ", data);
-    console.log(this.peerId)
+    console.log(this.peerId);
     // this.conn.send({
     //   message: data
     // })
@@ -279,10 +297,10 @@ class PeerClient {
 
   recieveMessage = () => {
     this.conn.on("message", (data) => {
-      console.log("Recieved",data)
+      console.log("Recieved", data);
       // Dispatch data to redux and update state
-    })
-  }
+    });
+  };
   connect = (type) => {
     const conn = this.peer.connect(this.connection.peerId, {
       metadata: {
@@ -300,9 +318,8 @@ class PeerClient {
         this.startCall();
       } else if (type === "file") {
         this.sendFile();
-      }
-      else if (type === "message"){
-        console.log('Sending message')
+      } else if (type === "message") {
+        console.log("Sending message");
         this.sendMessage();
       }
     });
