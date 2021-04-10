@@ -87,7 +87,6 @@ connect = async (ip) => {
     console.log("self IP");
     return;
   }
-  console.log(ip)
   return new Promise(async (resolve, reject) => {
     const socket = await socketIOClient(`http://${ip}:5000`);
     socket.on("connect", () => {

@@ -25,7 +25,7 @@ class Message extends Component {
 
     sendMessage = () => {
       console.log(this.state.message)
-      this.props.localPeer.handleMessage(this.state.message)
+      this.props.localPeer.sendMessage(this.state.message)
     }
     
     render() {
