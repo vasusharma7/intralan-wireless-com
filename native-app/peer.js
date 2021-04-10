@@ -14,6 +14,7 @@ import { Buffer } from "buffer";
 import FileViewer from "react-native-file-viewer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { throws } from "assert";
+import { addMessage, chatInit } from "./redux/messageRedux/messageAction";
 const sleep = (milliseconds) => {
   let timeStart = new Date().getTime();
   while (true) {
@@ -133,6 +134,9 @@ class PeerClient {
         conn.on("data", (data) => {
           if (data?.operation === "file") {
             this.saveFile(data, conn);
+          } else if (data?.operation === "chat") {
+            this.conn = conn;
+            this.recieveMessage(data);
           } else {
             console.log("Local peer sending some data.");
             conn.send("Hello, this is the LOCAL peer!");
@@ -195,7 +199,7 @@ class PeerClient {
           console.log("chunk arrived", res.chunk, resp);
         })
         .catch(console.error);
-      conn.send({ success: true, chunk: res.chunk });
+      conn.send({ success: true, chunk: res.chunk, operation: "file" });
     }
   }
   async sendFile() {
@@ -286,32 +290,47 @@ class PeerClient {
       console.log("The call is closed");
     });
   };
-
-  sendMessage = (data) => {
-    console.log("receiving data from peer ", data);
-    console.log(this.peerId);
-    // this.conn.send({
-    //   message: data
-    // })
-  };
-
-  recieveMessage = () => {
-    this.conn.on("message", (data) => {
-      console.log("Recieved", data);
-      // Dispatch data to redux and update state
+  initChat = () => {
+    store.dispatch(chatInit(true));
+    this.conn.send({
+      peerId: this.peerId,
+      operation: "chat",
+      message: "intralan-chat-init",
+      time: new Date(),
     });
   };
+  sendMessage = (data) => {
+    // console.log("receiving data from peer ", data);
+    // console.log(this.peerId);
+    console.log("sending", data);
+    store.dispatch(addMessage(data));
+    this.conn.send({
+      peerId: this.peerId,
+      operation: "chat",
+      message: data,
+      time: new Date(),
+    });
+  };
+
+  recieveMessage = (data) => {
+    console.log("receiving", data);
+    if (data.message === "intralan-chat-init") {
+      store.dispatch(chatInit(false));
+      return;
+    }
+    store.dispatch(addMessage(data));
+    console.log(this.state.message.messages);
+  };
   connect = (type) => {
-    const conn = this.peer.connect(this.connection.peerId, {
+    this.conn = this.peer.connect(this.connection.peerId, {
       metadata: {
         username: global.config.username,
       },
     });
-    this.conn = conn;
-    conn.on("error", (err) => {
+    this.conn.on("error", (err) => {
       console.log("conn", err);
     });
-    conn.on("open", () => {
+    this.conn.on("open", () => {
       store.dispatch(setConnStatus(null));
       console.log("Remote peer has opened connection.");
       if (type === "call") {
@@ -320,11 +339,15 @@ class PeerClient {
         this.sendFile();
       } else if (type === "message") {
         console.log("Sending message");
-        this.sendMessage();
+
+        this.initChat();
       }
     });
-    conn.on("data", (data) => {
+    this.conn.on("data", (data) => {
       console.log(data);
+      if (data?.operation === "chat") {
+        this.recieveMessage(data);
+      }
       if (data.success) {
         this.sendFile();
       }

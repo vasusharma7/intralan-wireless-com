@@ -1,14 +1,22 @@
-import React, { Component } from 'react'
-import { SafeAreaView, Text, Dimensions,TextInput, Button, View, StyleSheet } from "react-native";
-const {  width, height } = Dimensions.get("screen");
+import React, { Component } from "react";
+import {
+  SafeAreaView,
+  Text,
+  Dimensions,
+  TextInput,
+  Button,
+  View,
+  StyleSheet,
+} from "react-native";
+const { width, height } = Dimensions.get("screen");
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { connect } from "react-redux";
-import { GiftedChat } from 'react-native-gifted-chat';
+import { GiftedChat } from "react-native-gifted-chat";
 
 class Message extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {messages: []};
+    this.state = { messages: [] };
     this.onSend = this.onSend.bind(this);
   }
   componentDidMount() {
@@ -16,11 +24,11 @@ class Message extends React.Component {
       messages: [
         {
           _id: 1,
-          text: 'Welcome to IntraLAN',
+          text: "Welcome to IntraLAN",
           createdAt: new Date(Date.now()),
           user: {
             _id: this.props.remotePeer,
-            name: 'Dummy',
+            name: "Dummy",
           },
         },
       ],
@@ -34,7 +42,9 @@ class Message extends React.Component {
     });
     // console.log(messages)
     // Change later to use peer ids
-    this.props.localPeer.sendMessage(messages[0].text)
+    if (this.props.chatInit)
+      this.props.remotePeer.sendMessage(messages[0].text);
+    else this.props.localPeer.sendMessage(messages[0].text);
   }
   render() {
     return (
@@ -49,17 +59,18 @@ class Message extends React.Component {
   }
 }
 const mapStateToProps = (state) => ({
-    remotePeer: state.stream.remotePeer,
-    localPeer: state.stream.localPeer,
-  });
-  
-  const mapDispatchToProps = (dispatch) => {
-    return {
-      setConnStatus: (status) => dispatch(setConnStatus(status)),
-    };
+  remotePeer: state.stream.remotePeer,
+  localPeer: state.stream.localPeer,
+  chatInit: state.message.chatInit,
+});
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setConnStatus: (status) => dispatch(setConnStatus(status)),
   };
-  
-  export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(Message);
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Message);
