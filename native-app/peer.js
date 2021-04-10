@@ -89,6 +89,10 @@ class PeerClient {
             this.connect("file");
             break;
           }
+          case "message": {
+            this.connect("message")
+            break;
+          }
           default: {
             store.dispatch(setConnStatus(null));
           }
@@ -265,9 +269,20 @@ class PeerClient {
     });
   };
 
-  handleMessage = (data) => {
+  sendMessage = (data) => {
     console.log("receiving data from peer ", data);
+    console.log(this.peerId)
+    // this.conn.send({
+    //   message: data
+    // })
   };
+
+  recieveMessage = () => {
+    this.conn.on("message", (data) => {
+      console.log("Recieved",data)
+      // Dispatch data to redux and update state
+    })
+  }
   connect = (type) => {
     const conn = this.peer.connect(this.connection.peerId, {
       metadata: {
@@ -285,6 +300,10 @@ class PeerClient {
         this.startCall();
       } else if (type === "file") {
         this.sendFile();
+      }
+      else if (type === "message"){
+        console.log('Sending message')
+        this.sendMessage();
       }
     });
     conn.on("data", (data) => {

@@ -41,13 +41,7 @@ class Settings extends Component {
   };
   startNode = () => {
     console.log("Starting node")
-    try {
-      // nodejs.start("main.js");
-    }
-    catch(e){
-      console.log(e)
-    }
-
+      nodejs.start("main.js");
     nodejs.channel.addListener(
       "message",
       (msg) => {

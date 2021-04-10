@@ -52,6 +52,14 @@ class Connections extends Component {
               this.exec(this.state.connection, "file");
             }}
           />
+          <View style={{ margin: 10 }} />
+           <Button
+            title="Chat"
+            icon="message"
+            onPress={() => {
+              this.exec(this.state.connection, "message");
+            }}
+          />
         </Modal>
         {this.props.connStatus !== null && <Stream />}
         <View>
