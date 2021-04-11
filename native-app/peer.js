@@ -321,7 +321,7 @@ class PeerClient {
       message: message,
       time: new Date(),
       username: this.authInfo.username,
-      peerId: this.peerId,
+      peerId: this.localPeerId,
     };
     store.dispatch(addMessage(this.frameMessage(data)));
     this.conn.send({
