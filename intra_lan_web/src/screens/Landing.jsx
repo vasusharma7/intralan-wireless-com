@@ -16,6 +16,14 @@ export default class Landing extends Component {
             gologin : true
         })
     }
+    componentDidMount(){
+        const authInfo = {}
+        authInfo['name'] = sessionStorage.getItem("name");
+        authInfo['email'] = sessionStorage.getItem("email");
+        authInfo['uid'] = sessionStorage.getItem("id");
+        sessionStorage.setItem("authInfo",JSON.stringify(authInfo));
+        // global.config.authInfo = authInfo;
+    }
     render() {
         return (
             <div style={{background:"#4385F5" ,height:"100vh", display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'center'}}>

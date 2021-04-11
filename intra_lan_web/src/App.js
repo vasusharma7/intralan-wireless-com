@@ -14,6 +14,8 @@ import Landing from './screens/Landing';
 import Login from './screens/Login';
 import Files from './screens/Files';
 import "./config"
+// const PeerClient = require("./peer.js")
+import PeerClient from "./peer.js"
 
 const engine = new Styletron();
 const Centered = styled('div', {
@@ -33,6 +35,12 @@ class App extends Component {
 
   componentDidMount = async () => {
     // startBroadcast()
+    if (!this.props.localPeer) {
+      console.log("component mounted...")
+      const peer = new PeerClient(null, "vasu_007");
+      // const peer = new PeerClient(null, "vasu_007");
+      this.props.setLocalPeer(peer);
+    }
     console.log(global.config)
     this.props.initSearch("192.168.1.0/24");
   }
@@ -88,6 +96,7 @@ const mapStateToProps = (state) => {
     info: state.data.info,
     search: state.search.search,
     connStatus: state.data.connStatus,
+    localPeer: state.stream.localPeer
   };
 };
 

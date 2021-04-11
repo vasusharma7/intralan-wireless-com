@@ -37,7 +37,7 @@ export default class Login extends Component {
         sessionStorage.setItem("name", this.state.name)
         sessionStorage.setItem("email", this.state.email)
         sessionStorage.setItem("phone", this.state.phno)
-        sessionStorage.setItem("localID", Date.now())
+        sessionStorage.setItem("uid", Date.now())
     }
     handleLogin = () => {
         console.log(this.state)
@@ -46,6 +46,7 @@ export default class Login extends Component {
             this.setState({
                 logIn : true
             })
+            
         }
         else{
             console.log("Invalid")
