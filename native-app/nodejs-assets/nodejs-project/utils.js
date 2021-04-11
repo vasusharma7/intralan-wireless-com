@@ -5,6 +5,10 @@ const appEventHandler = (msg) => {
       global.config.metadata["localPeerId"] = msg[event];
       return;
     }
+    case "authInfo": {
+      global.config.authInfo = msg[event];
+      return;
+    }
     case "clearId": {
       if (
         global.config.peerConnections !== {} &&

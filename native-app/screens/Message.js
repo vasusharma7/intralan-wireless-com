@@ -21,25 +21,15 @@ class Message extends React.Component {
   }
   componentDidMount() {
     this.setState({
-      messages: [
-        {
-          _id: 1,
-          text: "Welcome to IntraLAN",
-          createdAt: new Date(Date.now()),
-          user: {
-            _id: this.props.remotePeer,
-            name: "Dummy",
-          },
-        },
-      ],
+      messages: [],
     });
   }
   onSend(messages = []) {
-    this.setState((previousState) => {
-      return {
-        messages: GiftedChat.append(previousState.messages, messages),
-      };
-    });
+    // this.setState((previousState) => {
+    //   return {
+    //     messages: GiftedChat.append(previousState.messages, messages),
+    //   };
+    // });
     // console.log(messages)
     // Change later to use peer ids
     if (this.props.chatInit)
@@ -49,10 +39,10 @@ class Message extends React.Component {
   render() {
     return (
       <GiftedChat
-        messages={this.state.messages}
+        messages={this.props.messages}
         onSend={this.onSend}
         user={{
-          _id: this.props.localPeer,
+          _id: global.config.authInfo.uid,
         }}
       />
     );
@@ -62,6 +52,7 @@ const mapStateToProps = (state) => ({
   remotePeer: state.stream.remotePeer,
   localPeer: state.stream.localPeer,
   chatInit: state.message.chatInit,
+  messages: state.message.messages,
 });
 
 const mapDispatchToProps = (dispatch) => {
@@ -74,3 +65,13 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(Message);
+
+// {
+//   _id: 1,
+//   text: "Welcome to IntraLAN",
+//   createdAt: new Date(Date.now()),
+//   user: {
+//     _id: this.props.remotePeer,
+//     name: "Dummy",
+//   },
+// },

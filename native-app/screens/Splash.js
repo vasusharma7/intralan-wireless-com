@@ -1,13 +1,27 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { Component } from "react";
 import { Dimensions, Image, View } from "react-native";
+import { Title } from "react-native-paper";
 import { connect } from "react-redux";
 const { width, height } = Dimensions.get("screen");
 
 export class Splash extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { message: "" };
+  }
   async componentDidMount() {
     await AsyncStorage.getItem("auth").then((res) => {
-      let component = res ? "Home" : "Auth";
+      if (res) {
+        global.config.authInfo = JSON.parse(res);
+      }
+      const cond = this.props.route?.params?.auth || res;
+      let component = cond ? "Home" : "Auth";
+      this.setState({
+        message: cond
+          ? "Authenticated | Lets Fly...."
+          : "Let's dive in to register....",
+      });
       setTimeout(() => {
         this.props.navigation.navigate(component);
       }, 1000);
@@ -27,6 +41,20 @@ export class Splash extends Component {
           source={require("../assets/wifi.gif")}
           style={{ width: Math.max(400, (3 * width) / 4), height: height / 2 }}
         />
+
+        <Title style={{ color: "white", textAlign: "center", paddingTop: 10 }}>
+          IntraLAN Communicaton
+        </Title>
+        <Title
+          style={{
+            color: "white",
+            textAlign: "center",
+            paddingTop: 10,
+            fontSize: 15,
+          }}
+        >
+          {this.state.message}
+        </Title>
       </View>
     );
   }

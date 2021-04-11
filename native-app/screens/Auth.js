@@ -12,51 +12,87 @@ import {
   Dimensions,
   ScrollView,
 } from "react-native";
+import { Title } from "react-native-paper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const { width, height } = Dimensions.get("screen");
 export class Auth extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: "",
-      contact: "",
-      email: "",
+      username: "Vasu",
+      contact: "9906330301",
+      email: "vasusharma@tech.com",
     };
   }
 
   onClickListener = () => {
-    Alert.alert("IntraLANCom ID", `Your Unique ID is ${new Date().getTime()}`);
+    if (
+      Object.keys(this.state).filter((val) => this.state[val].length === 0)
+        .length
+    ) {
+      Alert.alert("Please enter all details");
+      return;
+    }
     console.log(this.state);
+    let uid = new Date().getTime();
+    Alert.alert("IntraLANCom ID", `Your Unique ID is ${uid}`, [
+      {
+        text: "Proceed",
+        onPress: async () => {
+          await AsyncStorage.setItem(
+            "auth",
+            JSON.stringify({ uid: uid, ...this.state })
+          ).then(() => {
+            global.config.authInfo = { uid: uid, ...this.state };
+            this.props.navigation.navigate({
+              name: "Splash",
+              key: "Splash",
+              params: { auth: true },
+            });
+          });
+        },
+      },
+      {
+        text: "Cancel",
+        onPress: () => {},
+      },
+    ]);
   };
 
   render() {
     return (
       <ScrollView style={styles.container}>
+        <Title style={{ color: "white", textAlign: "center", paddingTop: 10 }}>
+          IntraLAN Communicaton
+        </Title>
         <View style={styles.container1}>
           <Image
-            source={require("../assets/login_main.gif")}
-            style={{ width: width }}
+            source={require("../assets/login_.gif")}
+            style={{ width: width / 2, height: height / 3 }}
           />
           <View style={styles.container2}>
             <View style={styles.inputContainer}>
               <Image
                 style={styles.inputIcon}
-                source={require("../assets/login.gif")}
+                source={require("../assets/wifi.gif")}
               />
               <TextInput
                 style={styles.inputs}
                 placeholder="Name"
                 keyboardType="default"
+                value={this.state.username}
                 underlineColorAndroid="transparent"
-                onChangeText={(name) => this.setState({ name })}
+                onChangeText={(username) => this.setState({ username })}
               />
             </View>
             <View style={styles.inputContainer}>
               <Image
                 style={styles.inputIcon}
-                source={require("../assets/login.gif")}
+                source={require("../assets/wifi.gif")}
               />
               <TextInput
                 style={styles.inputs}
+                value={this.state.contact}
                 placeholder="Contact No."
                 keyboardType="number-pad"
                 underlineColorAndroid="transparent"
@@ -66,10 +102,11 @@ export class Auth extends Component {
             <View style={styles.inputContainer}>
               <Image
                 style={styles.inputIcon}
-                source={require("../assets/login.gif")}
+                source={require("../assets/wifi.gif")}
               />
               <TextInput
                 style={styles.inputs}
+                value={this.state.email}
                 placeholder="Email"
                 keyboardType="email-address"
                 underlineColorAndroid="transparent"
@@ -116,21 +153,20 @@ export default connect(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffe6cb",
+    backgroundColor: "#000",
   },
   container1: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff9e4",
-    paddingTop: height / 10,
+    backgroundColor: "#000",
   },
   container2: {
     flex: 1,
     width: width,
     justifyContent: "flex-start",
     alignItems: "center",
-    backgroundColor: "#ffe6cb",
+    backgroundColor: "#000",
   },
   inputContainer: {
     borderBottomColor: "#F5FCFF",
@@ -153,7 +189,11 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     marginLeft: 15,
+    borderWidth: 1,
+    borderRadius: 30,
+    borderColor: "transparent",
     justifyContent: "center",
+    backgroundColor: "#222",
   },
   buttonContainer: {
     height: 45,
@@ -165,7 +205,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   loginButton: {
-    backgroundColor: "#00203f",
+    backgroundColor: "#0099dc",
   },
   loginText: {
     color: "white",

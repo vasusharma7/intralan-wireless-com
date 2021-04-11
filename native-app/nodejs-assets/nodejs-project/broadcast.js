@@ -30,7 +30,7 @@ io.sockets.on("connection", (client) => {
   io.emit("broadcast", {
     ip: getIp(),
     port: 5000,
-    username: "Vasu Sharma",
+    ...global.config.authInfo,
     peerId: global.config.metadata["localPeerId"],
   });
   console.log(client.id);

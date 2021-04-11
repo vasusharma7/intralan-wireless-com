@@ -27,7 +27,9 @@ const sleep = (milliseconds) => {
 class PeerClient {
   constructor(connection, localPeerId) {
     this.connection = connection;
-    this.localPeerId = localPeerId;
+    this.authInfo = global.config.authInfo;
+    // this.localPeerId = localPeerId ? this.authInfo.uid : null;
+    this.localPeerId = this.authInfo.uid;
     this.establishConnection();
     this.fileBuffer = [];
     this.chunksize = 32 * 1024;
@@ -116,6 +118,7 @@ class PeerClient {
         //   "localPeer",
         //   JSON.stringify(this.state.stream.localPeer)
         // );
+        nodejs.channel.send(JSON.stringify({ authInfo: this.authInfo }));
         nodejs.channel.send(JSON.stringify({ localPeerId: peerId }));
         store.dispatch(setLocalPeer(this));
       }
@@ -299,16 +302,31 @@ class PeerClient {
       time: new Date(),
     });
   };
-  sendMessage = (data) => {
+  frameMessage = (data) => {
+    return {
+      _id: new Date().getTime(),
+      text: data.message,
+      createdAt: data.time,
+      user: {
+        _id: data.peerId,
+        name: data.username,
+      },
+    };
+  };
+  sendMessage = (message) => {
     // console.log("receiving data from peer ", data);
     // console.log(this.peerId);
     console.log("sending", data);
-    store.dispatch(addMessage(data));
-    this.conn.send({
-      peerId: this.peerId,
-      operation: "chat",
-      message: data,
+    const data = {
+      message: message,
       time: new Date(),
+      username: this.authInfo.username,
+      peerId: this.peerId,
+    };
+    store.dispatch(addMessage(this.frameMessage(data)));
+    this.conn.send({
+      ...data,
+      operation: "chat",
     });
   };
 
@@ -318,14 +336,12 @@ class PeerClient {
       store.dispatch(chatInit(false));
       return;
     }
-    store.dispatch(addMessage(data));
-    console.log(this.state.message.messages);
+    store.dispatch(addMessage(this.frameMessage(data)));
   };
+
   connect = (type) => {
     this.conn = this.peer.connect(this.connection.peerId, {
-      metadata: {
-        username: global.config.username,
-      },
+      metadata: this.authInfo,
     });
     this.conn.on("error", (err) => {
       console.log("conn", err);

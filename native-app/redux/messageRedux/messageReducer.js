@@ -17,7 +17,7 @@ export const messageReducer = (state = initalState, action) => {
     case ADD_MESSAGE: {
       console.log("in reducer", action, state);
       let temp = state.messages;
-      temp = [...temp, action.payload];
+      temp = [action.payload, ...temp];
       return {
         ...state,
         messages: temp,

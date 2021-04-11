@@ -6,5 +6,10 @@ NetworkInfo.getIPV4Address().then((ip) => {
 });
 global.config = {
   info: info,
-  username: "Vasu Sharma",
+  authInfo: {
+    username: "",
+    uid: "",
+    contact: "",
+    email: "",
+  },
 };
