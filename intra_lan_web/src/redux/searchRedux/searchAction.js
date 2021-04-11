@@ -24,6 +24,7 @@ const sleep = (milliseconds) => {
 };
 
 export const initSearch = (block) => {
+  console.log(global)
   console.log("initialising search....");
   const ips = [];
   const generator = new Netmask(block);
