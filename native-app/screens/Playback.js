@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View, Button, StyleSheet, PermissionsAndroid } from "react-native";
 import { RTCView } from "react-native-webrtc";
-import RNFetchBlob from "react-native-fetch-blob";
+import RNFetchBlob from "rn-fetch-blob";
 var RNFS = require("react-native-fs");
 import DocumentPicker from "react-native-document-picker";
 import FileViewer from "react-native-file-viewer";

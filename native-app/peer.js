@@ -7,7 +7,7 @@ import { store } from "./redux/store";
 import { setAVStream, setLocalPeer } from "./redux/streamRedux/streamAction";
 import { setConnStatus } from "./redux/dataRedux/dataAction";
 import nodejs from "nodejs-mobile-react-native";
-import RNFetchBlob from "react-native-fetch-blob";
+import RNFetchBlob from "rn-fetch-blob";
 var RNFS = require("react-native-fs");
 import DocumentPicker from "react-native-document-picker";
 import { Buffer } from "buffer";
