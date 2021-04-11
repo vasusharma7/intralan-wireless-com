@@ -19,23 +19,32 @@ import {
   import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
   import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
   // import {Connections} from './Connections'
-  
-class Home extends Component {
+  import Navbar from './Navbar';
+
+
+  class Home extends Component {
     constructor(props){
-        super(props)
-        this.state = {
+      super(props)
+      this.state = {
             userName : 'Anup',
-            myip: '192.168.1.1',
+            myip: '',
             search: false,
         }
+    }
+    componentDidMount = () => {    
+      this.setState({
+        myip : sessionStorage.getItem("ip"),
+        userName : sessionStorage.getItem("name"),
+      })
     }
     
     render() {
         return (
-            <div style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'center'}}>
-                <div>
+          <>
+            <Navbar></Navbar>
+            <div style={{display:'flex', flexDirection:'column',marginTop:"40px" ,alignItems:'center', justifyContent:'center'}}>
                         <Avatar
-                            name="Anup Nair"
+                            name={this.state.name}
                             size="320px"
                             src="https://ambitioustracks.com/wp-content/uploads/2017/01/1.-fundadores.png"
                         />
@@ -45,9 +54,11 @@ class Home extends Component {
                         <p>
                         My IP : {this.state && this.state.myip}
                         </p>
-                </div>
+                        <Button kind="secondary" onClick={this.props.startSearch}>Search</Button>
   
             </div>
+
+          </>
         )
     }
 }
@@ -69,7 +80,7 @@ const mapStateToProps = (state) => {
       setLocalPeer: (info) => dispatch(setLocalPeer(info)),
       setRemotePeer: (info) => dispatch(setRemotePeer(info)),
     //   setScreenStatus: (status) => dispatch(setScreenStatus(status)),
-        startSearch: (info) => dispatch(startSearch(info)),
+        startSearch: () => dispatch(startSearch()),
     };
   };
   

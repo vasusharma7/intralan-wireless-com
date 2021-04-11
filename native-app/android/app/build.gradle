@@ -111,6 +111,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    dexOptions {
+        javaMaxHeapSize "4g" 
+    }
+
     defaultConfig {
         applicationId "com.vasusharma7.intralancom"
         minSdkVersion rootProject.ext.minSdkVersion

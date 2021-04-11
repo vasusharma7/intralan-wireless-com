@@ -3,15 +3,19 @@ import { FaBeer } from 'react-icons/fa';
 import {Client as Styletron} from 'styletron-engine-atomic';
 import {Provider as StyletronProvider} from 'styletron-react';
 import {DarkTheme, BaseProvider, styled} from 'baseui';
-import  { Route, BrowserRouter } from 'react-router-dom'
+import  { Route, BrowserRouter, Switch, Redirect } from 'react-router-dom'
 import { startSearch, initSearch } from "./redux/searchRedux/searchAction";
 import { updateConnections, updateInfo } from "./redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "./redux/streamRedux/streamAction";
 import { connect } from "react-redux";
-
 import './App.css';
 import Home from './screens/Home';
-import Navbar from './screens/Navbar';
+import Landing from './screens/Landing';
+import Login from './screens/Login';
+import Files from './screens/Files';
+import "./config"
+// const PeerClient = require("./peer.js")
+import PeerClient from "./peer.js"
 
 const engine = new Styletron();
 const Centered = styled('div', {
@@ -29,21 +33,54 @@ class App extends Component {
     }
   }
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
+    // startBroadcast()
+    if (!this.props.localPeer) {
+      console.log("component mounted...")
+      const peer = new PeerClient(null, "vasu_007");
+      // const peer = new PeerClient(null, "vasu_007");
+      this.props.setLocalPeer(peer);
+    }
+    console.log(global.config)
     this.props.initSearch("192.168.1.0/24");
   }
 
   render(){
   return  (
     <StyletronProvider value={engine}>
+      {sessionStorage.getItem("loggedIn") === true && (
+        <Redirect
+          to={{ pathname: '/home', state: sessionStorage.getItem('peerID') }}
+        />
+      )}
     <BaseProvider theme={DarkTheme}>
       <Centered>
     <BrowserRouter>
-    <div className="App">
-    <Navbar></Navbar>
-
-    <Home/>
-    </div>
+    <Switch>
+    <Route
+      exact
+      path = "/home"
+      render = {() => <Home/>}
+    >
+    </Route>
+    <Route
+      exact
+      path = "/"
+      render = {() => <Landing/>}
+    >
+    </Route>
+    <Route
+      exact
+      path = "/login"
+      render = {() => <Login/>}
+    >
+    </Route>
+    <Route
+      exact
+      path = "/files"
+      render = {() => <Files/>}
+    ></Route>
+    </Switch>
     </BrowserRouter>
       </Centered>
     </BaseProvider>
@@ -59,6 +96,7 @@ const mapStateToProps = (state) => {
     info: state.data.info,
     search: state.search.search,
     connStatus: state.data.connStatus,
+    localPeer: state.stream.localPeer
   };
 };
 
