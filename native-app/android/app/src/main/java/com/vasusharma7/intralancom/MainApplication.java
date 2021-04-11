@@ -6,6 +6,7 @@ import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.RNFetchBlob.RNFetchBlobPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.bitgo.randombytes.RandomBytesPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.pusherman.networkinfo.RNNetworkInfoPackage;
