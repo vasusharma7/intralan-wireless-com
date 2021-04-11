@@ -14,8 +14,14 @@ import "./config.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IncomingCall } from "./screens/IncomingCall";
 import { echoNode } from "./redux/nodeRedux/nodeAction";
-
+import { Auth } from "./screens/Auth";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { Splash } from "./screens/Splash";
 const { PeerClient } = require("./peer.js");
+
+const Stack = createStackNavigator();
+
 const sleep = async (delay) => await new Promise((r) => setTimeout(r, delay));
 const veryIntensiveTask = async (taskDataArguments) => {
   // Example of an infinite loop task
@@ -164,7 +170,19 @@ class App extends Component {
   };
 
   render() {
-    return <Home />;
+    return (
+      <Stack.Navigator
+        initialRouteName="Splash"
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="Splash" component={Splash} />
+        <Stack.Screen name="Auth" component={Auth} />
+        <Stack.Screen name="Home" component={Home} />
+      </Stack.Navigator>
+    );
+    // ) this.state.auth ? <Home /> : <Auth />;
   }
 }
 const mapStateToProps = (state) => {
