@@ -16,6 +16,7 @@ import decline from "../assets/decline.gif";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { store } from "../redux/store";
 import Timer from "./components/Timer";
+import { RTCView } from "react-native-webrtc";
 export class InCall extends Component {
   constructor(props) {
     super(props);
@@ -37,6 +38,10 @@ export class InCall extends Component {
           backgroundColor: "white",
         }}
       >
+        <RTCView
+          style={{ display: "none" }}
+          streamURL={this.props.stream ? this.props.stream.toURL() : ""}
+        />
         <Image
           source={user}
           style={{
@@ -97,6 +102,7 @@ const mapStateToProps = (state) => ({
   remotePeer: state.stream.remotePeer,
   localPeer: state.stream.localPeer,
   connStatus: state.data.connStatus,
+  stream: state.stream.stream,
 });
 
 const mapDispatchToProps = (dispatch) => {

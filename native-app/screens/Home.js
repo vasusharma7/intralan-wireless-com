@@ -5,11 +5,12 @@ import Settings from "./Settings";
 import { Appbar } from "react-native-paper";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import Playback from "./Playback";
-import Message from './Message';
+import Message from "./Message";
 import { connect } from "react-redux";
 const Tab = createMaterialBottomTabNavigator();
 import IncomingCall from "./IncomingCall";
 import InCall from "./InCall";
+import { FileTransfer } from "./FileTransfer";
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -33,20 +34,22 @@ class Home extends Component {
         {
           key: "chat",
           screen: Message,
-          title: 'My Messages',
-          icon: "message"
-        }
+          title: "My Messages",
+          icon: "message",
+        },
       ],
     };
   }
   paintTheScreen() {
     switch (this.props.connStatus) {
-      // switch ("inCall") {
+      // switch ("fileTransfer") {
       case "incoming":
         return <IncomingCall />;
       case "inCall":
       case "ringing":
         return <InCall />;
+      case "fileTransfer":
+        return <FileTransfer progress={this.props.fileProgress} />;
       default:
         return (
           <>
@@ -100,6 +103,7 @@ const mapStateToProps = (state) => {
     remotePeer: state.stream.remotePeer,
     connStatus: state.data.connStatus,
     screenStatus: state.data.screenStatus,
+    fileProgress: state.stream.fileProgress,
   };
 };
 

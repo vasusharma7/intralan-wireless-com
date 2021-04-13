@@ -4,17 +4,50 @@ import { Alert } from "react-native";
 require("react-native-webrtc");
 import Peer from "react-native-peerjs";
 import { store } from "./redux/store";
-import { setAVStream, setLocalPeer } from "./redux/streamRedux/streamAction";
+import {
+  setAVStream,
+  setFileProgress,
+  setLocalPeer,
+  streamInit,
+} from "./redux/streamRedux/streamAction";
 import { setConnStatus } from "./redux/dataRedux/dataAction";
 import nodejs from "nodejs-mobile-react-native";
-import RNFetchBlob from "react-native-fetch-blob";
+import RNFetchBlob from "rn-fetch-blob";
 var RNFS = require("react-native-fs");
 import DocumentPicker from "react-native-document-picker";
-import { Buffer } from "buffer";
+
 import FileViewer from "react-native-file-viewer";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { throws } from "assert";
-import { addMessage, chatInit } from "./redux/messageRedux/messageAction";
+
+import { addMessage } from "./redux/messageRedux/messageAction";
+
+const Sound = require("react-native-sound");
+Sound.setCategory("Playback");
+
+const whoosh = new Sound("ringtone.mp3", Sound.MAIN_BUNDLE, (error) => {
+  if (error) {
+    console.log("failed to load the sound", error);
+    return;
+  }
+  // loaded successfully
+  console.log(
+    "duration in seconds: " +
+      whoosh.getDuration() +
+      "number of channels: " +
+      whoosh.getNumberOfChannels()
+  );
+});
+whoosh.play((success) => {
+  if (success) {
+    console.log("successfully finished playing");
+  } else {
+    console.log("playback failed due to audio decoding errors");
+  }
+});
+whoosh.setNumberOfLoops(-1);
+whoosh.setVolume(1);
+whoosh.stop(() => {
+  whoosh.play();
+});
 const sleep = (milliseconds) => {
   let timeStart = new Date().getTime();
   while (true) {
@@ -32,9 +65,11 @@ class PeerClient {
     this.localPeerId = this.authInfo.uid;
     this.establishConnection();
     this.fileBuffer = [];
-    this.chunksize = 32 * 1024;
+    this.chunksize = 64 * 1024;
     this.state = store.getState();
+    this.maxRetries = 5;
     this.offset = 0;
+    this.res = {};
     this.getMediaSource();
     this.dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
     this.cacheLocation = `${RNFetchBlob.fs.dirs.CacheDir}/temp`;
@@ -43,7 +78,7 @@ class PeerClient {
     NetworkInfo.getIPV4Address().then((ip) => {
       this.ip = this.connection?.ip ? this.connection.ip : ip;
       if (this.connection) store.dispatch(setConnStatus("connecting"));
-      this.peer = new Peer(this.localPeerId, {
+      this.peer = new Peer(this.connection ? null : this.localPeerId, {
         host: this.ip,
         port: 5000,
         path: "/peerjs",
@@ -82,8 +117,11 @@ class PeerClient {
 
   fireEventListeners = () => {
     this.peer.on("error", (err) => {
-      if (this.localPeerId) this.disconnectSelf();
-      this.establishConnection();
+      store.dispatch(streamInit(false));
+      if (this.maxRetries--) {
+        if (this.localPeerId) this.disconnectSelf();
+        this.establishConnection();
+      }
       console.log("listen", err);
     });
     // this.peer.on("signal", (data) => {
@@ -125,6 +163,7 @@ class PeerClient {
     });
 
     this.peer.on("connection", (conn) => {
+      this.conn = conn;
       this.metadata = conn.metadata;
       console.log("Local peer has received connection.");
       conn.on("error", (err) => {
@@ -148,12 +187,31 @@ class PeerClient {
       });
     });
     this.peer.on("call", async (call) => {
+      this.playRingtone();
+      setTimeout(() => {
+        if (this.state.data.connStatus === "inComing") {
+          store.dispatch(setConnStatus(null));
+          this.conn.send({ operation: "call", action: "decline" });
+          whoosh.stop();
+        }
+      }, 20000);
+      store.dispatch(streamInit(false));
       this.call = call;
       console.log("call received");
       store.dispatch(setConnStatus("incoming"));
     });
   };
+  playRingtone = () => {
+    whoosh.play((success) => {
+      if (success) {
+        console.log("successfully finished playing");
+      } else {
+        console.log("playback failed due to audio decoding errors");
+      }
+    });
+  };
   async answerCall() {
+    whoosh.stop();
     store.dispatch(setConnStatus("inCall"));
     this.call.answer(this.stream);
     // Receive data
@@ -171,13 +229,22 @@ class PeerClient {
 
   async saveFile(res, conn) {
     if (res.file === "EOF") {
+      store.dispatch(setConnStatus(null));
       Alert.alert(
         "Success",
         `File Saved Successfully to location ${this.fileLocation}`
       );
       await FileViewer.open(this.fileLocation);
     } else {
+      store.dispatch(
+        setFileProgress(
+          Math.round(((this.chunksize * res.chunk) / res.size) * 100)
+        )
+      );
       if (res.chunk == 0) {
+        this.res = res;
+        store.dispatch(setConnStatus("fileTransfer"));
+        store.dispatch(streamInit(false));
         RNFetchBlob.fs.isDir(this.dirLocation).then(async (isDir) => {
           if (!isDir) {
             try {
@@ -208,6 +275,7 @@ class PeerClient {
   async sendFile() {
     if (this.offset === 0)
       try {
+        store.dispatch(setConnStatus("fileTransfer"));
         const res = await DocumentPicker.pick({
           type: [DocumentPicker.types.allFiles],
           readContent: true,
@@ -221,19 +289,27 @@ class PeerClient {
         this.res = res;
       } catch (err) {
         if (DocumentPicker.isCancel(err)) {
+          store.dispatch(setConnStatus(null));
           // User cancelled the picker, exit any dialogs or menus and move on
+          return;
         } else {
           throw err;
         }
       }
     console.log("sending file", this.offset / this.chunksize);
-    if (this.offset > this.res.size)
+    store.dispatch(
+      setFileProgress(
+        Math.round((this.offset / this.res.size).toFixed(2) * 100)
+      )
+    );
+    if (this.offset > this.res.size) {
       this.conn.send({
         ...this.res,
         file: "EOF",
         operation: "file",
       });
-    else {
+      store.dispatch(setConnStatus(null));
+    } else {
       await RNFetchBlob.fs
         .writeFile(this.cacheLocation, "", "utf8")
         .then(async () => {
@@ -263,6 +339,11 @@ class PeerClient {
     store.dispatch(setConnStatus(null));
     console.log("endCall");
     this?.call && this.call.close();
+  };
+  rejectCall = () => {
+    whoosh.stop();
+    store.dispatch(setConnStatus(null));
+    this.conn.send({ operation: "call", action: "decline" });
   };
 
   getPeerId = () => {
@@ -294,7 +375,6 @@ class PeerClient {
     });
   };
   initChat = () => {
-    store.dispatch(chatInit(true));
     this.conn.send({
       peerId: this.peerId,
       operation: "chat",
@@ -333,7 +413,7 @@ class PeerClient {
   recieveMessage = (data) => {
     console.log("receiving", data);
     if (data.message === "intralan-chat-init") {
-      store.dispatch(chatInit(false));
+      store.dispatch(streamInit(false));
       return;
     }
     store.dispatch(addMessage(this.frameMessage(data)));
@@ -348,6 +428,7 @@ class PeerClient {
     });
     this.conn.on("open", () => {
       store.dispatch(setConnStatus(null));
+      store.dispatch(streamInit(true));
       console.log("Remote peer has opened connection.");
       if (type === "call") {
         this.startCall();
@@ -355,7 +436,6 @@ class PeerClient {
         this.sendFile();
       } else if (type === "message") {
         console.log("Sending message");
-
         this.initChat();
       }
     });
@@ -363,6 +443,12 @@ class PeerClient {
       console.log(data);
       if (data?.operation === "chat") {
         this.recieveMessage(data);
+      }
+      if (data?.operation === "call") {
+        if (data.action === "decline") {
+          store.dispatch(setConnStatus(null));
+          Alert.alert("User declined your call !");
+        }
       }
       if (data.success) {
         this.sendFile();

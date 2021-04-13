@@ -76,7 +76,7 @@ export class IncomingCall extends Component {
               }}
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => this.props.localPeer.rejectCall()}>
             <Image
               source={reject}
               style={{

@@ -6,10 +6,9 @@ export const addMessage = (message) => {
     payload: message,
   };
 };
-
-export const chatInit = (value) => {
+export const chatInit = (message) => {
   return {
     type: CHAT_INIT,
-    payload: value,
+    payload: message,
   };
 };

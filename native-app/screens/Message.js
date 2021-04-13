@@ -51,7 +51,7 @@ class Message extends React.Component {
 const mapStateToProps = (state) => ({
   remotePeer: state.stream.remotePeer,
   localPeer: state.stream.localPeer,
-  chatInit: state.message.chatInit,
+  chatInit: state.stream.streamInit,
   messages: state.message.messages,
 });
 
