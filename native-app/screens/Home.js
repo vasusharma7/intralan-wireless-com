@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import Connections from "./Connections";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Settings from "./Settings";
-import { Appbar } from "react-native-paper";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import { connect } from "react-redux";
 import Playback from "./Playback";
 import Message from "./Message";
 import { connect } from "react-redux";
@@ -16,7 +16,7 @@ class Home extends Component {
     super(props);
     this.state = {
       index: 0,
-      title: "I am being Developed",
+      color: "black",
       routes: [
         {
           key: "connections",
@@ -24,7 +24,6 @@ class Home extends Component {
           title: "Connections",
           icon: "network",
         },
-        { key: "settings", screen: Settings, title: "Settings", icon: "tools" },
         {
           key: "playback",
           screen: Playback,
@@ -37,6 +36,7 @@ class Home extends Component {
           title: "My Messages",
           icon: "message",
         },
+        { key: "settings", screen: Settings, title: "Settings", icon: "tools" },
       ],
     };
   }
@@ -64,9 +64,9 @@ class Home extends Component {
             </Appbar.Header>
             <Tab.Navigator
               initialRouteName="Connections"
-              activeColor="#fff"
-              inactiveColor="#000"
-              barStyle={{ backgroundColor: "crimson" }}
+              activeColor="#99EFF8"
+              inactiveColor="#fff"
+              barStyle={{ backgroundColor: this.state.color }}
             >
               {this.state.routes.map(({ key, screen, title, icon }) => (
                 <Tab.Screen

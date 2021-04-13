@@ -11,7 +11,7 @@ const handleNodeEvents = (msg) => {
   const event = Object.keys(msg)[0];
   switch (event) {
     case "firedUp": {
-      Alert.alert("From node: " + msg[event]);
+      Alert.alert("Broadcasting started successfully.");
       echoNode();
       return;
     }
@@ -24,8 +24,12 @@ const handleNodeEvents = (msg) => {
       }
       return;
     }
-    default:
-      Alert.alert("From node: " + msg[event]);
+    default:{
+      console.log(msg[event])
+      if(msg[event].username){
+        Alert.alert("Welcome Back " + msg[event].username);
+      }
+    }
   }
 };
 export const echoNode = () => {
