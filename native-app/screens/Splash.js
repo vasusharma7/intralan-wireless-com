@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { Component } from "react";
-import { Dimensions, Image, View } from "react-native";
+import { Dimensions, Image, View, Text } from "react-native";
 import { Title } from "react-native-paper";
 import { connect } from "react-redux";
 const { width, height } = Dimensions.get("screen");
@@ -43,8 +43,11 @@ export class Splash extends Component {
         />
 
         <Title style={{ color: "white", textAlign: "center", paddingTop: 10 }}>
-          IntraLAN Communicaton
+          IntraLAN Mobile
         </Title>
+        <Text style={{ color: "white", textAlign: "center", paddingTop: 10 }}>
+          Connect safe, secure and fast
+        </Text>
         <Title
           style={{
             color: "white",

@@ -1,14 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { View, Button, StyleSheet, PermissionsAndroid } from "react-native";
+import { View, Button, StyleSheet, PermissionsAndroid, Image, Dimensions } from "react-native";
 import { RTCView } from "react-native-webrtc";
 import RNFetchBlob from "react-native-fetch-blob";
-var RNFS = require("react-native-fs");
 import DocumentPicker from "react-native-document-picker";
 import FileViewer from "react-native-file-viewer";
-import base64 from "react-native-base64";
 import {} from "../redux/streamRedux/streamAction";
-import { Buffer } from "buffer";
+const { width, height } = Dimensions.get("screen");
+
 class Playback extends Component {
   constructor(props) {
     super(props);
@@ -145,14 +144,18 @@ class Playback extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View
+        <Image
+            source={require("../assets/file.png")}
+            style={{ width: Math.max(300,0.3 * width), height: height / 3, marginBottom: 20 }}
+       ></Image>
+            <View
           style={{
             flexDirection: "row",
             alignSelf: "stretch",
             justifyContent: "space-around",
           }}
         >
-          <Button title="Pick" onPress={() => this.pick()} color="red" />
+          <Button title="Pick" onPress={() => this.pick()} color="#17A3B2" />
           <RTCView
             style={{ display: "none" }}
             streamURL={this.props.stream ? this.props.stream.toURL() : ""}

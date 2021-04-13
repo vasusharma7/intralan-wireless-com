@@ -19,9 +19,9 @@ export class Auth extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "Vasu",
-      contact: "9906330301",
-      email: "vasusharma@tech.com",
+      username: "",
+      contact: "",
+      email: "",
     };
   }
 
@@ -63,18 +63,20 @@ export class Auth extends Component {
     return (
       <ScrollView style={styles.container}>
         <Title style={{ color: "white", textAlign: "center", paddingTop: 10 }}>
-          IntraLAN Communicaton
+          IntraLAN Mobile
         </Title>
+        <Text style={{ color: "white", textAlign: "center", paddingTop: 10 }}>
+          Connect safe, secure and fast
+        </Text>
         <View style={styles.container1}>
           <Image
-            source={require("../assets/login_.gif")}
+            source={require("../assets/splash.gif")}
             style={{ width: width / 2, height: height / 3 }}
           />
           <View style={styles.container2}>
             <View style={styles.inputContainer}>
               <Image
                 style={styles.inputIcon}
-                source={require("../assets/wifi.gif")}
               />
               <TextInput
                 style={styles.inputs}
@@ -88,7 +90,6 @@ export class Auth extends Component {
             <View style={styles.inputContainer}>
               <Image
                 style={styles.inputIcon}
-                source={require("../assets/wifi.gif")}
               />
               <TextInput
                 style={styles.inputs}
@@ -102,7 +103,6 @@ export class Auth extends Component {
             <View style={styles.inputContainer}>
               <Image
                 style={styles.inputIcon}
-                source={require("../assets/wifi.gif")}
               />
               <TextInput
                 style={styles.inputs}
@@ -153,20 +153,20 @@ export default connect(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#4385F5",
   },
   container1: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#000",
+    backgroundColor: "#4385F5",
   },
   container2: {
     flex: 1,
     width: width,
     justifyContent: "flex-start",
     alignItems: "center",
-    backgroundColor: "#000",
+    backgroundColor: "#4385F5",
   },
   inputContainer: {
     borderBottomColor: "#F5FCFF",
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   loginButton: {
-    backgroundColor: "#0099dc",
+    backgroundColor: "#0a0124",
   },
   loginText: {
     color: "white",

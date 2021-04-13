@@ -4,8 +4,9 @@ import {
   Text,
   View,
   TouchableOpacity,
+  Dimensions,
   Image,
-  Alert,
+  Alert
 } from "react-native";
 import { connect } from "react-redux";
 import {
@@ -15,16 +16,21 @@ import {
 } from "../redux/dataRedux/dataAction";
 import { stopSearch } from "../redux/searchRedux/searchAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
+import { PeerClient } from "../peer";
+import { startNode } from "../redux/nodeRedux/nodeAction";
+const { width, height } = Dimensions.get("screen");
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NodeService from "../Service";
-import nodejs from "nodejs-mobile-react-native";
-import { PeerClient } from "../peer";
 import BackgroundService from "react-native-background-actions";
-import { startNode } from "../redux/nodeRedux/nodeAction";
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 class Settings extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      items: AsyncStorage.getItem("node")
+    };
+    console.log(this.state.items)
   }
 
   startConnection = () => {
@@ -44,7 +50,17 @@ class Settings extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Text style={{textAlign:"center", backgroundColor:"black", color: "white", fontSize : 40, paddingTop: 0.2*height, paddingBottom : 10, height: 0.3*height}}>Settings</Text>
+        <View
+          style={{
+            borderBottomColor: 'white',
+            borderBottomWidth: 1,
+          }}
+        />
         <View style={styles.view}>
+          <View>
+            <Text style = {{paddingLeft : 15, fontSize : 20, paddingTop : 10, fontWeight : "bold", color: "white"}}>Connection</Text>
+          </View>
           <TouchableOpacity
             style={styles.button}
             onPress={async () => {
@@ -57,8 +73,11 @@ class Settings extends Component {
               this.props.startNode();
             }}
           >
-            <Text style={styles.instructions}>Start NodeJS</Text>
+            <Icon size={25} style={styles.inputIcon} name="near-me"></Icon>
+            <Text style={styles.instructions}>Enable Network Discovery
+            </Text>
           </TouchableOpacity>
+          
           {/* <TouchableOpacity
             style={styles.button}
             onPress={() => this.props.stopSearch()}
@@ -70,16 +89,18 @@ class Settings extends Component {
           <TouchableOpacity
             style={styles.button}
             onPress={async () => {
+              Alert.alert("Stopping broadcast..")
               await AsyncStorage.setItem(
                 "node",
                 JSON.stringify({ node: false })
               );
               NodeService.stopService();
               BackgroundService.stop();
-              await AsyncStorage.removeItem("localPeer");
+              await AsyncStorage.removeItem("localPeer")
             }}
           >
-            <Text style={styles.instructions}>Stop NodeJS</Text>
+              <Icon size={25} style={styles.inputIcon} name="near-me-disabled"></Icon>
+            <Text style={styles.instructions}>Disable Network Discovery</Text>
           </TouchableOpacity>
           {/* <TouchableOpacity
             style={styles.button}
@@ -87,6 +108,10 @@ class Settings extends Component {
           >
             <Text style={styles.instructions}>Connect</Text>
           </TouchableOpacity> */}
+           
+           <View>
+            <Text style = {{paddingLeft : 15, fontSize : 20, paddingTop : 10, fontWeight : "bold", color: "white"}}>Calls</Text>
+          </View>
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
@@ -98,6 +123,7 @@ class Settings extends Component {
               }
             }}
           >
+             <Icon style={styles.inputIcon} size={25} name="phone-disabled"></Icon>
             <Text style={styles.instructions}>Disconnect Call</Text>
           </TouchableOpacity>
 
@@ -144,22 +170,27 @@ export default connect(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "white",
+    backgroundColor: "#2C2C2F",
   },
   view: {
-    flex: 0.5,
-    justifyContent: "center",
-    alignItems: "center",
+    flex: 0.6,
   },
   button: {
-    backgroundColor: "gray",
+    backgroundColor: "white",
     padding: 10,
     margin: 10,
+    borderRadius : 10,
+    flex: 1,
+    flexDirection: "row",
+    height: 40
   },
   text: {
     fontSize: 20,
     color: "white",
+  },
+  inputIcon: {
+    marginLeft: 5,
+    marginRight: 5,
+    color:"#99EFF8"
   },
 });

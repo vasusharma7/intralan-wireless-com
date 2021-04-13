@@ -2,20 +2,21 @@ import React, { Component } from "react";
 import Connections from "./Connections";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Settings from "./Settings";
-import { Appbar } from "react-native-paper";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import { connect } from "react-redux";
 import Playback from "./Playback";
 import Message from './Message';
-import { connect } from "react-redux";
-const Tab = createMaterialBottomTabNavigator();
 import IncomingCall from "./IncomingCall";
 import InCall from "./InCall";
+
+const Tab = createMaterialBottomTabNavigator();
+
 class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       index: 0,
-      title: "I am being Developed",
+      color: "black",
       routes: [
         {
           key: "connections",
@@ -23,7 +24,6 @@ class Home extends Component {
           title: "Connections",
           icon: "network",
         },
-        { key: "settings", screen: Settings, title: "Settings", icon: "tools" },
         {
           key: "playback",
           screen: Playback,
@@ -35,73 +35,69 @@ class Home extends Component {
           screen: Message,
           title: 'My Messages',
           icon: "message"
-        }
+        },
+        { key: "settings", screen: Settings, title: "Settings", icon: "tools" },
       ],
     };
   }
   paintTheScreen() {
     switch (this.props.connStatus) {
       // switch ("inCall") {
-      case "incoming":
-        return <IncomingCall />;
-      case "inCall":
-      case "ringing":
-        return <InCall />;
-      default:
-        return (
-          <>
-            <Appbar.Header>
-              <Appbar.Content
-                title="IntraLAN Communication"
-                subtitle={this.state.title}
-                style={{
-                  alignItems: "center",
-                }}
-              />
-            </Appbar.Header>
+        case "incoming":
+          return <IncomingCall />;
+          case "inCall":
+            case "ringing":
+              return <InCall />;
+              default:
+                return (
+                  <>
+          
+           
             <Tab.Navigator
               initialRouteName="Connections"
-              activeColor="#fff"
-              inactiveColor="#000"
-              barStyle={{ backgroundColor: "crimson" }}
-            >
+              activeColor="#99EFF8"
+              inactiveColor="#fff"
+              barStyle={{ backgroundColor: this.state.color }}
+              >
               {this.state.routes.map(({ key, screen, title, icon }) => (
                 <Tab.Screen
-                  name={title}
-                  component={screen}
-                  key={key}
-                  options={{
-                    tabBarLabel: title,
-                    tabBarIcon: ({ color }) => (
-                      <MaterialCommunityIcons
-                        name={icon}
-                        color={color}
-                        size={26}
-                      />
+                name={title}
+                component={screen}
+                key={key}
+                options={{
+                  tabBarLabel: title,
+                  tabBarIcon: ({ color }) => (
+                    <MaterialCommunityIcons
+                    name={icon}
+                    color={color}
+                    size={26}
+                    />
                     ),
                   }}
-                />
-              ))}
+                  />
+                  ))}
             </Tab.Navigator>
           </>
         );
+      }
+    }
+    render() {
+      return (
+        this.paintTheScreen()
+      )
     }
   }
-  render() {
-    return this.paintTheScreen();
-  }
-}
-
-const mapStateToProps = (state) => {
-  return {
-    connections: state.data.connections,
-    info: state.data.info,
-    localPeer: state.stream.localPeer,
-    remotePeer: state.stream.remotePeer,
-    connStatus: state.data.connStatus,
-    screenStatus: state.data.screenStatus,
+  
+  const mapStateToProps = (state) => {
+    return {
+      connections: state.data.connections,
+      info: state.data.info,
+      localPeer: state.stream.localPeer,
+      remotePeer: state.stream.remotePeer,
+      connStatus: state.data.connStatus,
+      screenStatus: state.data.screenStatus,
+    };
   };
-};
 
 const mapDispatchToProps = (dispatch) => {
   return {
