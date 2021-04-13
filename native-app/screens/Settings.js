@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Image,
-  Alert
+  Alert,
 } from "react-native";
 import { connect } from "react-redux";
 import {
@@ -22,15 +22,15 @@ const { width, height } = Dimensions.get("screen");
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NodeService from "../Service";
 import BackgroundService from "react-native-background-actions";
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 class Settings extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: AsyncStorage.getItem("node")
+      items: AsyncStorage.getItem("node"),
     };
-    console.log(this.state.items)
+    console.log(this.state.items);
   }
 
   startConnection = () => {
@@ -50,16 +50,38 @@ class Settings extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={{textAlign:"center", backgroundColor:"black", color: "white", fontSize : 40, paddingTop: 0.2*height, paddingBottom : 10, height: 0.3*height}}>Settings</Text>
+        <Text
+          style={{
+            textAlign: "center",
+            backgroundColor: "black",
+            color: "white",
+            fontSize: 40,
+            paddingTop: 0.2 * height,
+            paddingBottom: 10,
+            height: 0.3 * height,
+          }}
+        >
+          Settings
+        </Text>
         <View
           style={{
-            borderBottomColor: 'white',
+            borderBottomColor: "white",
             borderBottomWidth: 1,
           }}
         />
         <View style={styles.view}>
           <View>
-            <Text style = {{paddingLeft : 15, fontSize : 20, paddingTop : 10, fontWeight : "bold", color: "white"}}>Connection</Text>
+            <Text
+              style={{
+                paddingLeft: 15,
+                fontSize: 20,
+                paddingTop: 10,
+                fontWeight: "bold",
+                color: "white",
+              }}
+            >
+              Connection
+            </Text>
           </View>
           <TouchableOpacity
             style={styles.button}
@@ -73,11 +95,10 @@ class Settings extends Component {
               this.props.startNode();
             }}
           >
-            <Icon size={25} style={styles.inputIcon} name="near-me"></Icon>
-            <Text style={styles.instructions}>Enable Network Discovery
-            </Text>
+            <Icon size={25} style={styles.inputIcon} name="near-me" />
+            <Text style={styles.instructions}>Enable Network Discovery</Text>
           </TouchableOpacity>
-          
+
           {/* <TouchableOpacity
             style={styles.button}
             onPress={() => this.props.stopSearch()}
@@ -89,17 +110,17 @@ class Settings extends Component {
           <TouchableOpacity
             style={styles.button}
             onPress={async () => {
-              Alert.alert("Stopping broadcast..")
+              Alert.alert("Stopping broadcast..");
               await AsyncStorage.setItem(
                 "node",
                 JSON.stringify({ node: false })
               );
               NodeService.stopService();
               BackgroundService.stop();
-              await AsyncStorage.removeItem("localPeer")
+              await AsyncStorage.removeItem("localPeer");
             }}
           >
-              <Icon size={25} style={styles.inputIcon} name="near-me-disabled"></Icon>
+            <Icon size={25} style={styles.inputIcon} name="near-me-disabled" />
             <Text style={styles.instructions}>Disable Network Discovery</Text>
           </TouchableOpacity>
           {/* <TouchableOpacity
@@ -108,11 +129,21 @@ class Settings extends Component {
           >
             <Text style={styles.instructions}>Connect</Text>
           </TouchableOpacity> */}
-           
-           <View>
-            <Text style = {{paddingLeft : 15, fontSize : 20, paddingTop : 10, fontWeight : "bold", color: "white"}}>Calls</Text>
-          </View>
-          <TouchableOpacity
+
+          {/* <View>
+            <Text
+              style={{
+                paddingLeft: 15,
+                fontSize: 20,
+                paddingTop: 10,
+                fontWeight: "bold",
+                color: "white",
+              }}
+            >
+              Calls
+            </Text>
+          </View> */}
+          {/* <TouchableOpacity
             style={styles.button}
             onPress={() => {
               try {
@@ -123,9 +154,9 @@ class Settings extends Component {
               }
             }}
           >
-             <Icon style={styles.inputIcon} size={25} name="phone-disabled"></Icon>
+            <Icon style={styles.inputIcon} size={25} name="phone-disabled" />
             <Text style={styles.instructions}>Disconnect Call</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           {/* <TouchableOpacity
             style={styles.button}
@@ -177,12 +208,11 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "white",
-    padding: 10,
+    alignItems: "center",
     margin: 10,
-    borderRadius : 10,
-    flex: 1,
+    borderRadius: 10,
     flexDirection: "row",
-    height: 40
+    height: 40,
   },
   text: {
     fontSize: 20,
@@ -191,6 +221,6 @@ const styles = StyleSheet.create({
   inputIcon: {
     marginLeft: 5,
     marginRight: 5,
-    color:"#99EFF8"
+    color: "#99EFF8",
   },
 });

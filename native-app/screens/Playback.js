@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 import { RTCView } from "react-native-webrtc";
-import RNFetchBlob from "react-native-fetch-blob";
+import RNFetchBlob from "rn-fetch-blob";
 import DocumentPicker from "react-native-document-picker";
 import FileViewer from "react-native-file-viewer";
 import {} from "../redux/streamRedux/streamAction";
