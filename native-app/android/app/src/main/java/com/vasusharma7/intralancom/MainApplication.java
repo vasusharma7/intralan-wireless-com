@@ -7,10 +7,7 @@ import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.horcrux.svg.SvgPackage;
-import com.RNFetchBlob.RNFetchBlobPackage;
-import com.RNFetchBlob.RNFetchBlobPackage;
 import com.bitgo.randombytes.RandomBytesPackage;
-import com.RNFetchBlob.RNFetchBlobPackage;
 import com.pusherman.networkinfo.RNNetworkInfoPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
@@ -33,7 +30,7 @@ public class MainApplication extends Application implements ReactApplication {
       protected List<ReactPackage> getPackages() {
         @SuppressWarnings("UnnecessaryLocalVariable")
         List<ReactPackage> packages = new PackageList(this).getPackages();
-        // packages.add(new RNNodeJsMobilePackage());
+        packages.add(new RNNodeJsMobilePackage());
         return packages;
       }
 
