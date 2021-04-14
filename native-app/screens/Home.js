@@ -39,6 +39,7 @@ class Home extends Component {
         { key: "settings", screen: Settings, title: "Settings", icon: "tools" },
       ],
     };
+    console.log("target", this.props?.route?.params?.target);
   }
   paintTheScreen() {
     switch (this.props.connStatus) {

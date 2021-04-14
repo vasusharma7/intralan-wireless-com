@@ -9,6 +9,8 @@ import Settings from "./screens/Settings";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import { name as appName } from "./app.json";
+const navigationRef = React.createRef();
+global.config.navigationRef = navigationRef;
 const MyHeadlessTask = async () => {};
 const theme = {
   ...DefaultTheme,
@@ -20,7 +22,7 @@ const theme = {
 };
 
 const RNRedux = () => (
-  <NavigationContainer>
+  <NavigationContainer ref={navigationRef}>
     <PaperProvider theme={theme}>
       <Provider store={store}>
         <App />

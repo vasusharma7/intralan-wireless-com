@@ -16,7 +16,7 @@ const handleNodeEvents = (msg) => {
       return;
     }
     case "echo": {
-      console.log("echo localPeer", state.stream.localPeer);
+      console.log("echo localPeer", Boolean(state.stream.localPeer));
       if (!state.stream.localPeer) {
         const peer = new PeerClient(null, "vasu_007");
         // const peer = new PeerClient(null, "vasu_007");
@@ -24,9 +24,9 @@ const handleNodeEvents = (msg) => {
       }
       return;
     }
-    default:{
-      console.log(msg[event])
-      if(msg[event].username){
+    default: {
+      console.log(msg[event]);
+      if (msg[event].username) {
         Alert.alert("Welcome Back " + msg[event].username);
       }
     }

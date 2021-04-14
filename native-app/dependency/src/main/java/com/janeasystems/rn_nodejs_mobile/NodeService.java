@@ -1,5 +1,6 @@
 package com.janeasystems.rn_nodejs_mobile;
 
+// import com.asterinet.react.bgactions.*;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -17,13 +18,13 @@ import android.os.Bundle;
 import java.io.*;
 import java.util.*;
 
-
 import android.content.res.AssetManager;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 import android.system.Os;
 import android.system.ErrnoException;
+// import com.asterinet.react.bgactions.*;
 
 import java.util.concurrent.Semaphore;
 
@@ -35,8 +36,8 @@ public class NodeService extends Service {
       }
     
 
-    private static final int SERVICE_NOTIFICATION_ID = 12345;
-    private static final String CHANNEL_ID = "VSERVICE";
+    private static final int SERVICE_NOTIFICATION_ID = 92901;
+    private static final String CHANNEL_ID = "RN_BACKGROUND_ACTIONS_CHANNEL";
 
     private Handler handler = new Handler();
 
@@ -102,7 +103,7 @@ public class NodeService extends Service {
             }
         });
 
-        createNotificationChannel();
+        // createNotificationChannel();
 
         // Intent notificationIntent = new Intent(this, MainActivity.class);
         // PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -110,10 +111,11 @@ public class NodeService extends Service {
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Intra LAN Communication")
                 .setContentText("Running...")
-                // .setSmallIcon(R.mipmap.ic_launcher)
-                // .setContentIntent(contentIntent)
+                // // .setSmallIcon(R.mipmap.ic_launcher)
+                // // .setContentIntent(contentIntent)
                 .setOngoing(true)
                 .build();
+        // Notification appNotification = RNBackgroundActionsTask.appNotification;
         startForeground(SERVICE_NOTIFICATION_ID, notification);
         return START_STICKY;
     }

@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-import { PermissionsAndroid, AppState } from "react-native";
+import { PermissionsAndroid, AppState, Linking } from "react-native";
 import { connect } from "react-redux";
 import { updateConnections, updateInfo } from "./redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "./redux/streamRedux/streamAction";
 import BackgroundService from "react-native-background-actions";
 import Home from "./screens/Home";
 import { startSearch, initSearch } from "./redux/searchRedux/searchAction";
+import AndroidNotificationSettings from "rn-android-notification-settings";
 // const socketIOClient = require("socket.io-client");
 
 // const Tab = createMaterialBottomTabNavigator();
@@ -36,16 +37,16 @@ const veryIntensiveTask = async (taskDataArguments) => {
 
 const options = {
   taskName: "IntraLAN Comm",
-  taskTitle: "Synching with peers",
-  taskDesc: "",
+  taskTitle: "IntraLAN Communication",
+  taskDesc: "Fast, Reliable, Secure",
   taskIcon: {
     name: "ic_launcher",
     type: "mipmap",
   },
   color: "#ffffff",
-  linkingURI: "intralancom://call",
+  linkingURI: "intralancom://settings",
   parameters: {
-    delay: 10000,
+    delay: 1000,
   },
 };
 const rangeString = "192.168.1.0/24";
@@ -71,8 +72,21 @@ class App extends Component {
         },
       ],
     };
+    Linking.addEventListener("url", this.handleIncomingEvents);
   }
-
+  handleIncomingEvents = (evt) => {
+    console.log(evt.url);
+    // if (evt.url.includes("settings")) {
+    //   global.config.navigationRef.current.navigate({
+    //     name: "Home",
+    //     key: "Home",
+    //     params: { target: "Settings" },
+    //   });
+    // }
+    // Linking.openSettings();
+    AndroidNotificationSettings.openNotificationSettings();
+    // Linking.openURL("app-settings://notification/com.vasusharma7.intralan");
+  };
   componentWillUnmount() {
     clearInterval(this.state.interval);
   }
@@ -142,16 +156,26 @@ class App extends Component {
     // AsyncStorage.clear();
 
     this.requestPermissions();
-    await BackgroundService.start(veryIntensiveTask, options);
-
+    if (!BackgroundService.isRunning())
+      await BackgroundService.start(veryIntensiveTask, options);
     this.props.echoNode();
     // this.connectWithPeerJS();
     this.props.initSearch(rangeString);
     AppState.addEventListener("change", this._handleAppStateChange);
   }
 
-  componentWillUnmount() {
+  async componentWillUnmount() {
     AppState.removeEventListener("change", this._handleAppStateChange);
+    await AsyncStorage.getItem("node").then((res) => {
+      if (res) {
+        res = JSON.parse(res);
+        if (res.node === false) {
+          BackgroundService.stop();
+        }
+      } else {
+        BackgroundService.stop();
+      }
+    });
   }
 
   _handleAppStateChange = (nextAppState) => {

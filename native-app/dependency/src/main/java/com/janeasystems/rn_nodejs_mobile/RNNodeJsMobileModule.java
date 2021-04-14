@@ -28,7 +28,7 @@ import com.facebook.react.bridge.LifecycleEventListener;
 import javax.annotation.Nullable;
 import android.util.Log;
 import android.content.Intent;
-
+import android.provider.Settings;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -46,6 +46,7 @@ import java.util.concurrent.Semaphore;
 @ReactModule(name = "RNNodeJsMobile")
 public class RNNodeJsMobileModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
  
+  private static final String CHANNEL_ID = "RN_BACKGROUND_ACTIONS_CHANNEL";
   private final ReactApplicationContext reactContext;
   private static final String TAG = "NODEJS-RN";
   private static final String NODEJS_PROJECT_DIR = "nodejs-project";
@@ -220,6 +221,27 @@ public class RNNodeJsMobileModule extends ReactContextBaseJavaModule implements 
   public void sendMessage(String channel, String msg) {
     sendMessageToNodeChannel(channel, msg);
   }
+
+  @ReactMethod
+  public void openNotificationSettings() {
+    // Links to this app's notification settings.
+    Intent intent = new Intent();
+    intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        intent.setAction(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
+        intent.putExtra(Settings.EXTRA_CHANNEL_ID,CHANNEL_ID);
+        intent.putExtra("android.provider.extra.APP_PACKAGE", this.reactContext.getPackageName());
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    }
+    intent.putExtra("app_package", this.reactContext.getPackageName());
+    try{
+      PackageInfo packageInfo = this.reactContext.getPackageManager().getPackageInfo(this.reactContext.getPackageName(), 0);
+      intent.putExtra(" app_uid", packageInfo.applicationInfo.uid);
+      reactContext.startActivity(intent);
+    } catch (PackageManager.NameNotFoundException e) {
+      e.printStackTrace();
+    }
+}
 
   // Sends an event through the App Event Emitter.
   private void sendEvent(String eventName,
