@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { Alert, Dimensions, Text, View } from "react-native";
+import { Alert, Button, Dimensions, Text, View } from "react-native";
 import { connect } from "react-redux";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { store } from "../redux/store";
+import { streamInit } from "../redux/streamRedux/streamAction";
 const { width, height } = Dimensions.get("screen");
 export class FileTransfer extends Component {
   constructor(props) {
@@ -19,18 +20,40 @@ export class FileTransfer extends Component {
           justifyContent: "center",
         }}
       >
-        <AnimatedCircularProgress
-          size={(1 * width) / 2}
-          width={15}
-          fill={this.props.progress}
-          tintColor="#00e0ff"
-          backgroundColor="#3d5875"
-          style={{
-            alignSelf: "center",
-          }}
-        >
-          {() => <Text>{this.props.progress}%</Text>}
-        </AnimatedCircularProgress>
+        {this.props.streamMetaData.permission ? (
+          this.props.streamInit ? (
+            <>
+              <Text>Waiting for File Receive Permission</Text>
+            </>
+          ) : (
+            <>
+              <Text>User is Requesting Approval for File Transfer</Text>
+              <Button
+                title="Accept"
+                onPress={() => this.localPeer.receiveFile()}
+              />
+              <Button
+                title="Reject"
+                onPress={() => this.localPeer.rejectFile()}
+              />
+            </>
+          )
+        ) : (
+          <>
+            <AnimatedCircularProgress
+              size={(1 * width) / 2}
+              width={15}
+              fill={this.props.progress}
+              tintColor="#00e0ff"
+              backgroundColor="#3d5875"
+              style={{
+                alignSelf: "center",
+              }}
+            >
+              {() => <Text>{this.props.progress}%</Text>}
+            </AnimatedCircularProgress>
+          </>
+        )}
       </View>
     );
   }
@@ -42,6 +65,7 @@ const mapStateToProps = (state) => {
     localPeer: state.stream.localPeer,
     remotePeer: state.stream.remotePeer,
     fileProgress: state.stream.fileProgress,
+    streamMetaData: state.stream.streamMetaData,
   };
 };
 

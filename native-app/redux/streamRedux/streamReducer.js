@@ -4,6 +4,7 @@ import {
   AV_STREAM,
   STREAM_INIT,
   FILE_PROGRESS,
+  STREAM_METADATA,
 } from "./streamActionTypes";
 
 const initalState = {
@@ -12,6 +13,7 @@ const initalState = {
   stream: null,
   streamInit: null,
   fileProgress: 0,
+  streamMetaData: {},
 };
 
 export const streamReducer = (state = initalState, action) => {
@@ -21,6 +23,13 @@ export const streamReducer = (state = initalState, action) => {
         ...state,
         streamInit: action.payload,
         fileProgress: 0,
+        streamMetaData: {},
+      };
+    }
+    case STREAM_METADATA: {
+      return {
+        ...state,
+        streamMetaData: action.payload,
       };
     }
     case FILE_PROGRESS: {

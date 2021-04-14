@@ -8,6 +8,7 @@ import {
   setAVStream,
   setFileProgress,
   setLocalPeer,
+  setStreamMetaData,
   streamInit,
 } from "./redux/streamRedux/streamAction";
 import { setConnStatus } from "./redux/dataRedux/dataAction";
@@ -175,7 +176,12 @@ class PeerClient {
         this.fileBuffer = [];
         conn.on("data", (data) => {
           if (data?.operation === "file") {
-            this.saveFile(data, conn);
+            if (data.permission === true) {
+              store.dispatch(setStreamMetaData(data));
+              store.dispatch(setConnStatus("fileTransfer"));
+            } else {
+              this.saveFile(data, conn);
+            }
           } else if (data?.operation === "chat") {
             this.conn = conn;
             this.recieveMessage(data);
@@ -226,7 +232,13 @@ class PeerClient {
       console.log("The call is closed");
     });
   }
-
+  async recieveFile() {
+    this.conn.send({ operation: "file", fileReceive: true });
+    this.recieveFile(data);
+  }
+  async rejectFile() {
+    this.conn.send({ operation: "file", fileReceive: false });
+  }
   async saveFile(res, conn) {
     if (res.file === "EOF") {
       store.dispatch(setConnStatus(null));
@@ -272,30 +284,34 @@ class PeerClient {
       conn.send({ success: true, chunk: res.chunk, operation: "file" });
     }
   }
-  async sendFile() {
-    if (this.offset === 0)
-      try {
-        store.dispatch(setConnStatus("fileTransfer"));
-        const res = await DocumentPicker.pick({
-          type: [DocumentPicker.types.allFiles],
-          readContent: true,
-        });
-        console.log(
-          res.uri,
-          res.type, // mime type
-          res.name,
-          res.size
-        );
-        this.res = res;
-      } catch (err) {
-        if (DocumentPicker.isCancel(err)) {
-          store.dispatch(setConnStatus(null));
-          // User cancelled the picker, exit any dialogs or menus and move on
-          return;
-        } else {
-          throw err;
-        }
+  async selectFile() {
+    this.offset = 0;
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.allFiles],
+        readContent: true,
+      });
+      console.log(
+        res.uri,
+        res.type, // mime type
+        res.name,
+        res.size
+      );
+      this.res = res;
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        store.dispatch(setConnStatus(null));
+        // User cancelled the picker, exit any dialogs or menus and move on
+        return;
+      } else {
+        throw err;
       }
+    }
+    store.dispatch(setStreamMetaData({ ...this.res, permission: true }));
+    this.conn.send({ operation: "file", ...res, permission: true });
+    store.dispatch(setConnStatus("fileTransfer"));
+  }
+  async sendFile() {
     console.log("sending file", this.offset / this.chunksize);
     store.dispatch(
       setFileProgress(
@@ -433,7 +449,7 @@ class PeerClient {
       if (type === "call") {
         this.startCall();
       } else if (type === "file") {
-        this.sendFile();
+        this.selectFile();
       } else if (type === "message") {
         console.log("Sending message");
         this.initChat();
@@ -448,6 +464,15 @@ class PeerClient {
         if (data.action === "decline") {
           store.dispatch(setConnStatus(null));
           Alert.alert("User declined your call !");
+        }
+      }
+      if (data?.operation === file) {
+        if (data.fileReceive) {
+          this.sendFile();
+          store.dispatch(setStreamMetaData(this.res));
+        }
+        else{
+          //clear resources
         }
       }
       if (data.success) {
