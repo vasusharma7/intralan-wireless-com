@@ -7,6 +7,8 @@ import {
   Dimensions,
   Image,
   Alert,
+  ScrollView,
+  Linking,
 } from "react-native";
 import { connect } from "react-redux";
 import {
@@ -75,16 +77,16 @@ class Settings extends Component {
   };
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <Text
           style={{
             textAlign: "center",
             backgroundColor: "black",
             color: "white",
             fontSize: 40,
-            paddingTop: 0.2 * height,
+            paddingTop: 0.1 * height,
             paddingBottom: 10,
-            height: 0.3 * height,
+            height: 0.2 * height,
           }}
         >
           Settings
@@ -160,23 +162,14 @@ class Settings extends Component {
               openNotificationSettings();
             }}
           >
-            <Icon
-              size={25}
-              style={styles.inputIcon}
-              name="settings-applications"
-            />
+            <Icon size={25} style={styles.inputIcon} name="notifications" />
             <Text style={styles.instructions}>
               Show/Hide Tray Notifications
             </Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            style={styles.button}
-            onPress={() => this.startConnection()}
-          >
-            <Text style={styles.instructions}>Connect</Text>
-          </TouchableOpacity> */}
-
-          {/* <View>
+        </View>
+        <View style={styles.view}>
+          <View>
             <Text
               style={{
                 paddingLeft: 15,
@@ -186,32 +179,41 @@ class Settings extends Component {
                 color: "white",
               }}
             >
-              Calls
+              Issues ?
             </Text>
-          </View> */}
-          {/* <TouchableOpacity
+          </View>
+          <TouchableOpacity
             style={styles.button}
-            onPress={() => {
-              try {
-                this.props.localPeer?.endCall();
-                this.props.remotePeer?.endCall();
-              } catch {
-                console.log("igonoring some errros");
-              }
+            onPress={async () => {
+              await AsyncStorage.removeItem("node");
+              NodeService.stopService();
+              BackgroundService.stop();
+              await AsyncStorage.removeItem("localPeer");
+              Alert.alert(
+                "Success",
+                "It is recommended to close the app and try again"
+              );
             }}
           >
-            <Icon style={styles.inputIcon} size={25} name="phone-disabled" />
-            <Text style={styles.instructions}>Disconnect Call</Text>
-          </TouchableOpacity> */}
-
-          {/* <TouchableOpacity
+            <Icon size={25} style={styles.inputIcon} name="restore" />
+            <Text style={styles.instructions}>Reset Discovery Settings</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={styles.button}
-            onPress={() => nodejs.channel.send("A message!")}
+            onPress={async () => {
+              await AsyncStorage.getAllKeys().then(async (keys) => {
+                keys = keys.filter((val) => val !== "userData");
+                Promise.all(
+                  keys.map(async (key) => await AsyncStorage.removeItem(key))
+                ).then(() => this.props.navigation.navigate("Splash"));
+              });
+            }}
           >
-            <Text style={styles.instructions}>Invoke</Text>
-          </TouchableOpacity> */}
+            <Icon size={25} style={styles.inputIcon} name="logout" />
+            <Text style={styles.instructions}>Logout</Text>
+          </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     );
   }
 }

@@ -10,12 +10,13 @@ export class Splash extends Component {
     super(props);
     this.state = { message: "" };
   }
-  async componentDidMount() {
+  performUpdate = async () => {
     await AsyncStorage.getItem("auth").then((res) => {
       if (res) {
         global.config.authInfo = JSON.parse(res);
       }
       const cond = this.props.route?.params?.auth || res;
+      // console.log("splash", this.props.route?.params?.auth, res);
       let component = cond ? "Home" : "Auth";
       this.setState({
         message: cond
@@ -23,9 +24,12 @@ export class Splash extends Component {
           : "Let's dive in to register....",
       });
       setTimeout(() => {
-        this.props.navigation.navigate(component);
+        this.props.navigation.replace(component);
       }, 1000);
     });
+  };
+  async componentDidMount() {
+    this.performUpdate();
   }
   render() {
     return (
