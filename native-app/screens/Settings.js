@@ -153,14 +153,21 @@ class Settings extends Component {
             <Icon size={25} style={styles.inputIcon} name="near-me-disabled" />
             <Text style={styles.instructions}>Disable Network Discovery</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
               openNotificationSettings();
             }}
           >
-            <Icon size={25} style={styles.inputIcon} name="near-me-disabled" />
-            <Text style={styles.instructions}>Disable Notifications</Text>
+            <Icon
+              size={25}
+              style={styles.inputIcon}
+              name="settings-applications"
+            />
+            <Text style={styles.instructions}>
+              Show/Hide Tray Notifications
+            </Text>
           </TouchableOpacity>
           {/* <TouchableOpacity
             style={styles.button}
