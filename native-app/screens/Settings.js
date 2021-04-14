@@ -23,6 +23,32 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NodeService from "../Service";
 import BackgroundService from "react-native-background-actions";
 import Icon from "react-native-vector-icons/MaterialIcons";
+// import BackgroundService from "react-native-background-actions";
+const veryIntensiveTask = async (taskDataArguments) => {
+  // Example of an infinite loop task
+  const { delay } = taskDataArguments;
+  await new Promise(async (resolve) => {
+    for (let i = 0; BackgroundService.isRunning(); i++) {
+      // console.log("running", i);
+      await sleep(delay);
+    }
+  });
+};
+
+const options = {
+  taskName: "IntraLAN Comm",
+  taskTitle: "Broadcasting....",
+  taskDesc: "Peers can discover you in network",
+  taskIcon: {
+    name: "ic_launcher",
+    type: "mipmap",
+  },
+  color: "#ffffff",
+  linkingURI: "intralancom://call",
+  parameters: {
+    delay: 10000,
+  },
+};
 
 class Settings extends Component {
   constructor(props) {
@@ -86,6 +112,7 @@ class Settings extends Component {
           <TouchableOpacity
             style={styles.button}
             onPress={async () => {
+              await BackgroundService.start(veryIntensiveTask, options);
               await AsyncStorage.getItem("node").then(async (res) => {
                 await AsyncStorage.setItem(
                   "node",
@@ -93,6 +120,8 @@ class Settings extends Component {
                 );
               });
               this.props.startNode();
+
+              // if (BackgroundService.isRunning()) BackgroundService.stop();
             }}
           >
             <Icon size={25} style={styles.inputIcon} name="near-me" />

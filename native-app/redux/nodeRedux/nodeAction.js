@@ -24,9 +24,9 @@ const handleNodeEvents = (msg) => {
       }
       return;
     }
-    default:{
-      console.log(msg[event])
-      if(msg[event].username){
+    default: {
+      console.log(msg[event]);
+      if (msg[event].username) {
         Alert.alert("Welcome Back " + msg[event].username);
       }
     }

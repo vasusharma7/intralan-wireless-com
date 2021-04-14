@@ -1,14 +1,12 @@
 import React, { Component } from "react";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-import { PermissionsAndroid, AppState } from "react-native";
+import { PermissionsAndroid, AppState, Linking } from "react-native";
 import { connect } from "react-redux";
 import { updateConnections, updateInfo } from "./redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "./redux/streamRedux/streamAction";
-import BackgroundService from "react-native-background-actions";
 import Home from "./screens/Home";
 import { startSearch, initSearch } from "./redux/searchRedux/searchAction";
 // const socketIOClient = require("socket.io-client");
-
 // const Tab = createMaterialBottomTabNavigator();
 import "./config.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -23,31 +21,7 @@ const { PeerClient } = require("./peer.js");
 const Stack = createStackNavigator();
 
 const sleep = async (delay) => await new Promise((r) => setTimeout(r, delay));
-const veryIntensiveTask = async (taskDataArguments) => {
-  // Example of an infinite loop task
-  const { delay } = taskDataArguments;
-  await new Promise(async (resolve) => {
-    for (let i = 0; BackgroundService.isRunning(); i++) {
-      // console.log("running", i);
-      await sleep(delay);
-    }
-  });
-};
 
-const options = {
-  taskName: "IntraLAN Comm",
-  taskTitle: "Synching with peers",
-  taskDesc: "",
-  taskIcon: {
-    name: "ic_launcher",
-    type: "mipmap",
-  },
-  color: "#ffffff",
-  linkingURI: "intralancom://call",
-  parameters: {
-    delay: 10000,
-  },
-};
 const rangeString = "192.168.1.0/24";
 
 class App extends Component {
@@ -71,8 +45,13 @@ class App extends Component {
         },
       ],
     };
+    // Linking.addEventListener("url", this.handleOpenURL);
   }
-
+  // handleOpenURL = (evt) => {
+  //   // Will be called when the notification is pressed
+  //   console.log(evt.url);
+  //   // do something
+  // };
   componentWillUnmount() {
     clearInterval(this.state.interval);
   }
@@ -142,7 +121,6 @@ class App extends Component {
     // AsyncStorage.clear();
 
     this.requestPermissions();
-    await BackgroundService.start(veryIntensiveTask, options);
 
     this.props.echoNode();
     // this.connectWithPeerJS();
