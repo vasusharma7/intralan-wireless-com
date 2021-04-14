@@ -436,6 +436,7 @@ class PeerClient {
   };
 
   connect = (type) => {
+    
     this.conn = this.peer.connect(this.connection.peerId, {
       metadata: this.authInfo,
     });
@@ -470,8 +471,7 @@ class PeerClient {
         if (data.fileReceive) {
           this.sendFile();
           store.dispatch(setStreamMetaData(this.res));
-        }
-        else{
+        } else {
           //clear resources
         }
       }

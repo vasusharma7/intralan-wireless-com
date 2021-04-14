@@ -1,7 +1,6 @@
 global.config = {
-    metadata: {
-      localPeerId: "",
-    },
-    peerConnections: {},
-  };
-  
+  metadata: {
+    localPeerId: "",
+  },
+  peerConnections: {},
+};
