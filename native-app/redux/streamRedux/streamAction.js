@@ -4,6 +4,7 @@ import {
   AV_STREAM,
   STREAM_INIT,
   FILE_PROGRESS,
+  STREAM_METADATA,
 } from "./streamActionTypes";
 import { store } from "../store";
 import { chatInit } from "../messageRedux/messageAction";
@@ -32,6 +33,12 @@ export const setAVStream = (data) => {
   };
 };
 
+export const setStreamMetaData = (data) => {
+  return {
+    type: STREAM_METADATA,
+    payload: data,
+  };
+};
 export const streamInit = (value) => {
   store.dispatch(chatInit());
   return {

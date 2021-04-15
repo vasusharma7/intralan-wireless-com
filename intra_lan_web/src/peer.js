@@ -13,11 +13,11 @@ import { setConnStatus } from "./redux/dataRedux/dataAction";
 // import FileViewer from "react-native-file-viewer";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addMessage, chatInit } from "./redux/messageRedux/messageAction";
-
+const axios = require("axios");
 export default class PeerClient {
   constructor(connection, localPeerId) {
     this.connection = connection;
-    this.authInfo = JSON.parse(sessionStorage.getItem("authInfo"));
+    this.authInfo = JSON.parse(localStorage.getItem("authInfo"));
     // this.localPeerId = localPeerId ? this.authInfo.uid : null;
     this.localPeerId = this.authInfo.uid;
     this.establishConnection();
@@ -30,30 +30,29 @@ export default class PeerClient {
     // this.cacheLocation = `${RNFetchBlob.fs.dirs.CacheDir}/temp`;
   }
   establishConnection = () => {
-      //gey my ip
-      // this.ip = this.connection?.ip ? this.connection.ip : ip;
-      if (this.connection) store.dispatch(setConnStatus("connecting"));
-      this.peer = new Peer(this.localPeerId, {
-        host: "127.0.0.1",//replace with ip
-        port: 5000,
-        path: "/peerjs",
-        secure: false,
-        debug: true,
-      });
-      console.log("firing listeners");
-      this.fireEventListeners();
-    
+    //gey my ip
+    // this.ip = this.connection?.ip ? this.connection.ip : ip;
+    if (this.connection) store.dispatch(setConnStatus("connecting"));
+    this.peer = new Peer(this.localPeerId, {
+      host: "127.0.0.1", //replace with ip
+      port: 5000,
+      path: "/peerjs",
+      secure: false,
+      debug: true,
+    });
+    console.log("firing listeners");
+    this.fireEventListeners();
   };
   disconnectSelf = () => {
     // nodejs.channel.send(JSON.stringify({ clearId: this.localPeerId }));
   };
   getMediaSource = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       console.log(stream);
       this.stream = stream;
-    } catch(err) {
-      console.log(err)
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -97,6 +96,12 @@ export default class PeerClient {
         // );
         // nodejs.channel.send(JSON.stringify({ authInfo: this.authInfo }));
         // nodejs.channel.send(JSON.stringify({ localPeerId: peerId }));
+        axios
+          .post(`http://localhost:5000/setLocalPeerId`, {
+            localPeerId: this.peerId,
+          })
+          .then((res) => {})
+          .catch(() => {});
         store.dispatch(setLocalPeer(this));
       }
     });
@@ -128,6 +133,7 @@ export default class PeerClient {
       this.call = call;
       console.log("call received");
       store.dispatch(setConnStatus("incoming"));
+      // this.answerCall();
     });
   };
   async answerCall() {
@@ -140,7 +146,7 @@ export default class PeerClient {
       console.log("call answer", stream);
       store.dispatch(setAVStream(stream));
     });
-    this.call.on("close", function() {
+    this.call.on("close", function () {
       store.dispatch(setConnStatus(null));
       console.log("The call is closed");
     });
@@ -259,16 +265,21 @@ export default class PeerClient {
 
     // store.dispatch(setAVStream(stream));
 
-    this.call.on("stream", function(stream) {
+    this.call.on("stream", function (stream) {
       console.log("peer is streaming", this.peerId, stream);
       store.dispatch(setAVStream(stream));
       store.dispatch(setConnStatus("inCall")); //change to picked-up status
       // onReceiveStream(stream, "peer-camera");
     });
-    this.call.on("close", function() {
+    this.call.on("close", function () {
       store.dispatch(setConnStatus(null));
       console.log("The call is closed");
     });
+  };
+
+  rejectCall = () => {
+    store.dispatch(setConnStatus(null));
+    this.conn.send({operation : "call", data: "decline"})
   };
   initChat = () => {
     store.dispatch(chatInit(true));
@@ -341,6 +352,26 @@ export default class PeerClient {
       if (data?.operation === "chat") {
         this.recieveMessage(data);
       }
+      if (data?.operation === "call") {
+        if (data.action === "decline") {
+          store.dispatch(setConnStatus(null));
+          console.log("Declined");
+        }
+      }
+      if (data?.operation === "call") {
+        if (data.action === "end") {
+          store.dispatch(setConnStatus(null));
+          console.log("Call terminated");
+        }
+      }
+      // if (data?.operation === file) {
+      //   if (data.fileReceive) {
+      //     this.sendFile();
+      //     store.dispatch(setStreamMetaData(this.res));
+      //   } else {
+      //     //clear resources
+      //   }
+      // }
       if (data.success) {
         this.sendFile();
       }

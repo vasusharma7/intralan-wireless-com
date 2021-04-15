@@ -83,14 +83,25 @@ export class InCall extends Component {
             <Text style={{ color: "black", fontSize: width / 20 }}>
               Ringing..
             </Text>
-            <Image
-              source={decline}
+            <TouchableOpacity
               style={{
                 alignSelf: "center",
                 width: 200,
                 height: 200,
               }}
-            />
+              onPress ={() => {
+                this.props.setConnStatus(null);
+              }}
+            >
+              <Image
+                source={decline}
+                style={{
+                  alignSelf: "flex-start",
+                  width: 100,
+                  height: 100,
+                }}
+              />
+              </TouchableOpacity>
           </>
         )}
       </View>

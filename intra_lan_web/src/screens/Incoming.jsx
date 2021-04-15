@@ -30,7 +30,7 @@ class Incoming extends Component {
                 src="https://api.adorable.io/avatars/285/10@adorable.io.png"
                 >
                 </Avatar>
-                <Button style = {{marginTop: 140, borderRadius: 20, backgroundColor: "green", color: "white"}}>Accept Call</Button>
+                <Button onClick = {this.handlleAccept} style = {{marginTop: 140, borderRadius: 20, backgroundColor: "green", color: "white"}}>Accept Call</Button>
                 <Button onClick={this.handleReject} style = {{marginTop: 20, borderRadius: 20, backgroundColor: "red", color: "white"}}>Decline Call</Button>
             </div>
         )

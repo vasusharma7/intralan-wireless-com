@@ -4,6 +4,7 @@ import Navbar from './Navbar'
 export default class Files extends Component {
     constructor(props){
         super(props)
+        this.state = {}
     }
     handleFile = (e) => {
         console.log(e)

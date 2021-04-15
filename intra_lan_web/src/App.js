@@ -13,7 +13,6 @@ import Landing from "./screens/Landing";
 import Login from "./screens/Login";
 import Files from "./screens/Files";
 import "./config";
-import PeerClient from "./peer.js";
 
 const engine = new Styletron();
 const Centered = styled("div", {
@@ -32,12 +31,6 @@ class App extends Component {
 
   componentDidMount = async () => {
     // startBroadcast()
-    if (!this.props.localPeer) {
-      console.log("component mounted...");
-      const peer = new PeerClient(null, "vasu_007");
-      // const peer = new PeerClient(null, "vasu_007");
-      this.props.setLocalPeer(peer);
-    }
     console.log(global.config);
     this.props.initSearch("192.168.1.0/24");
   };
@@ -45,9 +38,9 @@ class App extends Component {
   render() {
     return (
       <StyletronProvider value={engine}>
-        {sessionStorage.getItem("loggedIn") === true && (
+        {localStorage.getItem("loggedIn") === true && (
           <Redirect
-            to={{ pathname: "/home", state: sessionStorage.getItem("peerID") }}
+            to={{ pathname: "/home", state: localStorage.getItem("peerID") }}
           />
         )}
         <BaseProvider theme={DarkTheme}>
