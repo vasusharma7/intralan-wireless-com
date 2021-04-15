@@ -13,10 +13,11 @@ import { connect } from "react-redux";
 import accept from "../assets/accept.gif";
 import decline from "../assets/decline.gif";
 import user from "../assets/user.png";
-import reject from "../assets/reject.png";
-import answer from "../assets/answer.png";
+import reject from "../assets/decline.gif";
+import answer from "../assets/call_.gif";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { store } from "../redux/store";
+import { Title } from "react-native-paper";
 
 export class IncomingCall extends Component {
   constructor(props) {
@@ -32,12 +33,17 @@ export class IncomingCall extends Component {
         style={{
           flex: 1,
           flexDirection: "column",
-          paddingTop: height / 10,
-          justifyContent: "space-around",
+          paddingTop: height / 15,
+          justifyContent: "space-between",
           alignItems: "center",
           backgroundColor: "white",
         }}
       >
+        <Title
+          style={{ color: "black", textAlign: "center", marginBottom: 20 }}
+        >
+          Incoming Call
+        </Title>
         <Image
           source={user}
           style={{
@@ -52,7 +58,7 @@ export class IncomingCall extends Component {
           style={{
             flex: 1,
             width: "100%",
-            marginTop: height / 4,
+            marginTop: 50,
             flexDirection: "row",
             justifyContent: "space-between",
             padding: 20,
@@ -76,13 +82,18 @@ export class IncomingCall extends Component {
               }}
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.props.localPeer.rejectCall()}>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.localPeer.rejectCall();
+            }}
+          >
             <Image
               source={reject}
               style={{
                 alignSelf: "flex-end",
-                width: 100,
-                height: 100,
+                marginRight: -(width / 10),
+                width: 150,
+                height: 150,
               }}
             />
           </TouchableOpacity>

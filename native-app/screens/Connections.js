@@ -32,17 +32,18 @@ class Connections extends Component {
     return (
       <>
         <Appbar.Header
-            style = {{
-              backgroundColor : "#04045B"
-            }}>
-              <Appbar.Content
-                title="IntraLAN Mobile"
-                subtitle="Connect fast, safe and secure"
-                style={{
-                  alignItems: "center",
-                }}
-                />
-            </Appbar.Header>
+          style={{
+            backgroundColor: "#04045B",
+          }}
+        >
+          <Appbar.Content
+            title="IntraLAN Mobile"
+            subtitle="Connect fast, safe and secure"
+            style={{
+              alignItems: "center",
+            }}
+          />
+        </Appbar.Header>
         <Modal isVisible={this.state.modalOpen}>
           <View
             style={{
@@ -65,7 +66,7 @@ class Connections extends Component {
             }}
           />
           <View style={{ margin: 10 }} />
-           <Button
+          <Button
             title="Chat"
             icon="message"
             onPress={() => {
@@ -75,7 +76,16 @@ class Connections extends Component {
         </Modal>
         {this.props.connStatus !== null && <Stream />}
         <View>
-          <Text style={{fontSize : 25, textAlign: "center", fontWeight: "bold", marginTop: 30}}>Available Connections</Text>
+          <Text
+            style={{
+              fontSize: 25,
+              textAlign: "center",
+              fontWeight: "bold",
+              marginTop: 30,
+            }}
+          >
+            Available Connections
+          </Text>
           {this.props?.info &&
             Object.keys(this.props?.info).map((ip) => {
               return (

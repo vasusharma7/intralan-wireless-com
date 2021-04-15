@@ -232,12 +232,14 @@ class PeerClient {
       console.log("The call is closed");
     });
   }
-  async recieveFile() {
+  async receiveFile() {
     this.conn.send({ operation: "file", fileReceive: true });
-    this.recieveFile(data);
+    store.dispatch(setConnStatus("fileTransfer"));
+    // this.recieveFile(data);
   }
   async rejectFile() {
     this.conn.send({ operation: "file", fileReceive: false });
+    this.props.setConnStatus(null);
   }
   async saveFile(res, conn) {
     if (res.file === "EOF") {
@@ -308,7 +310,7 @@ class PeerClient {
       }
     }
     store.dispatch(setStreamMetaData({ ...this.res, permission: true }));
-    this.conn.send({ operation: "file", ...res, permission: true });
+    this.conn.send({ operation: "file", ...this.res, permission: true });
     store.dispatch(setConnStatus("fileTransfer"));
   }
   async sendFile() {
@@ -436,7 +438,6 @@ class PeerClient {
   };
 
   connect = (type) => {
-    
     this.conn = this.peer.connect(this.connection.peerId, {
       metadata: this.authInfo,
     });
@@ -467,12 +468,14 @@ class PeerClient {
           Alert.alert("User declined your call !");
         }
       }
-      if (data?.operation === file) {
+      if (data?.operation === "file") {
         if (data.fileReceive) {
-          this.sendFile();
           store.dispatch(setStreamMetaData(this.res));
+          this.sendFile();
         } else {
           //clear resources
+          store.dispatch(setStreamMetaData({}));
+          store.dispatch(setConnStatus(null));
         }
       }
       if (data.success) {

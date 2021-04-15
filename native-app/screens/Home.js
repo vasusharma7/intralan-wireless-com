@@ -11,6 +11,7 @@ const Tab = createMaterialBottomTabNavigator();
 import IncomingCall from "./IncomingCall";
 import InCall from "./InCall";
 import { FileTransfer } from "./FileTransfer";
+import { setConnStatus } from "../redux/dataRedux/dataAction";
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -43,26 +44,25 @@ class Home extends Component {
   }
   paintTheScreen() {
     switch (this.props.connStatus) {
-      // switch ("fileTransfer") {
+      // switch ("ringing") {
       case "incoming":
         return <IncomingCall />;
       case "inCall":
       case "ringing":
         return <InCall />;
       case "fileTransfer":
-        return <FileTransfer progress={this.props.fileProgress} />;
+        return (
+          <FileTransfer
+            progress={this.props.fileProgress}
+            localPeer={this.props.localPeer}
+            streamMetaData={this.props.streamMetaData}
+            streamInit={this.props.streamInit}
+            setConnStatus={this.props.setConnStatus}
+          />
+        );
       default:
         return (
           <>
-            <Appbar.Header>
-              <Appbar.Content
-                title="IntraLAN Communication"
-                subtitle={this.state.title}
-                style={{
-                  alignItems: "center",
-                }}
-              />
-            </Appbar.Header>
             <Tab.Navigator
               initialRouteName="Connections"
               activeColor="#99EFF8"
@@ -92,7 +92,20 @@ class Home extends Component {
     }
   }
   render() {
-    return this.paintTheScreen();
+    return (
+      <>
+        <Appbar.Header>
+          <Appbar.Content
+            title={global.config.appTitle}
+            subtitle={this.state.title}
+            style={{
+              alignItems: "center",
+            }}
+          />
+        </Appbar.Header>
+        {this.paintTheScreen()}
+      </>
+    );
   }
 }
 
@@ -105,6 +118,8 @@ const mapStateToProps = (state) => {
     connStatus: state.data.connStatus,
     screenStatus: state.data.screenStatus,
     fileProgress: state.stream.fileProgress,
+    streamMetaData: state.stream.streamMetaData,
+    streamInit: state.stream.streamInit,
   };
 };
 
@@ -113,6 +128,7 @@ const mapDispatchToProps = (dispatch) => {
     setLocalPeer: (info) => dispatch(setLocalPeer(info)),
     setRemotePeer: (info) => dispatch(setRemotePeer(info)),
     setScreenStatus: (status) => dispatch(setScreenStatus(status)),
+    setConnStatus: (status) => dispatch(setConnStatus(status)),
   };
 };
 

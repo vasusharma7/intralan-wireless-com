@@ -11,14 +11,39 @@ import {
 import { stopSearch } from "../redux/searchRedux/searchAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
 import wifi from "../assets/wifi.gif";
+import connecting from "../assets/connecting2.gif";
 class Stream extends React.Component {
   paint() {
     switch (this.props.connStatus) {
       case "connecting": {
         return (
-          <Text style={{ color: "white", fontSize: 20, textAlign: "center" }}>
-            Connecting....
-          </Text>
+          <>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "#1c1c1c",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={connecting}
+                style={{
+                  width: 300,
+                  height: 300,
+                }}
+              />
+              <Text
+                style={{ color: "white", fontSize: 20, textAlign: "center" }}
+              >
+                Connecting....
+              </Text>
+              <Button
+                onPress={() => this.props.setConnStatus(null)}
+                title={"Cancel"}
+              />
+            </View>
+          </>
         );
       }
       // case "connecting": {

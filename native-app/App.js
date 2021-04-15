@@ -37,7 +37,7 @@ const veryIntensiveTask = async (taskDataArguments) => {
 
 const options = {
   taskName: "IntraLAN Comm",
-  taskTitle: "IntraLAN Communication",
+  taskTitle: global.config.appTitle,
   taskDesc: "Fast, Reliable, Secure",
   taskIcon: {
     name: "ic_launcher",

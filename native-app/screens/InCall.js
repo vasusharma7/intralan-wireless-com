@@ -17,6 +17,7 @@ import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { store } from "../redux/store";
 import Timer from "./components/Timer";
 import { RTCView } from "react-native-webrtc";
+import { Title } from "react-native-paper";
 export class InCall extends Component {
   constructor(props) {
     super(props);
@@ -80,9 +81,11 @@ export class InCall extends Component {
           </>
         ) : (
           <>
-            <Text style={{ color: "black", fontSize: width / 20 }}>
-              Ringing..
-            </Text>
+            <Title
+              style={{ color: "black", textAlign: "center", marginBottom: 20 }}
+            >
+              Incoming Call
+            </Title>
             <Image
               source={decline}
               style={{

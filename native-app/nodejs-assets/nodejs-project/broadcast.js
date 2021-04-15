@@ -30,8 +30,8 @@ io.sockets.on("connection", (client) => {
   io.emit("broadcast", {
     ip: getIp(),
     port: 5000,
-    ...global?.config?.authInfo,
-    peerId: global?.config?.metadata["localPeerId"],
+    ...global.config.authInfo,
+    peerId: global.config.metadata["localPeerId"],
   });
   console.log(client.id);
 });
@@ -54,6 +54,6 @@ peerServer.on("error", (err) => {
 
 peerServer.on("connection", (peer) => {
   //global.config.peerConnections[peer.id] = peer;
-  //console.log(global?.config?.peerConnections);
+  //console.log(global.config.peerConnections);
   console.log("peer connection");
 });
