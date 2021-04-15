@@ -1,28 +1,26 @@
 import React, { Component } from "react";
-import { Card, StyledBody, StyledAction } from "baseui/card";
 import { Button } from "baseui/button";
-import { useStyletron } from "baseui";
-
-import { Grid, Cell } from "baseui/layout-grid";
 import { Avatar } from "baseui/avatar";
-import { Display1, Display2, Display3, Display4 } from "baseui/typography";
+import { Display2 } from "baseui/typography";
 import { connect } from "react-redux";
-import { startSearch, initSearch } from "../redux/searchRedux/searchAction";
-import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
+import { startSearch } from "../redux/searchRedux/searchAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
-// import {Connections} from './Connections'
 import Navbar from "./Navbar";
 import PeerClient from "../peer";
+import Incoming from "./Incoming";
+import InCall from "./InCall";
+
 class Home extends Component {
   constructor(props) {
     super(props);
-    this.videoRef = React.createRef();
+
     this.state = {
       userName: "Anup",
       myip: "",
       search: false,
     };
   }
+
   componentDidMount = () => {
     this.setState({
       myip: localStorage.getItem("ip"),
@@ -34,50 +32,47 @@ class Home extends Component {
     this.props.setLocalPeer(peer);
     // }
   };
-  componentDidUpdate() {
-    console.log("came in update");
-    this.videoRef.current.srcObject = this.props.stream;
-  }
+
+  setScreen = () => {
+    switch (this.props.connStatus) {
+      case "incoming":
+        return <Incoming></Incoming>;
+      case "inCall":
+        return <InCall></InCall>;
+      default:
+        return (
+          <>
+            <Navbar></Navbar>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                marginTop: "40px",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Avatar
+                name={this.state.name}
+                size="320px"
+                src="https://ambitioustracks.com/wp-content/uploads/2017/01/1.-fundadores.png"
+              />
+              <Display2 marginBottom="scale500">
+                Welcome {this.state && this.state.userName}
+              </Display2>
+              <p>My IP : {this.state && this.state.myip}</p>
+              <Button kind="secondary" onClick={this.props.startSearch}>
+                Search
+              </Button>
+            </div>
+          </>
+        );
+    }
+  };
+
   render() {
-    return (
-      <>
-        <Navbar></Navbar>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            marginTop: "40px",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Avatar
-            name={this.state.name}
-            size="320px"
-            src="https://ambitioustracks.com/wp-content/uploads/2017/01/1.-fundadores.png"
-          />
-          <Display2 marginBottom="scale500">
-            Welcome {this.state && this.state.userName}
-          </Display2>
-          <p>My IP : {this.state && this.state.myip}</p>
-          <Button kind="secondary" onClick={this.props.startSearch}>
-            Search
-          </Button>
-          <video
-            key={this.props.stream}
-            style={{
-              borderWidth: 1,
-              borderColor: "black",
-              height: 100,
-              width: 100,
-            }}
-            controls
-            ref={this.videoRef}
-            autoPlay
-          ></video>
-        </div>
-      </>
-    );
+    console.log(this.props.connStatus)
+    return this.setScreen()
   }
 }
 
@@ -98,7 +93,6 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setLocalPeer: (info) => dispatch(setLocalPeer(info)),
     setRemotePeer: (info) => dispatch(setRemotePeer(info)),
-    //   setScreenStatus: (status) => dispatch(setScreenStatus(status)),
     startSearch: () => dispatch(startSearch()),
   };
 };

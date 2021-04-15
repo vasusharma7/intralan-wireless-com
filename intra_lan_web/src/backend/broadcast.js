@@ -49,7 +49,7 @@ const peerServer = require("peer").ExpressPeerServer(http, {
 app.use("/peerjs", peerServer);
 
 app.post("/setLocalPeerId", (req, res) => {
-  console.log("setting local Peer Id", req.body);
+  console.log("setting local Peer Id", req.body.localPeerId);
   const { localPeerId } = req.body;
   global.config.metadata["localPeerId"] = localPeerId;
   console.log(global.config.metadata["localPeerId"]);

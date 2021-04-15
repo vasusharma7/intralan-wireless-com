@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import { Display1 } from "baseui/typography";
 import { Button } from "baseui/button";
 export default class Landing extends Component {
@@ -41,7 +41,7 @@ export default class Landing extends Component {
           <Display1>Welcome to IntraLAN web</Display1>
           <Button onClick={this.gotoLogin}>Get Started</Button>
         </div>
-        <img src="https://i.pinimg.com/originals/1c/aa/40/1caa406fbe764228551a30045e0ec271.gif"></img>
+        <img alt="lan" src="https://i.pinimg.com/originals/1c/aa/40/1caa406fbe764228551a30045e0ec271.gif"></img>
       </div>
     );
   }

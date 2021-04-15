@@ -133,7 +133,7 @@ export default class PeerClient {
       this.call = call;
       console.log("call received");
       store.dispatch(setConnStatus("incoming"));
-      this.answerCall();
+      // this.answerCall();
     });
   };
   async answerCall() {
@@ -276,6 +276,11 @@ export default class PeerClient {
       console.log("The call is closed");
     });
   };
+
+  rejectCall = () => {
+    store.dispatch(setConnStatus(null));
+    this.conn.send({operation : "call", data: "decline"})
+  };
   initChat = () => {
     store.dispatch(chatInit(true));
     this.conn.send({
@@ -347,6 +352,26 @@ export default class PeerClient {
       if (data?.operation === "chat") {
         this.recieveMessage(data);
       }
+      if (data?.operation === "call") {
+        if (data.action === "decline") {
+          store.dispatch(setConnStatus(null));
+          console.log("Declined");
+        }
+      }
+      if (data?.operation === "call") {
+        if (data.action === "end") {
+          store.dispatch(setConnStatus(null));
+          console.log("Call terminated");
+        }
+      }
+      // if (data?.operation === file) {
+      //   if (data.fileReceive) {
+      //     this.sendFile();
+      //     store.dispatch(setStreamMetaData(this.res));
+      //   } else {
+      //     //clear resources
+      //   }
+      // }
       if (data.success) {
         this.sendFile();
       }

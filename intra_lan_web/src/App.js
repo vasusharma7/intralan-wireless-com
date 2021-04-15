@@ -1,10 +1,9 @@
 import { Component } from "react";
-import { FaBeer } from "react-icons/fa";
 import { Client as Styletron } from "styletron-engine-atomic";
 import { Provider as StyletronProvider } from "styletron-react";
 import { DarkTheme, BaseProvider, styled } from "baseui";
 import { Route, BrowserRouter, Switch, Redirect } from "react-router-dom";
-import { startSearch, initSearch } from "./redux/searchRedux/searchAction";
+import { initSearch } from "./redux/searchRedux/searchAction";
 import { updateConnections, updateInfo } from "./redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "./redux/streamRedux/streamAction";
 import { connect } from "react-redux";
@@ -14,15 +13,12 @@ import Landing from "./screens/Landing";
 import Login from "./screens/Login";
 import Files from "./screens/Files";
 import "./config";
-// const PeerClient = require("./peer.js")
-import PeerClient from "./peer.js";
 
 const engine = new Styletron();
 const Centered = styled("div", {
   height: "100%",
   width: "100%",
 });
-const Netmask = require("netmask").Netmask;
 class App extends Component {
   constructor(props) {
     super(props);
@@ -35,7 +31,6 @@ class App extends Component {
 
   componentDidMount = async () => {
     // startBroadcast()
-
     console.log(global.config);
     this.props.initSearch("192.168.1.0/24");
   };

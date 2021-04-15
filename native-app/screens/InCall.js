@@ -84,16 +84,30 @@ export class InCall extends Component {
             <Title
               style={{ color: "black", textAlign: "center", marginBottom: 20 }}
             >
-              Incoming Call
+              Ringing...
             </Title>
-            <Image
+            <TouchableOpacity
               source={decline}
               style={{
                 alignSelf: "center",
                 width: 200,
                 height: 200,
               }}
-            />
+              onPress={() => {
+                // this.props.setConnStatus(null);
+                this.props.remotePeer.endCall();
+                //handle class cancel
+              }}
+            >
+              <Image
+                source={decline}
+                style={{
+                  alignSelf: "center",
+                  width: 150,
+                  height: 150,
+                }}
+              />
+            </TouchableOpacity>
           </>
         )}
       </View>
