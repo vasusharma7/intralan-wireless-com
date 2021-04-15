@@ -1,26 +1,16 @@
 import React, { Component } from 'react'
-import {
-    Card,
-    StyledBody,
-    StyledAction
-  } from "baseui/card";
-  import { Button } from "baseui/button";
-  import {useStyletron} from 'baseui';
-import {Grid, Cell} from 'baseui/layout-grid';
+import { Button } from "baseui/button";
 import {Avatar} from 'baseui/avatar'
 import {
-    Display1,
     Display2,
-    Display3,
-    Display4,
   } from 'baseui/typography';
-  import { connect } from "react-redux";
-  import { startSearch, initSearch } from "../redux/searchRedux/searchAction";
-  import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
-  import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
-  // import {Connections} from './Connections'
-  import Navbar from './Navbar';
-
+import { connect } from "react-redux";
+import { startSearch } from "../redux/searchRedux/searchAction";
+  // import { updateConnections, updateInfo } from "../redux/dataRedux/dataAction";
+import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
+import Navbar from './Navbar';
+import InCall from './InCall' 
+import Incoming from './Incoming';
 
   class Home extends Component {
     constructor(props){
@@ -55,6 +45,8 @@ import {
                         My IP : {this.state && this.state.myip}
                         </p>
                         <Button kind="secondary" onClick={this.props.startSearch}>Search</Button>
+                        {/* <InCall></InCall> */}
+                        <Incoming></Incoming>
   
             </div>
 
@@ -80,7 +72,7 @@ const mapStateToProps = (state) => {
       setLocalPeer: (info) => dispatch(setLocalPeer(info)),
       setRemotePeer: (info) => dispatch(setRemotePeer(info)),
     //   setScreenStatus: (status) => dispatch(setScreenStatus(status)),
-        startSearch: () => dispatch(startSearch()),
+      startSearch: () => dispatch(startSearch()),
     };
   };
   

@@ -1,17 +1,13 @@
 import React, { Component } from "react";
 import {
   View,
-  Button,
   Text,
   Image,
   TouchableOpacity,
-  Alert,
   Dimensions,
 } from "react-native";
 const { width, height } = Dimensions.get("screen");
 import { connect } from "react-redux";
-import accept from "../assets/accept.gif";
-import decline from "../assets/decline.gif";
 import user from "../assets/user.png";
 import reject from "../assets/reject.png";
 import answer from "../assets/answer.png";
