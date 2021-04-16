@@ -12,6 +12,7 @@ import { RTCView } from "react-native-webrtc";
 import RNFetchBlob from "rn-fetch-blob";
 import DocumentPicker from "react-native-document-picker";
 import FileViewer from "react-native-file-viewer";
+import RNFS from "react-native-fs";
 import {} from "../redux/streamRedux/streamAction";
 const { width, height } = Dimensions.get("screen");
 
@@ -48,9 +49,12 @@ class Playback extends Component {
       const chunksize = 16 * 1024;
       // let file = await RNFS.readFile(res.uri, "base64");
       // while (file.length) {
-      //   let chunk = Buffer.from(file.slice(0, 1024));
-      //   file = file.slice(1024, file.length);
+      //   let chunk = Buffer.from(file.slice(0, 64 * 1024));
+      //   file = file.slice(64 * 1024, file.length);
       //   console.log(chunk);
+      //   console.log(
+      //     "----------------------------------------------------------------------"
+      //   );
       // }
 
       // console.log(Buffer.from(file.slice(0, 16 * 1024)));

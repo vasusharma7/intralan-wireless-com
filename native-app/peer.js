@@ -237,6 +237,7 @@ class PeerClient {
   }
   async receiveFile() {
     this.conn.send({ operation: "file", fileReceive: true });
+    console.log("sending permission true");
     // store.dispatch(setConnStatus("fileTransfer"));
     // this.recieveFile(data);
   }
@@ -290,6 +291,7 @@ class PeerClient {
           console.log("chunk arrived", res.chunk, resp);
         })
         .catch(console.error);
+      console.log(res.chunk);
       conn.send({ success: true, chunk: res.chunk, operation: "file" });
     }
   }

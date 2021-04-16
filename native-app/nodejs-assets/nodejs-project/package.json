@@ -16,6 +16,6 @@
     "peer": "^0.6.1",
     "react-redux": "^7.2.3",
     "redux": "^4.0.5",
-    "socket.io": "^4.0.0"
+    "socket.io": "^2.3.0"
   }
 }

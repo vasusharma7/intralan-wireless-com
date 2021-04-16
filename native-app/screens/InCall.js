@@ -96,6 +96,7 @@ export class InCall extends Component {
               onPress={() => {
                 // this.props.setConnStatus(null);
                 this.props.remotePeer.endCall();
+                this.props.localPeer.endCall();
                 //handle class cancel
               }}
             >
