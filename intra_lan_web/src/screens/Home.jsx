@@ -9,7 +9,11 @@ import Navbar from "./Navbar";
 import PeerClient from "../peer";
 import Incoming from "./Incoming";
 import InCall from "./InCall";
-
+import { setConnStatus } from "../redux/dataRedux/dataAction";
+import Stream from "./Stream";
+import { Modal } from "baseui/modal";
+import { ListItem, ListItemLabel } from "baseui/list";
+import Files from "./Files";
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -18,6 +22,7 @@ class Home extends Component {
       userName: "Anup",
       myip: "",
       search: false,
+      modalOpen: false,
     };
   }
 
@@ -32,6 +37,11 @@ class Home extends Component {
     this.props.setLocalPeer(peer);
     // }
   };
+  exec = (connection, operation) => {
+    const remotePeer = new PeerClient({ ...connection, operation: operation });
+    this.props.setRemotePeer(remotePeer);
+    this.setState({ modalOpen: false });
+  };
 
   setScreen = () => {
     switch (this.props.connStatus) {
@@ -39,10 +49,63 @@ class Home extends Component {
         return <Incoming></Incoming>;
       case "inCall":
         return <InCall></InCall>;
+      case "searching":
+        return <Stream />;
+      case "fileSelect":
+        return (
+          <Files
+            open={this.props.connStatus}
+            remotePeer={this.props.remotePeer}
+            setConnStatus={this.props.setConnStatus}
+          />
+        );
       default:
         return (
           <>
             <Navbar></Navbar>
+            <Modal
+              isOpen={this.state.modalOpen}
+              onClose={() => this.setState({ modalOpen: false })}
+            >
+              <div
+                style={{
+                  backgroundColor: "rgba(1,1,1,0.7)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Button
+                  onClick={() => {
+                    this.exec(this.state.connection, "call");
+                  }}
+                >
+                  <ListItem>
+                    <ListItemLabel>Call</ListItemLabel>
+                  </ListItem>
+                </Button>
+
+                <Button
+                  onClick={() => {
+                    this.exec(this.state.connection, "file");
+                  }}
+                >
+                  <ListItem>
+                    <ListItemLabel>File Transfer</ListItemLabel>
+                  </ListItem>
+                </Button>
+                <Button
+                  onClick={() => {
+                    this.exec(this.state.connection, "chat");
+                  }}
+                >
+                  <ListItem>
+                    <ListItemLabel>Chat</ListItemLabel>
+                  </ListItem>
+                </Button>
+              </div>
+            </Modal>
             <div
               style={{
                 display: "flex",
@@ -61,9 +124,47 @@ class Home extends Component {
                 Welcome {this.state && this.state.userName}
               </Display2>
               <p>My IP : {this.state && this.state.myip}</p>
-              <Button kind="secondary" onClick={this.props.startSearch}>
+              <Button
+                kind="secondary"
+                onClick={() => {
+                  this.props.setConnStatus("searching");
+                  this.props.startSearch();
+                }}
+              >
                 Search
               </Button>
+            </div>
+            <h1>Test</h1>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                marginTop: "40px",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {this.props?.info &&
+                Object.keys(this.props?.info).map((ip) => {
+                  return (
+                    <div>
+                      <Button
+                        onClick={() => {
+                          this.setState(
+                            { connection: this.props.info[ip] },
+                            () => this.setState({ modalOpen: true })
+                          );
+                        }}
+                      >
+                        <ListItem>
+                          <ListItemLabel>
+                            {this.props.info[ip]["username"]} |{ip}
+                          </ListItemLabel>
+                        </ListItem>
+                      </Button>
+                    </div>
+                  );
+                })}
             </div>
           </>
         );
@@ -71,8 +172,8 @@ class Home extends Component {
   };
 
   render() {
-    console.log(this.props.connStatus)
-    return this.setScreen()
+    console.log(this.props.connStatus);
+    return this.setScreen();
   }
 }
 
@@ -94,6 +195,7 @@ const mapDispatchToProps = (dispatch) => {
     setLocalPeer: (info) => dispatch(setLocalPeer(info)),
     setRemotePeer: (info) => dispatch(setRemotePeer(info)),
     startSearch: () => dispatch(startSearch()),
+    setConnStatus: (status) => dispatch(setConnStatus(status)),
   };
 };
 

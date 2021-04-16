@@ -1,9 +1,15 @@
-import { LOCAL_PEER, REMOTE_PEER, AV_STREAM } from "./streamActionTypes";
-
+import {
+  LOCAL_PEER,
+  REMOTE_PEER,
+  AV_STREAM,
+  SET_VEDIO_REF,
+} from "./streamActionTypes";
+import { createRef } from "react";
 const initalState = {
   remotePeer: null,
   localPeer: null,
   stream: null,
+  videoRef: createRef(),
 };
 
 export const streamReducer = (state = initalState, action) => {
@@ -14,6 +20,13 @@ export const streamReducer = (state = initalState, action) => {
         localPeer: action.payload,
       };
     }
+    case SET_VEDIO_REF: {
+      console.log(action.payload);
+      return {
+        ...state,
+        videoRef: action.payload,
+      };
+    }
     case REMOTE_PEER: {
       return {
         ...state,
@@ -21,6 +34,8 @@ export const streamReducer = (state = initalState, action) => {
       };
     }
     case AV_STREAM: {
+      // console.log("in avstream", state);
+      // state.videoRef.current.srcObject = action.payload;
       return {
         ...state,
         stream: action.payload,

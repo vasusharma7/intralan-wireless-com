@@ -22,7 +22,8 @@ export default class PeerClient {
     this.localPeerId = this.authInfo.uid;
     this.establishConnection();
     this.fileBuffer = [];
-    this.chunksize = 32 * 1024;
+    this.maxRetries = 5;
+    this.chunksize = 64 * 1024;
     this.state = store.getState();
     this.offset = 0;
     this.getMediaSource();
@@ -34,7 +35,7 @@ export default class PeerClient {
     // this.ip = this.connection?.ip ? this.connection.ip : ip;
     if (this.connection) store.dispatch(setConnStatus("connecting"));
     this.peer = new Peer(this.localPeerId, {
-      host: "127.0.0.1", //replace with ip
+      host: this.connection ? this.connection.ip : "127.0.0.1", //replace with ip
       port: 5000,
       path: "/peerjs",
       secure: false,
@@ -59,7 +60,7 @@ export default class PeerClient {
   fireEventListeners = () => {
     this.peer.on("error", (err) => {
       if (this.localPeerId) this.disconnectSelf();
-      this.establishConnection();
+      if (this.maxRetries--) this.establishConnection();
       console.log("listen", err);
     });
     // this.peer.on("signal", (data) => {
@@ -107,6 +108,7 @@ export default class PeerClient {
     });
 
     this.peer.on("connection", (conn) => {
+      this.conn = conn;
       this.metadata = conn.metadata;
       console.log("Local peer has received connection.");
       conn.on("error", (err) => {
@@ -120,7 +122,6 @@ export default class PeerClient {
           if (data?.operation === "file") {
             this.saveFile(data, conn);
           } else if (data?.operation === "chat") {
-            this.conn = conn;
             this.recieveMessage(data);
           } else {
             console.log("Local peer sending some data.");
@@ -133,6 +134,10 @@ export default class PeerClient {
       this.call = call;
       console.log("call received");
       store.dispatch(setConnStatus("incoming"));
+      this.call.on("close", function () {
+        store.dispatch(setConnStatus(null));
+        console.log("The call is closed");
+      });
       // this.answerCall();
     });
   };
@@ -145,28 +150,53 @@ export default class PeerClient {
       this.call.answer(this.stream);
       console.log("call answer", stream);
       store.dispatch(setAVStream(stream));
-    });
-    this.call.on("close", function () {
-      store.dispatch(setConnStatus(null));
-      console.log("The call is closed");
+      global.config.videoRef.current.srcObject = stream;
     });
   }
-
+  async receiveFile() {
+    this.conn.send({ operation: "file", fileReceive: true });
+    // store.dispatch(setConnStatus("fileTransfer"));
+    // this.recieveFile(data);
+  }
+  async rejectFile() {
+    this.conn.send({ operation: "file", fileReceive: false });
+    store.dispatch(setConnStatus(null));
+  }
+  async setFile(file) {
+    this.file = file;
+  }
+  async setRes(res) {
+    this.res = res;
+  }
   // async saveFile(res, conn) {
   //   if (res.file === "EOF") {
-  //     alert(
+  //     store.dispatch(setConnStatus(null));
+  //     console.log(
   //       "Success",
   //       `File Saved Successfully to location ${this.fileLocation}`
   //     );
-  //     await FileViewer.open(this.fileLocation);
+  //     try {
+  //       // await FileViewer.open(this.fileLocation);
+  //     } catch (err) {
+  //       console.log("could not open file");
+  //     }
   //   } else {
+  //     store
+  //       .dispatch
+  //       // setFileProgress(
+  //       //   Math.round(((this.chunksize * res.chunk) / res.size) * 100)
+  //       // )
+  //       ();
   //     if (res.chunk == 0) {
+  //       this.res = res;
+  //       store.dispatch(setConnStatus("fileTransfer"));
+  //       // store.dispatch(streamInit(false));
   //       RNFetchBlob.fs.isDir(this.dirLocation).then(async (isDir) => {
   //         if (!isDir) {
   //           try {
   //             await RNFetchBlob.fs.mkdir(dirLocation);
   //           } catch {
-  //             alert(
+  //             Alert.alert(
   //               "Oops !",
   //               "Could not create App Directory in Downloads folder"
   //             );
@@ -188,59 +218,42 @@ export default class PeerClient {
   //     conn.send({ success: true, chunk: res.chunk, operation: "file" });
   //   }
   // }
-  // async sendFile() {
-  //   if (this.offset === 0)
-  //     try {
-  //       const res = await DocumentPicker.pick({
-  //         type: [DocumentPicker.types.allFiles],
-  //         readContent: true,
-  //       });
-  //       console.log(
-  //         res.uri,
-  //         res.type, // mime type
-  //         res.name,
-  //         res.size
-  //       );
-  //       this.res = res;
-  //     } catch (err) {
-  //       if (DocumentPicker.isCancel(err)) {
-  //         // User cancelled the picker, exit any dialogs or menus and move on
-  //       } else {
-  //         throw err;
-  //       }
-  //     }
-  //   console.log("sending file", this.offset / this.chunksize);
-  //   if (this.offset > this.res.size)
-  //     this.conn.send({
-  //       ...this.res,
-  //       file: "EOF",
-  //       operation: "file",
-  //     });
-  //   else {
-  //     await RNFetchBlob.fs
-  //       .writeFile(this.cacheLocation, "", "utf8")
-  //       .then(async () => {
-  //         await RNFetchBlob.fs
-  //           .slice(
-  //             this.res.uri,
-  //             this.cacheLocation,
-  //             this.offset,
-  //             this.offset + this.chunksize
-  //           )
-  //           .then(async (resp) => {
-  //             const file = await RNFS.readFile(this.cacheLocation, "base64");
-  //             console.log(resp);
-  //             this.conn.send({
-  //               ...this.res,
-  //               file: file,
-  //               operation: "file",
-  //               chunk: this.offset / this.chunksize,
-  //             });
-  //             this.offset += this.chunksize;
-  //           });
-  //       });
-  //   }
-  // }
+  async selectFile() {
+    //watchout this thing---
+    this.offset = 0;
+    store.dispatch(setConnStatus("fileSelect"));
+    // store.dispatch(setStreamMetaData({ ...this.res, permission: true }));
+    // this.conn.send({ operation: "file", ...this.res, permission: true });
+    // store.dispatch(setConnStatus("fileTransfer"));
+  }
+  async sendFile() {
+    console.log(
+      "sending file",
+      this.offset / this.chunksize,
+      this.file.slice(this.offset, this.offset + this.chunksize)
+    );
+    // store.dispatch(
+    //   setFileProgress(
+    //     Math.round((this.offset / this.res.size).toFixed(2) * 100)
+    //   )
+    // );
+    if (this.offset > this.res.size) {
+      this.conn.send({
+        ...this.res,
+        file: "EOF",
+        operation: "file",
+      });
+      store.dispatch(setConnStatus(null));
+    } else {
+      this.conn.send({
+        ...this.res,
+        file: this.file.slice(this.offset, this.offset + this.chunksize),
+        operation: "file",
+        chunk: this.offset / this.chunksize,
+      });
+      this.offset += this.chunksize;
+    }
+  }
 
   endCall = () => {
     store.dispatch(setConnStatus(null));
@@ -268,6 +281,7 @@ export default class PeerClient {
     this.call.on("stream", function (stream) {
       console.log("peer is streaming", this.peerId, stream);
       store.dispatch(setAVStream(stream));
+      global.config.videoRef.current.srcObject = stream;
       store.dispatch(setConnStatus("inCall")); //change to picked-up status
       // onReceiveStream(stream, "peer-camera");
     });
@@ -279,7 +293,7 @@ export default class PeerClient {
 
   rejectCall = () => {
     store.dispatch(setConnStatus(null));
-    this.conn.send({operation : "call", data: "decline"})
+    this.conn.send({ operation: "call", data: "decline" });
   };
   initChat = () => {
     store.dispatch(chatInit(true));
@@ -331,6 +345,7 @@ export default class PeerClient {
     this.conn = this.peer.connect(this.connection.peerId, {
       metadata: this.authInfo,
     });
+    this.conn.serialization = "json";
     this.conn.on("error", (err) => {
       console.log("conn", err);
     });
@@ -340,7 +355,7 @@ export default class PeerClient {
       if (type === "call") {
         this.startCall();
       } else if (type === "file") {
-        this.sendFile();
+        this.selectFile();
       } else if (type === "message") {
         console.log("Sending message");
 
@@ -348,6 +363,7 @@ export default class PeerClient {
       }
     });
     this.conn.on("data", (data) => {
+      if (typeof data == "string") data = JSON.parse(data);
       console.log(data);
       if (data?.operation === "chat") {
         this.recieveMessage(data);
@@ -364,16 +380,18 @@ export default class PeerClient {
           console.log("Call terminated");
         }
       }
-      // if (data?.operation === file) {
-      //   if (data.fileReceive) {
-      //     this.sendFile();
-      //     store.dispatch(setStreamMetaData(this.res));
-      //   } else {
-      //     //clear resources
-      //   }
-      // }
-      if (data.success) {
-        this.sendFile();
+      if (data?.operation === "file") {
+        if (data.success) {
+          this.sendFile();
+        } else if (data.fileReceive === true) {
+          // store.dispatch(setStreamMetaData(this.res));
+          this.sendFile();
+        } else {
+          //clear resources
+          console.log("Peer revoked your request");
+          // store.dispatch(setStreamMetaData({}));
+          store.dispatch(setConnStatus(null));
+        }
       }
     });
   };

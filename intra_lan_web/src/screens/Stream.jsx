@@ -1,9 +1,9 @@
 import React from "react";
 import { Button } from "baseui/button";
-import { H5} from 'baseui/typography'
+import { H5 } from "baseui/typography";
 
 import { store } from "../redux/store";
-import {Modal} from "baseui/modal";
+import { Modal } from "baseui/modal";
 import { connect } from "react-redux";
 import {
   updateConnections,
@@ -12,6 +12,7 @@ import {
 } from "../redux/dataRedux/dataAction";
 import { stopSearch } from "../redux/searchRedux/searchAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
+import logo from "../assets/wifi.gif";
 
 class Stream extends React.Component {
   paint() {
@@ -41,25 +42,24 @@ class Stream extends React.Component {
         return (
           <div
             style={{
-              flex: 1,
+              display: "flex",
+              flexDirection: "column",
               justifyContent: "center",
               alignContent: "center",
               alignItems: "center",
-              backgroundColor: "rgba(1,1,1,0.7)",
-              padding: 0,
-              margin: 0,
             }}
           >
             <H5 style={{ color: "white", fontSize: 20, textAlign: "center" }}>
               Searching
             </H5>
-            {/* <Image
-              source={wifi}
+            <img
+              src={logo}
               style={{
                 width: 200,
-                height: 200,
+                height: 350,
               }}
-            /> */}
+              alt="wifi"
+            />
             <H5
               style={{
                 color: "white",
@@ -72,9 +72,11 @@ class Stream extends React.Component {
             </H5>
 
             <Button
-              onClick ={() => this.props.stopSearch()}
-              title={"Stop Search"}
-            />
+              style={{ marginBottom: 20 }}
+              onClick={() => this.props.stopSearch()}
+            >
+              Stop Searching
+            </Button>
           </div>
         );
       }
@@ -119,7 +121,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Stream);
+export default connect(mapStateToProps, mapDispatchToProps)(Stream);

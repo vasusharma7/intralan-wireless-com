@@ -1,5 +1,16 @@
-import { LOCAL_PEER, REMOTE_PEER, AV_STREAM } from "./streamActionTypes";
+import {
+  LOCAL_PEER,
+  REMOTE_PEER,
+  AV_STREAM,
+  SET_VEDIO_REF,
+} from "./streamActionTypes";
 
+export const setVideoRef = (ref) => {
+  return {
+    type: SET_VEDIO_REF,
+    payload: ref,
+  };
+};
 export const setLocalPeer = (peer) => {
   return {
     type: LOCAL_PEER,

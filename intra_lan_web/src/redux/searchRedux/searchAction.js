@@ -24,7 +24,7 @@ const sleep = (milliseconds) => {
 };
 
 export const initSearch = (block) => {
-  console.log(global)
+  console.log(global);
   console.log("initialising search....");
   const ips = [];
   const generator = new Netmask(block);
@@ -55,7 +55,8 @@ export const startSearch = () => {
         .then(async (res) => {
           console.log("success", res.length);
           await new Promise((r) => setTimeout(r, 5000));
-          dispatch(startSearch());
+          // dispatch(startSearch());
+          dispatch(toggleSearch());
         })
         .catch((ips) => console.log(ips));
     }, 0);
@@ -89,7 +90,9 @@ const connect = async (ip) => {
     return;
   }
   return new Promise(async (resolve, reject) => {
-    const socket = await socketIOClient(`http://${ip}:5000`);
+    const socket = await socketIOClient(`http://192.168.1.6:5000`, {
+      reconnection: false,
+    });
     socket.on("connect", () => {
       console.log(socket.id, socket.connected);
       !Object.keys(state.data.connections).includes(ip) &&

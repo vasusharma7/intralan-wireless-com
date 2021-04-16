@@ -45,7 +45,7 @@ export default class Login extends Component {
         name: this.state.name,
         email: this.state.email,
         phone: this.state.phone,
-        uid: uid,
+        uid: localStorage.getItem("uid"),
       })
     );
   };

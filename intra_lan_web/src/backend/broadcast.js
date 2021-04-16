@@ -7,7 +7,9 @@ const port = process.env.PORT || 5000;
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" }));
+app.use(cors());
 app.options("*", cors());
+
 const http = require("http").Server(app);
 var io = require("socket.io")(http);
 const os = require("os");
@@ -33,7 +35,7 @@ io.sockets.on("connection", (client) => {
     ...global?.config?.authInfo,
     peerId: global?.config?.metadata["localPeerId"],
   });
-  console.log(client.id);
+  // console.log(client.id);
 });
 
 app.get("/", (req, res) =>
@@ -61,6 +63,6 @@ peerServer.on("error", (err) => {
 
 peerServer.on("connection", (peer) => {
   global.config.peerConnections[peer.id] = peer;
-  console.log(global?.config?.peerConnections);
+  // console.log(global?.config?.peerConnections);
   console.log("peer connection");
 });

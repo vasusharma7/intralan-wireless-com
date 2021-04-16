@@ -5,7 +5,9 @@ import Timer from "../components/Timer";
 import { connect } from "react-redux";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { store } from "../redux/store";
-
+import { setVideoRef } from "../redux/streamRedux/streamAction";
+import "../config";
+global.config.videoRef = React.createRef();
 class InCall extends Component {
   constructor(props) {
     super(props);
@@ -13,7 +15,11 @@ class InCall extends Component {
     this.state = { ...store.getState() };
   }
   componentDidUpdate() {
-    this.videoRef.current.srcObject = this.props.stream;
+    console.log("i m in update", this.props.stream);
+    // this.videoRef.current.srcObject = this.props.stream;
+  }
+  componentDidMount() {
+    this.props.setVideoRef(this.videoRef);
   }
   handleEnd = () => {
     this.props.setConnStatus(null);
@@ -44,7 +50,6 @@ class InCall extends Component {
         ></Avatar>
         <Timer></Timer>
         <video
-          key={this.props.stream}
           style={{
             borderWidth: 1,
             display: "none",
@@ -53,7 +58,7 @@ class InCall extends Component {
             width: 100,
           }}
           controls
-          ref={this.videoRef}
+          ref={global.config.videoRef}
           autoPlay
         ></video>
         <Button
@@ -77,10 +82,12 @@ const mapStateToProps = (state) => ({
   localPeer: state.stream.localPeer,
   connStatus: state.data.connStatus,
   stream: state.stream.stream,
+  videoRef: state.stream.videoRef,
 });
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    setVideoRef: (ref) => dispatch(setVideoRef(ref)),
     setConnStatus: (status) => dispatch(setConnStatus(status)),
   };
 };
