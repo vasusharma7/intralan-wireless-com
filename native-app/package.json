@@ -52,6 +52,7 @@
     "react-native-os": "^1.2.6",
     "react-native-paper": "^4.7.2",
     "react-native-peerjs": "^1.0.4",
+    "react-native-push-notification": "^7.2.3",
     "react-native-randombytes": "^3.6.0",
     "react-native-reanimated": "^2.0.1",
     "react-native-safe-area-context": "^3.2.0",

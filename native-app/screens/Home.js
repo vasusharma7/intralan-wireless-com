@@ -12,6 +12,7 @@ import IncomingCall from "./IncomingCall";
 import InCall from "./InCall";
 import { FileTransfer } from "./FileTransfer";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
+
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -40,7 +41,7 @@ class Home extends Component {
         { key: "settings", screen: Settings, title: "Settings", icon: "tools" },
       ],
     };
-    console.log("target", this.props?.route?.params?.target);
+    // console.log("target", this.props?.route?.params?.target);
   }
   paintTheScreen() {
     switch (this.props.connStatus) {

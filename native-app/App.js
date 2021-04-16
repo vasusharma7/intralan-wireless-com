@@ -12,15 +12,16 @@ import AndroidNotificationSettings from "rn-android-notification-settings";
 
 // const Tab = createMaterialBottomTabNavigator();
 import "./config.js";
+import "./notif.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IncomingCall } from "./screens/IncomingCall";
 import { echoNode } from "./redux/nodeRedux/nodeAction";
 import { Auth } from "./screens/Auth";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import PushNotification from "react-native-push-notification";
 import { Splash } from "./screens/Splash";
 const { PeerClient } = require("./peer.js");
-
 const Stack = createStackNavigator();
 
 const sleep = async (delay) => await new Promise((r) => setTimeout(r, delay));
@@ -74,6 +75,44 @@ class App extends Component {
     };
     Linking.addEventListener("url", this.handleIncomingEvents);
   }
+  createChannels = () => {
+    PushNotification.createChannel(
+      {
+        channelId: "message-channel", // (required)
+        channelName: `Message channel`, // (required)
+        channelDescription: "channel for sending messages", // (optional) default: undefined.
+        soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
+        importance: 4, // (optional) default: 4. Int value of the Android notification importance
+        vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
+      },
+      (created) =>
+        console.log(`createChannel 'message-channel' returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+    );
+    PushNotification.createChannel(
+      {
+        channelId: "file-channel", // (required)
+        channelName: `File channel`, // (required)
+        channelDescription: "channel for file transfer", // (optional) default: undefined.
+        soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
+        importance: 4, // (optional) default: 4. Int value of the Android notification importance
+        vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
+      },
+      (created) =>
+        console.log(`createChannel 'file-channel' returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+    );
+    PushNotification.createChannel(
+      {
+        channelId: "call-channel", // (required)
+        channelName: `Call channel`, // (required)
+        channelDescription: "channel for calls", // (optional) default: undefined.
+        soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
+        importance: 4, // (optional) default: 4. Int value of the Android notification importance
+        vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
+      },
+      (created) =>
+        console.log(`createChannel 'call-channel' returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+    );
+  };
   handleIncomingEvents = (evt) => {
     console.log(evt.url);
     // if (evt.url.includes("settings")) {
@@ -84,7 +123,9 @@ class App extends Component {
     //   });
     // }
     // Linking.openSettings();
-    AndroidNotificationSettings.openNotificationSettings();
+
+    // AndroidNotificationSettings.openNotificationSettings();
+
     // Linking.openURL("app-settings://notification/com.vasusharma7.intralan");
   };
   componentWillUnmount() {
@@ -153,11 +194,13 @@ class App extends Component {
     // });
   };
   async componentDidMount() {
+    this.createChannels();
     // AsyncStorage.clear();
 
     this.requestPermissions();
-    if (!BackgroundService.isRunning())
-      await BackgroundService.start(veryIntensiveTask, options);
+    //check here if notifications are not working
+    // if (!BackgroundService.isRunning())
+    await BackgroundService.start(veryIntensiveTask, options);
     this.props.echoNode();
     // this.connectWithPeerJS();
     this.props.initSearch(rangeString);
