@@ -26,6 +26,15 @@ const getIp = () => {
 };
 
 //io.origins('*//*:*');
+//to be tested
+setInterval(() => {
+  io.emit("broadcast", {
+    ip: getIp(),
+    port: 5000,
+    ...global.config.authInfo,
+    peerId: global.config.metadata["localPeerId"],
+  });
+}, 40000);
 io.sockets.on("connection", (client) => {
   io.emit("broadcast", {
     ip: getIp(),

@@ -73,6 +73,15 @@ class Connections extends Component {
               this.exec(this.state.connection, "message");
             }}
           />
+          <View style={{ margin: 10 }} />
+          <Button
+            color="gray"
+            title="Cancel"
+            icon="cancel"
+            onPress={() => {
+              this.setState({ modalOpen: false });
+            }}
+          />
         </Modal>
         {this.props.connStatus !== null && <Stream />}
         <View>

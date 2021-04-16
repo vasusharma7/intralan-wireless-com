@@ -204,6 +204,7 @@ class App extends Component {
     this.props.echoNode();
     // this.connectWithPeerJS();
     this.props.initSearch(rangeString);
+    global.config.background = false;
     AppState.addEventListener("change", this._handleAppStateChange);
     // setInterval(() => global.config.fireMessageNotification(), 5000);
   }
@@ -228,9 +229,11 @@ class App extends Component {
       nextAppState === "active"
     ) {
       console.log("App has come to the foreground!");
+      global.config.background = false;
       // this.setState({ block: rangeString }, this.handleBlockChange);
     } else {
       console.log("App has gone to background !");
+      global.config.background = true;
       // clearInterval(this.state.interval);
       // this.setState({ interval: -1 });
     }

@@ -71,7 +71,7 @@ handleConnectionChange = (connections) => {
     connections[ip].on("broadcast", (data) => {
       console.log("receiving broadcast data", data);
       handleInfoChnage({ ...state.data.info, [ip]: data });
-      connections[ip].off("broadcast");
+      // connections[ip].off("broadcast");
     });
   }
 };

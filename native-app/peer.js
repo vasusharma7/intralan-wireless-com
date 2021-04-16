@@ -237,12 +237,12 @@ class PeerClient {
   }
   async receiveFile() {
     this.conn.send({ operation: "file", fileReceive: true });
-    store.dispatch(setConnStatus("fileTransfer"));
+    // store.dispatch(setConnStatus("fileTransfer"));
     // this.recieveFile(data);
   }
   async rejectFile() {
     this.conn.send({ operation: "file", fileReceive: false });
-    this.props.setConnStatus(null);
+    store.dispatch(setConnStatus(null));
   }
   async saveFile(res, conn) {
     if (res.file === "EOF") {
@@ -251,7 +251,11 @@ class PeerClient {
         "Success",
         `File Saved Successfully to location ${this.fileLocation}`
       );
-      await FileViewer.open(this.fileLocation);
+      try {
+        await FileViewer.open(this.fileLocation);
+      } catch (err) {
+        console.log("could not open file");
+      }
     } else {
       store.dispatch(
         setFileProgress(
@@ -290,6 +294,7 @@ class PeerClient {
     }
   }
   async selectFile() {
+    //watchout this thing---
     this.offset = 0;
     try {
       const res = await DocumentPicker.pick({
@@ -446,6 +451,7 @@ class PeerClient {
       metadata: this.authInfo,
     });
     this.conn.on("error", (err) => {
+      Alert.alert("Connection Droppped");
       console.log("conn", err);
     });
     this.conn.on("open", () => {
@@ -473,17 +479,17 @@ class PeerClient {
         }
       }
       if (data?.operation === "file") {
-        if (data.fileReceive) {
+        if (data.success) {
+          this.sendFile();
+        } else if (data.fileReceive === true) {
           store.dispatch(setStreamMetaData(this.res));
           this.sendFile();
         } else {
           //clear resources
+          Alert.alert("Peer revoked your request");
           store.dispatch(setStreamMetaData({}));
           store.dispatch(setConnStatus(null));
         }
-      }
-      if (data.success) {
-        this.sendFile();
       }
     });
   };

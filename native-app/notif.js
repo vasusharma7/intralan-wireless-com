@@ -1,6 +1,7 @@
 import PushNotification from "react-native-push-notification";
 
 global.config.fireCallsNotification = () => {
+  if (!global.config.background) return;
   //   PushNotification.ca;
   PushNotification.localNotification({
     /* Android Only Properties */
@@ -30,6 +31,7 @@ global.config.fireCallsNotification = () => {
 };
 
 global.config.fireMessageNotification = () => {
+  if (!global.config.background) return;
   PushNotification.localNotification({
     /* Android Only Properties */
     channelId: "message-channel",
@@ -59,6 +61,7 @@ global.config.fireMessageNotification = () => {
 };
 
 global.config.fireFileNotification = () => {
+  if (!global.config.background) return;
   PushNotification.localNotification({
     /* Android Only Properties */
     channelId: "file-channel",

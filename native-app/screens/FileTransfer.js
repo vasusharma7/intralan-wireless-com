@@ -40,8 +40,12 @@ export class FileTransfer extends Component {
                     "<File Name Not Avaialble>"}
                 </Title>
                 <Title style={{ color: "white", textAlign: "center" }}>
-                  {this.props?.streamMetaData?.size ||
-                    "<File Size Not Avaialble>"}
+                  {Number(
+                    (this.props?.streamMetaData?.size / (1024 * 1024)).toFixed(
+                      2
+                    )
+                  ) || "0"}{" "}
+                  MB
                 </Title>
                 <Image
                   source={require("../assets/connecting.gif")}
@@ -77,8 +81,12 @@ export class FileTransfer extends Component {
                     "<File Name Not Avaialble>"}
                 </Title>
                 <Title style={{ color: "white", textAlign: "center" }}>
-                  {this.props?.streamMetaData?.size ||
-                    "<File Size Not Avaialble>"}
+                  {Number(
+                    (this.props?.streamMetaData?.size / (1024 * 1024)).toFixed(
+                      2
+                    )
+                  ) || "0"}{" "}
+                  MB
                 </Title>
                 <Image
                   source={require("../assets/connecting.gif")}
@@ -126,18 +134,57 @@ export class FileTransfer extends Component {
           )
         ) : (
           <>
-            <AnimatedCircularProgress
-              size={(1 * width) / 2}
-              width={15}
-              fill={this.props.progress}
-              tintColor="#0466aa"
-              backgroundColor="rgba(1,1,1,0.7)"
+            <View
               style={{
-                alignSelf: "center",
+                display: "flex",
+                flex: 1,
+                backgroundColor: "#1f1f1f",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              {() => <Text>{this.props.progress}%</Text>}
-            </AnimatedCircularProgress>
+              <View style={{ marginBottom: 10 }}>
+                <Title style={{ color: "white", textAlign: "center" }}>
+                  {this.props?.streamMetaData?.name ||
+                    "<File Name Not Avaialble>"}
+                </Title>
+                <Title style={{ color: "white", textAlign: "center" }}>
+                  {Number(
+                    (this.props?.streamMetaData?.size / (1024 * 1024)).toFixed(
+                      2
+                    )
+                  ) || "0"}{" "}
+                  MB
+                </Title>
+              </View>
+              <View>
+                <AnimatedCircularProgress
+                  size={(1 * width) / 2}
+                  width={15}
+                  fill={this.props.progress}
+                  tintColor="#0466aa"
+                  backgroundColor="rgba(150,150,150,1)"
+                  style={{
+                    alignSelf: "center",
+                  }}
+                >
+                  {() => (
+                    <Text style={{ color: "white" }}>
+                      {this.props.progress}%
+                    </Text>
+                  )}
+                </AnimatedCircularProgress>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    this.props.setConnStatus(null);
+                  }}
+                >
+                  <Text style={styles.buttonText}>Hide</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </>
         )}
       </>

@@ -45,7 +45,7 @@ class Home extends Component {
   }
   paintTheScreen() {
     switch (this.props.connStatus) {
-      // switch ("ringing") {
+      // switch ("fileTransfer") {
       case "incoming":
         return <IncomingCall />;
       case "inCall":
