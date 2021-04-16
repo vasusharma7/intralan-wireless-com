@@ -34,7 +34,7 @@ global.config.fireMessageNotification = () => {
     /* Android Only Properties */
     channelId: "message-channel",
     // smallIcon: "lock", // (optional) default: "ic_notification" with fallback for "ic_launcher"
-    bigText: "Open IntraLANCom app to receive Call", // (optional) default: "message" prop
+    bigText: "Tap the banner to see the message", // (optional) default: "message" prop
     // subText: "Please Stay Indoors", // (optional) default: none
     vibrate: true, // (optional) default: true
     vibration: 10, // vibration length in milliseconds, ignored if vibrate=false, default: 1000
@@ -48,7 +48,7 @@ global.config.fireMessageNotification = () => {
     ignoreInForeground: false, // (optional) if true, the notification will not be visible when the app is in the foreground (useful for parity with how iOS notifications appear)
 
     /* iOS and Android properties */
-    title: "Incoming Call ", // (optional)
+    title: "New Message received", // (optional)
     message: "", // (required)
     playSound: true, // (optional) default: true
     // soundName: 'android.resource://com.reactnativemapview/raw/woosh', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
@@ -63,7 +63,7 @@ global.config.fireFileNotification = () => {
     /* Android Only Properties */
     channelId: "file-channel",
     // smallIcon: "lock", // (optional) default: "ic_notification" with fallback for "ic_launcher"
-    bigText: "Open IntraLANCom app to receive Call", // (optional) default: "message" prop
+    bigText: "Tap the banner to grant/revoke permission", // (optional) default: "message" prop
     // subText: "Please Stay Indoors", // (optional) default: none
     vibrate: true, // (optional) default: true
     vibration: 10, // vibration length in milliseconds, ignored if vibrate=false, default: 1000
@@ -77,7 +77,7 @@ global.config.fireFileNotification = () => {
     ignoreInForeground: false, // (optional) if true, the notification will not be visible when the app is in the foreground (useful for parity with how iOS notifications appear)
 
     /* iOS and Android properties */
-    title: "Incoming Call ", // (optional)
+    title: "File Transfer Permission Request", // (optional)
     message: "", // (required)
     playSound: true, // (optional) default: true
     // soundName: 'android.resource://com.reactnativemapview/raw/woosh', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)

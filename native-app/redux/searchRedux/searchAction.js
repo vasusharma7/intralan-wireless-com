@@ -53,7 +53,7 @@ export const startSearch = () => {
       )
         .then(async (res) => {
           console.log("success", res.length);
-          await new Promise((r) => setTimeout(r, 10000));
+          await new Promise((r) => setTimeout(r, 20000));
           dispatch(startSearch());
         })
         .catch((ips) => console.log(ips));

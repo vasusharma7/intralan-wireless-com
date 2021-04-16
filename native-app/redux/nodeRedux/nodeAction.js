@@ -11,7 +11,7 @@ const handleNodeEvents = (msg) => {
   const event = Object.keys(msg)[0];
   switch (event) {
     case "firedUp": {
-      // Alert.alert("Broadcasting started successfully.");
+      Alert.alert("Broadcasting started successfully.");
       echoNode();
       return;
     }

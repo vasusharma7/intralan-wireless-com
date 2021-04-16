@@ -205,6 +205,7 @@ class App extends Component {
     // this.connectWithPeerJS();
     this.props.initSearch(rangeString);
     AppState.addEventListener("change", this._handleAppStateChange);
+    // setInterval(() => global.config.fireMessageNotification(), 5000);
   }
 
   async componentWillUnmount() {

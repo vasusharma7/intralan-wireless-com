@@ -53,7 +53,7 @@ peerServer.on("error", (err) => {
 });
 
 peerServer.on("connection", (peer) => {
-  //global.config.peerConnections[peer.id] = peer;
-  //console.log(global.config.peerConnections);
+  global.config.peerConnections[peer.id] = peer;
+  // console.log(global.config.peerConnections);
   console.log("peer connection");
 });

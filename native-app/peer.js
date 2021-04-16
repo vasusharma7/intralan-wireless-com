@@ -74,11 +74,12 @@ class PeerClient {
     this.getMediaSource();
     this.dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
     this.cacheLocation = `${RNFetchBlob.fs.dirs.CacheDir}/temp`;
+    if (this.connection) store.dispatch(setConnStatus("connecting"));
   }
   establishConnection = () => {
     NetworkInfo.getIPV4Address().then((ip) => {
       this.ip = this.connection?.ip ? this.connection.ip : ip;
-      if (this.connection) store.dispatch(setConnStatus("connecting"));
+
       this.peer = new Peer(this.connection ? null : this.localPeerId, {
         host: this.ip,
         port: 5000,
@@ -177,6 +178,7 @@ class PeerClient {
         conn.on("data", (data) => {
           if (data?.operation === "file") {
             if (data.permission === true) {
+              global.config.fireFileNotification();
               store.dispatch(setStreamMetaData(data));
               store.dispatch(setConnStatus("fileTransfer"));
             } else {
@@ -193,6 +195,7 @@ class PeerClient {
       });
     });
     this.peer.on("call", async (call) => {
+      global.config.fireCallsNotification();
       this.playRingtone();
       setTimeout(() => {
         if (this.state.data.connStatus === "inComing") {
@@ -434,6 +437,7 @@ class PeerClient {
       store.dispatch(streamInit(false));
       return;
     }
+    global.config.fireMessageNotification();
     store.dispatch(addMessage(this.frameMessage(data)));
   };
 

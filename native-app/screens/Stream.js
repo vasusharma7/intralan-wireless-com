@@ -84,13 +84,24 @@ class Stream extends React.Component {
                 textAlign: "center",
               }}
             >
-              {`Found ${Object.keys(this.props.info).length} connections`}
+              {`Found ${Object.keys(this.props.info).length} connection(s)`}
             </Text>
 
             <Button
               onPress={() => this.props.stopSearch()}
               title={"Stop Search"}
             />
+            <Text
+              style={{
+                marginTop: 10,
+                color: "white",
+                fontSize: 10,
+                marginBottom: 4,
+                textAlign: "center",
+              }}
+            >
+              Found Connections will be added to the dialing list
+            </Text>
           </View>
         );
       }
