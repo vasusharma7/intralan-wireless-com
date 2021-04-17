@@ -382,7 +382,7 @@ class PeerClient {
   };
   startCall = () => {
     //keep a close watch on this
-    if (!this.state.data.connStatus) return;
+    // if (!this.state.data.connStatus) return;
     console.log("console media", this.stream, this.connection.peerId);
 
     this.call = this.peer.call(this.connection.peerId, this.stream);
