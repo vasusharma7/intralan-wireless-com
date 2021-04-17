@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@progress/kendo-file-saver": "^1.1.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -15,6 +16,7 @@
     "peer": "^0.6.1",
     "peerjs": "^1.3.2",
     "react": "^17.0.1",
+    "react-base64-downloader": "^2.1.6",
     "react-dom": "^17.0.1",
     "react-file-base64": "^1.0.3",
     "react-icons": "^4.2.0",

@@ -2,11 +2,11 @@ const cors = require("cors");
 const express = require("express");
 require("./config");
 const app = express();
-
+const fs = require("fs");
 const port = process.env.PORT || 5000;
 
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: false, limit: "50mb" }));
+app.use(express.json({ limit: "100mb" }));
+app.use(express.urlencoded({ extended: false, limit: "100mb" }));
 app.use(cors());
 app.options("*", cors());
 
@@ -57,10 +57,33 @@ app.post("/setLocalPeerId", (req, res) => {
   console.log(global.config.metadata["localPeerId"]);
 });
 
-app.get("/myip",(req,res) => {
-  const ip = getIp()
-  return res.status(200).json({ip : ip})
-})
+app.get("/myip", (req, res) => {
+  const ip = getIp();
+  return res.status(200).json({ ip: ip });
+});
+
+app.post("/saveFile", (req, res) => {
+  const { data, name, chunk } = req.body;
+  console.log(req.body.data.length);
+  try {
+    if (chunk === 0 && fs.existsSync(`./${name}`)) {
+      fs.writeFileSync(`./${name}`, "", { encoding: "base64" });
+    }
+    fs.appendFileSync(`./${name}`, data, { encoding: "base64" });
+    return res.status(200).send("success");
+  } catch {
+    return res.status(400).send("error");
+  }
+
+  // fs.writeFileSync(`./${name}`, data, { encoding: "base64" }, function (err) {
+  //   if (err) {
+  //     console.log(err);
+  //     return res.status(400).send("error");
+  //   }
+  //   console.log("File created");
+  //   return res.status(200).send("success");
+  // });
+});
 
 peerServer.on("error", (err) => {
   console.log("peerjs error", err);

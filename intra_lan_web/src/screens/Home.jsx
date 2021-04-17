@@ -69,10 +69,12 @@ class Home extends Component {
       case "ringing":
         return <Ringing></Ringing>;
       case "fileSelect":
+      case "fileSave":
         return (
           <Files
             open={this.props.connStatus}
             remotePeer={this.props.remotePeer}
+            localPeer={this.props.localPeer}
             setConnStatus={this.props.setConnStatus}
           />
         );

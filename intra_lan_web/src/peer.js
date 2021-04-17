@@ -3,19 +3,19 @@ import { store } from "./redux/store";
 import { setAVStream, setLocalPeer } from "./redux/streamRedux/streamAction";
 import { setConnStatus } from "./redux/dataRedux/dataAction";
 import { addMessage, chatInit } from "./redux/messageRedux/messageAction";
+import { saveAs } from "@progress/kendo-file-saver";
 const axios = require("axios");
-
 // import nodejs from "nodejs-mobile-react-native";
 // import RNFetchBlob from "rn-fetch-blob";
 // var RNFS = require("react-native-fs");
 
 export default class PeerClient {
   constructor(connection, localPeerId) {
-    console.log(connection)
+    console.log(connection);
     this.connection = connection;
     this.authInfo = JSON.parse(localStorage.getItem("authInfo"));
     // this.localPeerId = localPeerId ? this.authInfo.uid : null;
-    this.localPeerId = this.authInfo.uid;
+    this.localPeerId = localStorage.getItem("uid");
     this.establishConnection();
     this.fileBuffer = [];
     this.maxRetries = 5;
@@ -93,10 +93,10 @@ export default class PeerClient {
             localPeerId: this.peerId,
           })
           .then((res) => {
-            console.log(res)
+            console.log(res);
           })
           .catch((e) => {
-            console.log(e)
+            console.log(e);
           });
         store.dispatch(setLocalPeer(this));
       }
@@ -115,7 +115,16 @@ export default class PeerClient {
         this.fileBuffer = [];
         conn.on("data", (data) => {
           if (data?.operation === "file") {
-            this.saveFile(data, conn);
+            if (data.permission === true) {
+              console.log("in permission true");
+              // global.config.fireFileNotification();
+              // store.dispatch(setStreamMetaData(data));
+              // store.dispatch(setConnStatus("fileTransfer"));
+              this.res = data;
+              this.receiveFile();
+            } else {
+              this.saveFile(data, conn);
+            }
           } else if (data?.operation === "chat") {
             this.recieveMessage(data);
           } else {
@@ -126,7 +135,6 @@ export default class PeerClient {
       });
     });
 
-    
     this.peer.on("call", async (call) => {
       this.call = call;
       console.log("call received");
@@ -151,6 +159,8 @@ export default class PeerClient {
     });
   }
   async receiveFile() {
+    console.log(this.res);
+    console.log("receiving....");
     this.conn.send({ operation: "file", fileReceive: true });
     // store.dispatch(setConnStatus("fileTransfer"));
     // this.recieveFile(data);
@@ -165,56 +175,57 @@ export default class PeerClient {
   async setRes(res) {
     this.res = res;
   }
-  // async saveFile(res, conn) {
-  //   if (res.file === "EOF") {
-  //     store.dispatch(setConnStatus(null));
-  //     console.log(
-  //       "Success",
-  //       `File Saved Successfully to location ${this.fileLocation}`
-  //     );
-  //     try {
-  //       // await FileViewer.open(this.fileLocation);
-  //     } catch (err) {
-  //       console.log("could not open file");
-  //     }
-  //   } else {
-  //     store
-  //       .dispatch
-  //       // setFileProgress(
-  //       //   Math.round(((this.chunksize * res.chunk) / res.size) * 100)
-  //       // )
-  //       ();
-  //     if (res.chunk == 0) {
-  //       this.res = res;
-  //       store.dispatch(setConnStatus("fileTransfer"));
-  //       // store.dispatch(streamInit(false));
-  //       RNFetchBlob.fs.isDir(this.dirLocation).then(async (isDir) => {
-  //         if (!isDir) {
-  //           try {
-  //             await RNFetchBlob.fs.mkdir(dirLocation);
-  //           } catch {
-  //             Alert.alert(
-  //               "Oops !",
-  //               "Could not create App Directory in Downloads folder"
-  //             );
-  //             console.log("something went wrong in creating folder");
-  //           }
-  //         }
-  //       });
-  //       this.fileLocation = `${this.dirLocation}/${res.name}`;
-  //       await RNFetchBlob.fs
-  //         .writeFile(this.fileLocation, "", "utf8")
-  //         .then(() => {});
-  //     }
-  //     await RNFetchBlob.fs
-  //       .appendFile(this.fileLocation, res.file, "base64")
-  //       .then((resp) => {
-  //         console.log("chunk arrived", res.chunk, resp);
-  //       })
-  //       .catch(console.error);
-  //     conn.send({ success: true, chunk: res.chunk, operation: "file" });
-  //   }
-  // }
+  downloadPDF() {
+    const linkSource = this.file;
+    const downloadLink = document.createElement("a");
+    const fileName = this.res.name;
+
+    downloadLink.href = linkSource;
+    downloadLink.download = fileName;
+    downloadLink.click();
+  }
+  async saveFile(res, conn) {
+    console.log("saving", res.chunk);
+    if (res.file === "EOF") {
+      console.log(this.file);
+      store.dispatch(setConnStatus(null));
+      // console.log(
+      //   "Success",
+      //   `File Saved Successfully to location ${this.fileLocation}`
+      // );
+      console.log("EOF received");
+      alert("File Saved Successfully");
+      // store.dispatch(setConnStatus("fileSave"));
+      // saveAs(this.file, this.res.name);
+      // this.downloadPDF();
+    } else {
+      // store
+      //   .dispatch
+      // setFileProgress(
+      //   Math.round(((this.chunksize * res.chunk) / res.size) * 100)
+      // )
+      // ();
+      // store.dispatch(setConnStatus("fileTransfer"));
+      if (res.chunk === 0) {
+        // data:image/jpeg;base64,
+        this.file = "";
+      }
+      // this.file += res.file;
+      axios
+        .post("http://localhost:5000/saveFile", {
+          data: res.file,
+          name: this.res.name,
+          chunk: res.chunk,
+        })
+        .then(() => {
+          conn.send({ success: true, chunk: res.chunk, operation: "file" });
+        })
+        .catch((err) => {
+          console.log(err);
+          alert("Issues in saving chunk");
+        });
+    }
+  }
   async selectFile() {
     //watchout this thing---
     this.offset = 0;
