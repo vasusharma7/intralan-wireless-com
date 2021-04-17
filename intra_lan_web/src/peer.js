@@ -3,18 +3,15 @@ import { store } from "./redux/store";
 import { setAVStream, setLocalPeer } from "./redux/streamRedux/streamAction";
 import { setConnStatus } from "./redux/dataRedux/dataAction";
 import { addMessage, chatInit } from "./redux/messageRedux/messageAction";
-import { saveAs } from "@progress/kendo-file-saver";
+import "react-notifications-component/dist/theme.css";
+import  { store as NotifStore }  from "react-notifications-component";
 const axios = require("axios");
-// import nodejs from "nodejs-mobile-react-native";
-// import RNFetchBlob from "rn-fetch-blob";
-// var RNFS = require("react-native-fs");
 
 export default class PeerClient {
   constructor(connection, localPeerId) {
     console.log(connection);
     this.connection = connection;
     this.authInfo = JSON.parse(localStorage.getItem("authInfo"));
-    // this.localPeerId = localPeerId ? this.authInfo.uid : null;
     this.localPeerId = localStorage.getItem("uid");
     this.establishConnection();
     this.fileBuffer = [];
@@ -23,6 +20,7 @@ export default class PeerClient {
     this.state = store.getState();
     this.offset = 0;
     this.getMediaSource();
+    // this.localPeerId = localPeerId ? this.authInfo.uid : null;
     // this.dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
     // this.cacheLocation = `${RNFetchBlob.fs.dirs.CacheDir}/temp`;
   }
@@ -194,7 +192,21 @@ export default class PeerClient {
       //   `File Saved Successfully to location ${this.fileLocation}`
       // );
       console.log("EOF received");
-      alert("File Saved Successfully");
+      // alert("File Saved Successfully");
+      NotifStore.addNotification({
+        title: "Success",
+        message: `File saved successfully to ${localStorage.getItem("download")}`,
+        type: "success",
+        // insert: "top",
+        container: "top-center",
+        animationIn: ["animated", "fadeIn"],
+        animationOut: ["animated", "fadeOut"],
+        dismiss: {
+          duration: 3000,
+          pauseOnHover: true,
+        },
+      });
+      
       // store.dispatch(setConnStatus("fileSave"));
       // saveAs(this.file, this.res.name);
       // this.downloadPDF();

@@ -17,7 +17,8 @@ import Files from "./Files";
 import { FiPhoneCall, FiFilePlus, FiMessageSquare } from "react-icons/fi";
 import axios from "axios";
 import Ringing from "./Ringing";
-
+import "react-notifications-component/dist/theme.css";
+import ReactNotification, { store } from "react-notifications-component";
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -28,6 +29,7 @@ class Home extends Component {
       search: false,
       modalOpen: false,
       connection: "",
+      download: "",
     };
   }
 
@@ -47,6 +49,16 @@ class Home extends Component {
     })
       .then((res) => {
         localStorage.setItem("myip", res.data.ip);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    axios({
+      method: "GET",
+      url: "http://localhost:5000/downloads",
+    })
+      .then((res) => {
+        localStorage.setItem("download", res.data.download);
       })
       .catch((e) => {
         console.log(e);
@@ -81,6 +93,7 @@ class Home extends Component {
       default:
         return (
           <>
+            <ReactNotification></ReactNotification>
             <Navbar></Navbar>
             <Modal
               isOpen={this.state.modalOpen}
