@@ -1,21 +1,17 @@
-// const { NetworkInfo } = require("react-native-network-info");
-// import { mediaDevices } from "react-native-webrtc";
-// require("react-native-webrtc");
 import Peer from "peerjs";
 import { store } from "./redux/store";
 import { setAVStream, setLocalPeer } from "./redux/streamRedux/streamAction";
 import { setConnStatus } from "./redux/dataRedux/dataAction";
+import { addMessage, chatInit } from "./redux/messageRedux/messageAction";
+const axios = require("axios");
+
 // import nodejs from "nodejs-mobile-react-native";
 // import RNFetchBlob from "rn-fetch-blob";
 // var RNFS = require("react-native-fs");
-// import DocumentPicker from "react-native-document-picker";
-// import { Buffer } from "buffer";
-// import FileViewer from "react-native-file-viewer";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
-import { addMessage, chatInit } from "./redux/messageRedux/messageAction";
-const axios = require("axios");
+
 export default class PeerClient {
   constructor(connection, localPeerId) {
+    console.log(connection)
     this.connection = connection;
     this.authInfo = JSON.parse(localStorage.getItem("authInfo"));
     // this.localPeerId = localPeerId ? this.authInfo.uid : null;
@@ -36,6 +32,7 @@ export default class PeerClient {
     if (this.connection) store.dispatch(setConnStatus("connecting"));
     this.peer = new Peer(this.localPeerId, {
       host: this.connection ? this.connection.ip : "127.0.0.1", //replace with ip
+      // host: "192.168.1.6", //replace with ip
       port: 5000,
       path: "/peerjs",
       secure: false,
@@ -91,18 +88,16 @@ export default class PeerClient {
           }
         }
       } else {
-        // await AsyncStorage.setItem(
-        //   "localPeer",
-        //   JSON.stringify(this.state.stream.localPeer)
-        // );
-        // nodejs.channel.send(JSON.stringify({ authInfo: this.authInfo }));
-        // nodejs.channel.send(JSON.stringify({ localPeerId: peerId }));
         axios
           .post(`http://localhost:5000/setLocalPeerId`, {
             localPeerId: this.peerId,
           })
-          .then((res) => {})
-          .catch(() => {});
+          .then((res) => {
+            console.log(res)
+          })
+          .catch((e) => {
+            console.log(e)
+          });
         store.dispatch(setLocalPeer(this));
       }
     });
@@ -130,6 +125,8 @@ export default class PeerClient {
         });
       });
     });
+
+    
     this.peer.on("call", async (call) => {
       this.call = call;
       console.log("call received");
@@ -318,7 +315,6 @@ export default class PeerClient {
   sendMessage = (message) => {
     // console.log("receiving data from peer ", data);
     // console.log(this.peerId);
-    console.log("sending", data);
     const data = {
       message: message,
       time: new Date(),

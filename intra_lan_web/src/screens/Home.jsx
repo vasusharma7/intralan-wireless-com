@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Button } from "baseui/button";
 import { Avatar } from "baseui/avatar";
-import { Display2 } from "baseui/typography";
+import { Display4, Display2, H5 } from "baseui/typography";
 import { connect } from "react-redux";
 import { startSearch } from "../redux/searchRedux/searchAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
@@ -14,6 +14,10 @@ import Stream from "./Stream";
 import { Modal } from "baseui/modal";
 import { ListItem, ListItemLabel } from "baseui/list";
 import Files from "./Files";
+import { FiPhoneCall, FiFilePlus, FiMessageSquare } from "react-icons/fi";
+import axios from "axios";
+import Ringing from "./Ringing";
+
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -23,6 +27,7 @@ class Home extends Component {
       myip: "",
       search: false,
       modalOpen: false,
+      connection: "",
     };
   }
 
@@ -36,6 +41,16 @@ class Home extends Component {
     const peer = new PeerClient(null, "vasu_007");
     this.props.setLocalPeer(peer);
     // }
+    axios({
+      method: "GET",
+      url: "http://localhost:5000/myip",
+    })
+      .then((res) => {
+        localStorage.setItem("myip", res.data.ip);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
   exec = (connection, operation) => {
     const remotePeer = new PeerClient({ ...connection, operation: operation });
@@ -51,6 +66,8 @@ class Home extends Component {
         return <InCall></InCall>;
       case "searching":
         return <Stream />;
+      case "ringing":
+        return <Ringing></Ringing>;
       case "fileSelect":
         return (
           <Files
@@ -69,40 +86,95 @@ class Home extends Component {
             >
               <div
                 style={{
-                  backgroundColor: "rgba(1,1,1,0.7)",
+                  backgroundColor: "rgba(1,1,1)",
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "center",
+                  justifyContent: "space-evenly",
                   alignItems: "center",
+                  height: "70vh",
+                  width: "30vw",
+                  borderRadius: "20px",
                 }}
               >
+                <H5>Contact Panel</H5>
+                <Display4>{this.state.connection.username}</Display4>
+                <Display4>{this.state.connection.ip}</Display4>
+
                 <Button
                   onClick={() => {
                     this.exec(this.state.connection, "call");
                   }}
+                  kind="secondary"
+                  style={{ width: "20vw" }}
                 >
-                  <ListItem>
-                    <ListItemLabel>Call</ListItemLabel>
-                  </ListItem>
+                  <ListItemLabel>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <FiPhoneCall
+                        size="30"
+                        style={{ marginRight: "20" }}
+                        color="green"
+                      ></FiPhoneCall>
+                      <p>Call</p>
+                    </div>
+                  </ListItemLabel>
                 </Button>
 
                 <Button
                   onClick={() => {
                     this.exec(this.state.connection, "file");
                   }}
+                  kind="secondary"
+                  style={{ width: "20vw" }}
                 >
-                  <ListItem>
-                    <ListItemLabel>File Transfer</ListItemLabel>
-                  </ListItem>
+                  <ListItemLabel>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <FiFilePlus
+                        size="30"
+                        color="yellow"
+                        style={{ marginRight: "20" }}
+                      ></FiFilePlus>
+                      <p>File Transfer</p>
+                    </div>
+                  </ListItemLabel>
                 </Button>
                 <Button
                   onClick={() => {
                     this.exec(this.state.connection, "chat");
                   }}
+                  kind="secondary"
+                  style={{ width: "20vw" }}
                 >
-                  <ListItem>
-                    <ListItemLabel>Chat</ListItemLabel>
-                  </ListItem>
+                  <ListItemLabel>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <FiMessageSquare
+                        size="30"
+                        color="blue"
+                        style={{ marginRight: "20" }}
+                      ></FiMessageSquare>
+                      <p>Chat</p>
+                    </div>
+                  </ListItemLabel>
                 </Button>
               </div>
             </Modal>
@@ -123,7 +195,7 @@ class Home extends Component {
               <Display2 marginBottom="scale500">
                 Welcome {this.state && this.state.userName}
               </Display2>
-              <p>My IP : {this.state && this.state.myip}</p>
+              <p>My IP : {localStorage.getItem("myip")}</p>
               <Button
                 kind="secondary"
                 onClick={() => {
@@ -134,7 +206,6 @@ class Home extends Component {
                 Search
               </Button>
             </div>
-            <h1>Test</h1>
             <div
               style={{
                 display: "flex",
@@ -144,6 +215,7 @@ class Home extends Component {
                 justifyContent: "center",
               }}
             >
+              <H5 color="black">Dialing List</H5>
               {this.props?.info &&
                 Object.keys(this.props?.info).map((ip) => {
                   return (
@@ -155,10 +227,16 @@ class Home extends Component {
                             () => this.setState({ modalOpen: true })
                           );
                         }}
+                        style={{
+                          width: "50vw",
+                          borderRadius: "20px",
+                        }}
                       >
                         <ListItem>
                           <ListItemLabel>
-                            {this.props.info[ip]["username"]} |{ip}
+                            <H5>
+                              {this.props.info[ip]["username"]} | {ip}
+                            </H5>
                           </ListItemLabel>
                         </ListItem>
                       </Button>
@@ -172,7 +250,6 @@ class Home extends Component {
   };
 
   render() {
-    console.log(this.props.connStatus);
     return this.setScreen();
   }
 }

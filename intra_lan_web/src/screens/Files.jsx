@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { FileUploader } from "baseui/file-uploader";
-import Navbar from "./Navbar";
 import FileBase64 from "react-file-base64";
 import { Modal } from "baseui/modal";
 export default class Files extends Component {
@@ -8,22 +6,23 @@ export default class Files extends Component {
     super(props);
     this.state = { modalOpen: true };
   }
-  handleFile = (e) => {
-    console.log(e);
-  };
+
   render() {
     return (
       <>
         <Modal
           isOpen={this.props.open === "fileSelect" && this.state.modalOpen}
+          onClose={() => this.props.setConnStatus(null)}
         >
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              marginTop: "40px",
+              flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
+              height: "70vh",
+              width: "30vw",
+              backgroundColor: "#333",
             }}
           >
             <FileBase64
@@ -34,7 +33,7 @@ export default class Files extends Component {
                   name: file.file.name,
                   type: file.file.type,
                 };
-                console.log(file, data, metadata);
+                // console.log(file, data, metadata);
                 this.props.remotePeer.setFile(data);
                 this.props.remotePeer.setRes(metadata);
                 this.props.remotePeer.conn.send({
@@ -46,7 +45,6 @@ export default class Files extends Component {
                 this.props.setConnStatus(null);
               }}
             />
-            {/* <FileUploader name="Select file to send" onDrop={this.handleFile} /> */}
           </div>
         </Modal>
       </>

@@ -57,6 +57,11 @@ app.post("/setLocalPeerId", (req, res) => {
   console.log(global.config.metadata["localPeerId"]);
 });
 
+app.get("/myip",(req,res) => {
+  const ip = getIp()
+  return res.status(200).json({ip : ip})
+})
+
 peerServer.on("error", (err) => {
   console.log("peerjs error", err);
 });

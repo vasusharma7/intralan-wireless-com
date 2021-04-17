@@ -1,8 +1,6 @@
 import React from "react";
 import { Button } from "baseui/button";
 import { H5 } from "baseui/typography";
-
-import { store } from "../redux/store";
 import { Modal } from "baseui/modal";
 import { connect } from "react-redux";
 import {
@@ -91,7 +89,11 @@ class Stream extends React.Component {
   render() {
     return (
       //   <View style={{ flex: 1 }}>
-      <Modal isOpen={true} style={{ margin: 1 }}>
+      <Modal
+        isOpen={true}
+        onClose={() => this.props.setConnStatus(null)}
+        style={{ margin: 1 }}
+      >
         {this.paint()}
       </Modal>
       //   </View>

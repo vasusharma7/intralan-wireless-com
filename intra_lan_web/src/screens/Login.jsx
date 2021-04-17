@@ -4,7 +4,8 @@ import { Input } from "baseui/input";
 import { Display3 } from "baseui/typography";
 import { Button } from "baseui/button";
 import { Redirect } from "react-router-dom";
-
+import "react-notifications-component/dist/theme.css";
+import ReactNotification, { store } from "react-notifications-component";
 export default class Login extends Component {
   constructor(props) {
     super(props);
@@ -48,6 +49,19 @@ export default class Login extends Component {
         uid: localStorage.getItem("uid"),
       })
     );
+    store.addNotification({
+      title: "Done",
+      message: "Registered successfully",
+      type: "success",
+      // insert: "top",
+      container: "top-center",
+      animationIn: ["animated", "fadeIn"],
+      animationOut: ["animated", "fadeOut"],
+      dismiss: {
+        duration: 3000,
+        pauseOnHover: true,
+      },
+    });
   };
   handleLogin = () => {
     console.log(this.state);
@@ -60,48 +74,64 @@ export default class Login extends Component {
         logIn: true,
       });
     } else {
+      store.addNotification({
+        title: "Error",
+        message: "Incorrect credentials",
+        type: "danger",
+        // insert: "top",
+        container: "top-center",
+        animationIn: ["animated", "fadeIn"],
+        animationOut: ["animated", "fadeOut"],
+        dismiss: {
+          duration: 3000,
+          pauseOnHover: true,
+        },
+      });
       console.log("Invalid");
     }
   };
   render() {
     return (
-      <div
-        style={{
-          background: "#4385F5",
-          height: "100vh",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-around",
-        }}
-      >
-        {this.state && this.state.logIn && (
-          <Redirect push to={{ pathname: "/home" }} />
-        )}
-        <div>
-          <Display3>Register</Display3>
-          <FormControl label="Name">
-            <Input onChange={this.handleName}></Input>
-          </FormControl>
-          <FormControl label="Email">
-            <Input onChange={this.handleEmail}></Input>
-          </FormControl>
-          <FormControl label="Phone number">
-            <Input onChange={this.handlePhone}></Input>
-          </FormControl>
-          <Button onClick={this.handleReg}>Register Now</Button>
+      <>
+        <ReactNotification></ReactNotification>
+        <div
+          style={{
+            background: "#4385F5",
+            height: "100vh",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-around",
+          }}
+        >
+          {this.state && this.state.logIn && (
+            <Redirect push to={{ pathname: "/home" }} />
+          )}
+          <div>
+            <Display3>Register</Display3>
+            <FormControl label="Name">
+              <Input onChange={this.handleName}></Input>
+            </FormControl>
+            <FormControl label="Email">
+              <Input onChange={this.handleEmail}></Input>
+            </FormControl>
+            <FormControl label="Phone number">
+              <Input onChange={this.handlePhone}></Input>
+            </FormControl>
+            <Button onClick={this.handleReg}>Register Now</Button>
+          </div>
+          <div>
+            <Display3>Login</Display3>
+            <FormControl label="Email">
+              <Input onChange={this.handleEmail}></Input>
+            </FormControl>
+            <FormControl label="Phone number">
+              <Input onChange={this.handlePhone}></Input>
+            </FormControl>
+            <Button onClick={this.handleLogin}>Login Now</Button>
+          </div>
         </div>
-        <div>
-          <Display3>Login</Display3>
-          <FormControl label="Email">
-            <Input onChange={this.handleEmail}></Input>
-          </FormControl>
-          <FormControl label="Phone number">
-            <Input onChange={this.handlePhone}></Input>
-          </FormControl>
-          <Button onClick={this.handleLogin}>Login Now</Button>
-        </div>
-      </div>
+      </>
     );
   }
 }

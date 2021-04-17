@@ -70,6 +70,7 @@
     "rn-android-notification-settings": "^1.0.2",
     "rn-fetch-blob": "^0.12.0",
     "simple-peer": "^9.10.0",
+    "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "stream-browserify": "^1.0.0",
     "string_decoder": "^0.10.31",

@@ -5,9 +5,7 @@ import { Display2 } from "baseui/typography";
 import { connect } from "react-redux";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { store } from "../redux/store";
-import Sound from "react-sound";
-import ringtone from "../assets/ringtone.mp3";
-class Incoming extends Component {
+class Ringing extends Component {
   constructor(props) {
     super(props);
     this.state = { ...store.getState() };
@@ -15,15 +13,10 @@ class Incoming extends Component {
   }
   handleReject = () => {
     // try {
-    this.props.localPeer.rejectCall();
-    this.props.remotePeer?.rejectCall();
+    this.props.localPeer.endCall();
+    this.props.remotePeer?.endCall();
     // } catch {}
   };
-  handlleAccept = () => {
-    this.props.setConnStatus(null);
-    this.props.localPeer.answerCall();
-  };
-
   render() {
     return (
       <div
@@ -37,24 +30,12 @@ class Incoming extends Component {
           width: "100vw",
         }}
       >
-        <Sound url={ringtone} playStatus={Sound.status.PLAYING} />
-        <Display2 style={{ marginBottom: 40 }}>Incoming call</Display2>
+        <Display2 style={{ marginBottom: 40 }}>Calling...</Display2>
         <Avatar
           name={localStorage.getItem("name")}
           size="250px"
           src="https://api.adorable.io/avatars/285/10@adorable.io.png"
         ></Avatar>
-        <Button
-          onClick={this.handlleAccept}
-          style={{
-            marginTop: 140,
-            borderRadius: 20,
-            backgroundColor: "green",
-            color: "white",
-          }}
-        >
-          Accept Call
-        </Button>
         <Button
           onClick={this.handleReject}
           style={{
@@ -64,7 +45,7 @@ class Incoming extends Component {
             color: "white",
           }}
         >
-          Decline Call
+          End Call
         </Button>
       </div>
     );
@@ -82,4 +63,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Incoming);
+export default connect(mapStateToProps, mapDispatchToProps)(Ringing);
