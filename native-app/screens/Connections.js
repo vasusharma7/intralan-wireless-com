@@ -1,6 +1,13 @@
 import { FAB, Text } from "react-native-paper";
 import React, { Component } from "react";
-import { Button, Platform, View, Alert, StyleSheet } from "react-native";
+import {
+  Button,
+  Platform,
+  View,
+  Alert,
+  StyleSheet,
+  FlatList,
+} from "react-native";
 import { Appbar, List } from "react-native-paper";
 import { connect } from "react-redux";
 import Modal from "react-native-modal";
@@ -101,7 +108,10 @@ class Connections extends Component {
                 <List.Item
                   key={ip}
                   title={this.props.info[ip]["username"]}
-                  description={this.props.info[ip]["ip"]}
+                  description={`IP: ${this.props.info[ip]["ip"]}\nPhone: ${
+                    this.props.info[ip]["contact"]
+                  }`}
+                  rippleColor="#00f"
                   left={(props) => <List.Icon {...props} icon="network" />}
                   onPress={() =>
                     this.setState({ connection: this.props.info[ip] }, () =>

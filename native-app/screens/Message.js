@@ -12,6 +12,8 @@ const { width, height } = Dimensions.get("screen");
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { connect } from "react-redux";
 import { GiftedChat } from "react-native-gifted-chat";
+import { Appbar, List } from "react-native-paper";
+import { Icon } from "react-native-vector-icons/MaterialIcons";
 
 class Message extends React.Component {
   constructor(props) {
@@ -38,13 +40,47 @@ class Message extends React.Component {
   }
   render() {
     return (
-      <GiftedChat
-        messages={this.props.messages}
-        onSend={this.onSend}
-        user={{
-          _id: global.config.authInfo.uid,
-        }}
-      />
+      <>
+        <Appbar.Header
+          style={{
+            backgroundColor: "#04045B",
+          }}
+        >
+          <Appbar.Content
+            title={
+              this.props.chatInit
+                ? this.props.remotePeer?.connection.username ||
+                  "<Username not available>"
+                : this.props.localPeer?.metadata.username
+            }
+            subtitle={`PeerId : ${
+              this.props.chatInit
+                ? this.props.remotePeer?.connection.uid ||
+                  "<Username not available>"
+                : this.props.localPeer?.metadata.uid
+            }`}
+            style={{
+              alignItems: "center",
+            }}
+          />
+          <Appbar.Action
+            icon="close"
+            onPress={() => {
+              this.props.setConnStatus(null);
+              this.props.chatInit
+                ? this.props.remotePeer?.chatEnd()
+                : this.props.localPeer?.chatEnd();
+            }}
+          />
+        </Appbar.Header>
+        <GiftedChat
+          messages={this.props.messages}
+          onSend={this.onSend}
+          user={{
+            _id: global.config.authInfo.uid,
+          }}
+        />
+      </>
     );
   }
 }

@@ -78,6 +78,7 @@ class PeerClient {
   }
   establishConnection = () => {
     NetworkInfo.getIPV4Address().then((ip) => {
+      this.myIp = ip;
       this.ip = this.connection?.ip ? this.connection.ip : ip;
 
       this.peer = new Peer(this.connection ? null : this.localPeerId, {
@@ -170,6 +171,8 @@ class PeerClient {
       console.log("Local peer has received connection.");
       conn.on("error", (err) => {
         console.log("peer", err);
+        Alert.alert("Oops !", "Connection Dropped or Peer went offline");
+        store.dispatch(setConnStatus(null));
       });
       conn.on("open", () => {
         console.log("data on open");
@@ -291,7 +294,7 @@ class PeerClient {
           console.log("chunk arrived", res.chunk, resp);
         })
         .catch(console.error);
-      console.log(res.chunk);
+      // console.log(res.chunk);
       conn.send({ success: true, chunk: res.chunk, operation: "file" });
     }
   }
@@ -378,6 +381,8 @@ class PeerClient {
     return this.peerId;
   };
   startCall = () => {
+    //keep a close watch on this
+    if (!this.state.data.connStatus) return;
     console.log("console media", this.stream, this.connection.peerId);
 
     this.call = this.peer.call(this.connection.peerId, this.stream);
@@ -409,6 +414,7 @@ class PeerClient {
       message: "intralan-chat-init",
       time: new Date(),
     });
+    store.dispatch(setConnStatus("chatWindow"));
   };
   frameMessage = (data) => {
     return {
@@ -424,13 +430,13 @@ class PeerClient {
   sendMessage = (message) => {
     // console.log("receiving data from peer ", data);
     // console.log(this.peerId);
-    console.log("sending", data);
     const data = {
       message: message,
       time: new Date(),
       username: this.authInfo.username,
       peerId: this.localPeerId,
     };
+    console.log("sending", data);
     store.dispatch(addMessage(this.frameMessage(data)));
     this.conn.send({
       ...data,
@@ -442,18 +448,26 @@ class PeerClient {
     console.log("receiving", data);
     if (data.message === "intralan-chat-init") {
       store.dispatch(streamInit(false));
+      store.dispatch(setConnStatus("chatWindow"));
+      return;
+    } else if (data.message === "intralan-chat-end") {
+      store.dispatch(setConnStatus(null));
+      // this.conn.close();
       return;
     }
     global.config.fireMessageNotification();
     store.dispatch(addMessage(this.frameMessage(data)));
   };
-
+  endChat() {
+    this.conn.send({ operation: "chat", message: "intralan-chat-end" });
+  }
   connect = (type) => {
     this.conn = this.peer.connect(this.connection.peerId, {
-      metadata: this.authInfo,
+      metadata: { ...this.authInfo, ip: this.myIp },
     });
     this.conn.on("error", (err) => {
       Alert.alert("Connection Droppped");
+      store.dispatch(setConnStatus(null));
       console.log("conn", err);
     });
     this.conn.on("open", () => {

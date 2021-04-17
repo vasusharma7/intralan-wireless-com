@@ -23,7 +23,7 @@ export const streamReducer = (state = initalState, action) => {
         ...state,
         streamInit: action.payload,
         fileProgress: 0,
-        streamMetaData: {},
+        // streamMetaData: {},
       };
     }
     case STREAM_METADATA: {

@@ -12,6 +12,7 @@ import IncomingCall from "./IncomingCall";
 import InCall from "./InCall";
 import { FileTransfer } from "./FileTransfer";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
+import { Chats } from "./Chats";
 
 class Home extends Component {
   constructor(props) {
@@ -34,8 +35,8 @@ class Home extends Component {
         },
         {
           key: "chat",
-          screen: Message,
-          title: "My Messages",
+          screen: Chats,
+          title: "Chats",
           icon: "message",
         },
         { key: "settings", screen: Settings, title: "Settings", icon: "tools" },
@@ -61,6 +62,8 @@ class Home extends Component {
             setConnStatus={this.props.setConnStatus}
           />
         );
+      case "chatWindow":
+        return <Message />;
       default:
         return (
           <>
