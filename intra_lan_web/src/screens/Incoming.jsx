@@ -5,6 +5,8 @@ import { Display2 } from "baseui/typography";
 import { connect } from "react-redux";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { store } from "../redux/store";
+import Sound from "react-sound";
+import ringtone from "../assets/ringtone.mp3";
 class Incoming extends Component {
   constructor(props) {
     super(props);
@@ -35,6 +37,7 @@ class Incoming extends Component {
           width: "100vw",
         }}
       >
+        <Sound url={ringtone} playStatus={Sound.status.PLAYING} />
         <Display2 style={{ marginBottom: 40 }}>Incoming call</Display2>
         <Avatar
           name={localStorage.getItem("name")}

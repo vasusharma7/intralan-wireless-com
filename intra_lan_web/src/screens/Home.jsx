@@ -250,7 +250,6 @@ class Home extends Component {
   };
 
   render() {
-    console.log(this.state?.connection);
     return this.setScreen();
   }
 }
