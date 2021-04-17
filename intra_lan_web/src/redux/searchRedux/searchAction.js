@@ -90,7 +90,7 @@ const connect = async (ip) => {
     return;
   }
   return new Promise(async (resolve, reject) => {
-    const socket = await socketIOClient(`http://192.168.1.204:5000`, {
+    const socket = await socketIOClient(`http://192.168.1.6:5000`, {
       reconnection: false,
     });
     socket.on("connect", () => {

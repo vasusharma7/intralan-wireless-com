@@ -15,6 +15,8 @@ import { Modal } from "baseui/modal";
 import { ListItem, ListItemLabel } from "baseui/list";
 import Files from "./Files";
 import { FiPhoneCall, FiFilePlus, FiMessageSquare } from "react-icons/fi";
+import axios from "axios";
+import Ringing from "./Ringing";
 
 class Home extends Component {
   constructor(props) {
@@ -39,6 +41,16 @@ class Home extends Component {
     const peer = new PeerClient(null, "vasu_007");
     this.props.setLocalPeer(peer);
     // }
+    axios({
+      method: "GET",
+      url: "http://localhost:5000/myip",
+    })
+      .then((res) => {
+        localStorage.setItem("myip", res.data.ip);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
   exec = (connection, operation) => {
     const remotePeer = new PeerClient({ ...connection, operation: operation });
@@ -54,6 +66,8 @@ class Home extends Component {
         return <InCall></InCall>;
       case "searching":
         return <Stream />;
+      case "ringing":
+        return <Ringing></Ringing>;
       case "fileSelect":
         return (
           <Files
@@ -181,7 +195,7 @@ class Home extends Component {
               <Display2 marginBottom="scale500">
                 Welcome {this.state && this.state.userName}
               </Display2>
-              <p>My IP : {this.state && this.state.myip}</p>
+              <p>My IP : {localStorage.getItem("myip")}</p>
               <Button
                 kind="secondary"
                 onClick={() => {
