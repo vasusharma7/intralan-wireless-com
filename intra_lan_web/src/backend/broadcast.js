@@ -4,6 +4,7 @@ require("./config");
 const app = express();
 const fs = require("fs");
 const port = process.env.PORT || 5000;
+const download = require('downloads-folder')
 
 app.use(express.json({ limit: "100mb" }));
 app.use(express.urlencoded({ extended: false, limit: "100mb" }));
@@ -62,14 +63,20 @@ app.get("/myip", (req, res) => {
   return res.status(200).json({ ip: ip });
 });
 
+
+app.get("/downloads", (req, res) => {
+  const folder = download();
+  return res.status(200).json({ download: folder });
+});
+
 app.post("/saveFile", (req, res) => {
   const { data, name, chunk } = req.body;
   console.log(req.body.data.length);
   try {
-    if (chunk === 0 && fs.existsSync(`./${name}`)) {
-      fs.writeFileSync(`./${name}`, "", { encoding: "base64" });
+    if (chunk === 0 && fs.existsSync(`${download()}/${name}`)) {
+      fs.writeFileSync(`${download()}/${name}`, "", { encoding: "base64" });
     }
-    fs.appendFileSync(`./${name}`, data, { encoding: "base64" });
+    fs.appendFileSync(`${download()}/${name}`, data, { encoding: "base64" });
     return res.status(200).send("success");
   } catch {
     return res.status(400).send("error");
