@@ -13,9 +13,19 @@ class Ringing extends Component {
   }
   handleReject = () => {
     // try {
-    this.props.localPeer.endCall();
-    this.props.remotePeer?.endCall();
+    //   this.props.localPeer.endCall();
+    //   this.props.remotePeer?.endCall();
     // } catch {}
+    try {
+      this.props.localPeer?.endCall();
+    } catch (err) {
+      console.log("Something is fishy in development !", err);
+    }
+    try {
+      this.props.remotePeer?.endCall();
+    } catch (err) {
+      console.log("Something is fishy in development !", err);
+    }
   };
   render() {
     return (

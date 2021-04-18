@@ -406,14 +406,15 @@ class PeerClient {
   }
 
   endCall = () => {
+    this.conn.send({ operation: "call", action: "decline" });
     store.dispatch(setConnStatus(null));
     console.log("endCall");
     this?.call && this.call.close();
   };
   rejectCall = () => {
+    this.conn.send({ operation: "call", action: "decline" });
     whoosh.stop();
     store.dispatch(setConnStatus(null));
-    this.conn.send({ operation: "call", action: "decline" });
   };
 
   getPeerId = () => {

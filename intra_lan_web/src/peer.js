@@ -4,7 +4,7 @@ import { setAVStream, setLocalPeer } from "./redux/streamRedux/streamAction";
 import { setConnStatus } from "./redux/dataRedux/dataAction";
 import { addMessage, chatInit } from "./redux/messageRedux/messageAction";
 import "react-notifications-component/dist/theme.css";
-import  { store as NotifStore }  from "react-notifications-component";
+import { store as NotifStore } from "react-notifications-component";
 const axios = require("axios");
 
 export default class PeerClient {
@@ -28,7 +28,7 @@ export default class PeerClient {
     //gey my ip
     // this.ip = this.connection?.ip ? this.connection.ip : ip;
     if (this.connection) store.dispatch(setConnStatus("connecting"));
-    this.peer = new Peer(this.localPeerId, {
+    this.peer = new Peer(this.connection ? null : this.localPeerId, {
       host: this.connection ? this.connection.ip : "127.0.0.1", //replace with ip
       // host: "192.168.1.6", //replace with ip
       port: 5000,
@@ -153,7 +153,10 @@ export default class PeerClient {
       this.call.answer(this.stream);
       console.log("call answer", stream);
       store.dispatch(setAVStream(stream));
-      global.config.videoRef.current.srcObject = stream;
+      setTimeout(() => {
+        //see some workaround for this - the inCall component is rendered late and it gives undefined
+        global.config.videoRef.current.srcObject = stream;
+      }, 1000);
     });
   }
   async receiveFile() {
@@ -195,7 +198,9 @@ export default class PeerClient {
       // alert("File Saved Successfully");
       NotifStore.addNotification({
         title: "Success",
-        message: `File saved successfully to ${localStorage.getItem("download")}`,
+        message: `File saved successfully to ${localStorage.getItem(
+          "download"
+        )}`,
         type: "success",
         // insert: "top",
         container: "top-center",
@@ -206,7 +211,7 @@ export default class PeerClient {
           pauseOnHover: true,
         },
       });
-      
+
       // store.dispatch(setConnStatus("fileSave"));
       // saveAs(this.file, this.res.name);
       // this.downloadPDF();
@@ -276,6 +281,7 @@ export default class PeerClient {
   }
 
   endCall = () => {
+    this.conn.send({ operation: "call", action: "decline" });
     store.dispatch(setConnStatus(null));
     console.log("endCall");
     this?.call && this.call.close();
@@ -301,7 +307,12 @@ export default class PeerClient {
     this.call.on("stream", function (stream) {
       console.log("peer is streaming", this.peerId, stream);
       store.dispatch(setAVStream(stream));
-      global.config.videoRef.current.srcObject = stream;
+      setTimeout(() => {
+        //see some workaround for this - the inCall component is rendered late and it gives undefined
+        global.config.videoRef.current.srcObject = stream;
+      }, 1000);
+      //see some workaround for this - the inCall component is rendered late and it gives undefined
+      // global.config.videoRef.current.srcObject = stream;
       store.dispatch(setConnStatus("inCall")); //change to picked-up status
       // onReceiveStream(stream, "peer-camera");
     });
@@ -312,8 +323,8 @@ export default class PeerClient {
   };
 
   rejectCall = () => {
-    store.dispatch(setConnStatus(null));
     this.conn.send({ operation: "call", data: "decline" });
+    store.dispatch(setConnStatus(null));
   };
   initChat = () => {
     store.dispatch(chatInit(true));
@@ -382,7 +393,8 @@ export default class PeerClient {
       }
     });
     this.conn.on("data", (data) => {
-      if (typeof data == "string") data = JSON.parse(data);
+      console.log("data", data);
+      // if (typeof data == "string") data = JSON.parse(data);
       console.log(data);
       if (data?.operation === "chat") {
         this.recieveMessage(data);

@@ -25,6 +25,10 @@ class InCall extends Component {
     this.props.setConnStatus(null);
     try {
       this.props.localPeer?.endCall();
+    } catch (err) {
+      console.log("Something is fishy in development !", err);
+    }
+    try {
       this.props.remotePeer?.endCall();
     } catch (err) {
       console.log("Something is fishy in development !", err);

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-import { PermissionsAndroid, AppState, Linking } from "react-native";
+import { PermissionsAndroid, AppState, Linking, Alert } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 import { connect } from "react-redux";
 import { updateConnections, updateInfo } from "./redux/dataRedux/dataAction";
 import { setLocalPeer, setRemotePeer } from "./redux/streamRedux/streamAction";
@@ -75,6 +76,7 @@ class App extends Component {
     };
     Linking.addEventListener("url", this.handleIncomingEvents);
   }
+
   createChannels = () => {
     PushNotification.createChannel(
       {
@@ -82,7 +84,7 @@ class App extends Component {
         channelName: `Message channel`, // (required)
         channelDescription: "channel for sending messages", // (optional) default: undefined.
         soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
-        importance: 1, // (optional) default: 4. Int value of the Android notification importance
+        importance: 4, // (optional) default: 4. Int value of the Android notification importance
         vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
       },
       (created) =>
@@ -94,7 +96,7 @@ class App extends Component {
         channelName: `File channel`, // (required)
         channelDescription: "channel for file transfer", // (optional) default: undefined.
         soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
-        importance: 1, // (optional) default: 4. Int value of the Android notification importance
+        importance: 4, // (optional) default: 4. Int value of the Android notification importance
         vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
       },
       (created) =>
@@ -106,7 +108,7 @@ class App extends Component {
         channelName: `Call channel`, // (required)
         channelDescription: "channel for calls", // (optional) default: undefined.
         soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
-        importance: 1, // (optional) default: 4. Int value of the Android notification importance
+        importance: 4, // (optional) default: 4. Int value of the Android notification importance
         vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
       },
       (created) =>
@@ -194,6 +196,16 @@ class App extends Component {
     // });
   };
   async componentDidMount() {
+    this.netInfoUnsubscribe = NetInfo.addEventListener((state) => {
+      console.log("Connection type", state.type);
+      console.log("Is connected?", state.isConnected);
+      state.isConnected
+        ? ""
+        : Alert.alert(
+            "You are not connected to Wifi !",
+            "PLease Connect to Wifi to search for peers"
+          );
+    });
     await AsyncStorage.getItem("userData").then(async (userData) => {
       if (!userData) {
         await AsyncStorage.setItem("userData", JSON.stringify({}));
@@ -215,6 +227,7 @@ class App extends Component {
   }
 
   async componentWillUnmount() {
+    this.netInfoUnsubscribe();
     AppState.removeEventListener("change", this._handleAppStateChange);
     await AsyncStorage.getItem("node").then((res) => {
       if (res) {

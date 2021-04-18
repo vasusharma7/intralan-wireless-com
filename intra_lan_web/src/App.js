@@ -32,7 +32,7 @@ class App extends Component {
   componentDidMount = async () => {
     // startBroadcast()
     console.log(global.config);
-    this.props.initSearch("192.168.1.0/29");
+    this.props.initSearch("192.168.1.0/24");
   };
 
   render() {
