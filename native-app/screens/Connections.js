@@ -7,6 +7,7 @@ import {
   Alert,
   StyleSheet,
   FlatList,
+  Dimensions,
 } from "react-native";
 import { Appbar, List } from "react-native-paper";
 import { connect } from "react-redux";
@@ -21,6 +22,7 @@ import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
 import { startSearch, stopSearch } from "../redux/searchRedux/searchAction";
 import { PeerClient } from "../peer";
 import Stream from "./Stream";
+const { width, height } = Dimensions.get("screen");
 class Connections extends Component {
   constructor(props) {
     super(props);
@@ -108,8 +110,8 @@ class Connections extends Component {
                 <List.Item
                   key={ip}
                   title={this.props.info[ip]["username"]}
-                  description={`IP: ${this.props.info[ip]["ip"]}\nPhone: ${
-                    this.props.info[ip]["contact"]
+                  description={`IP: ${this.props.info[ip]["ip"]}\nPeerId: ${
+                    this.props.info[ip]["peerId"]
                   }`}
                   rippleColor="#00f"
                   left={(props) => <List.Icon {...props} icon="network" />}
@@ -122,15 +124,24 @@ class Connections extends Component {
               );
             })}
         </View>
+        {JSON.stringify(this.props.info) !== JSON.stringify({}) ? (
+          <FAB
+            style={styles.fab1}
+            icon="delete"
+            onPress={() => {
+              this.props.updateInfo(null);
+            }}
+          />
+        ) : (
+          <></>
+        )}
+
         <FAB
-          style={styles.fab}
+          style={styles.fab2}
           icon="magnify"
           onPress={() => {
             this.props.setConnStatus("searching");
             setTimeout(() => this.props.startSearch(), 1000);
-            // setTimeout(() => {
-            //   this.props.setConnStatus(null);
-            // }, 4000);
           }}
         />
       </>
@@ -155,6 +166,7 @@ const mapDispatchToProps = (dispatch) => {
     stopSearch: () => dispatch(stopSearch()),
     startSearch: () => dispatch(startSearch()),
     setConnStatus: (status) => dispatch(setConnStatus(status)),
+    updateInfo: (data) => dispatch(updateInfo(data)),
   };
 };
 
@@ -163,7 +175,14 @@ export default connect(
   mapDispatchToProps
 )(Connections);
 const styles = StyleSheet.create({
-  fab: {
+  fab1: {
+    position: "absolute",
+    margin: 16,
+    right: 0,
+    bottom: width * 0.2,
+    backgroundColor: "#0fefaa",
+  },
+  fab2: {
     position: "absolute",
     margin: 16,
     right: 0,

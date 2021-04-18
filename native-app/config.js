@@ -9,7 +9,7 @@ global.config = {
   info: info,
   authInfo: {
     username: "",
-    uid: "",
+    peerId: "",
     contact: "",
     email: "",
   },

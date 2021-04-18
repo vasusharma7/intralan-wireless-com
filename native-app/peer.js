@@ -20,6 +20,7 @@ import DocumentPicker from "react-native-document-picker";
 import FileViewer from "react-native-file-viewer";
 
 import { addMessage } from "./redux/messageRedux/messageAction";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Sound = require("react-native-sound");
 Sound.setCategory("Playback");
@@ -62,8 +63,8 @@ class PeerClient {
   constructor(connection, localPeerId) {
     this.connection = connection;
     this.authInfo = global.config.authInfo;
-    // this.localPeerId = localPeerId ? this.authInfo.uid : null;
-    this.localPeerId = this.authInfo.uid;
+    // this.localPeerId = localPeerId ? this.authInfo.peerId : null;
+    this.localPeerId = this.authInfo.peerId;
     this.establishConnection();
     this.fileBuffer = [];
     this.chunksize = 64 * 1024;
@@ -135,6 +136,16 @@ class PeerClient {
       console.log("Local peer open with ID", peerId, this.connection);
 
       if (this.connection) {
+        AsyncStorage.getItem("userData").then(async (userData) => {
+          let peerId = this.connection.peerId;
+          userData = JSON.parse(userData);
+          let user = userData[peerId] || {};
+          let info = this.connection;
+          user["info"] = info;
+          userData[peerId] = user;
+          await AsyncStorage.setItem("userData", JSON.stringify(userData));
+        });
+
         switch (this.connection.operation) {
           case "call": {
             store.dispatch(setConnStatus(null));
@@ -168,6 +179,15 @@ class PeerClient {
     this.peer.on("connection", (conn) => {
       this.conn = conn;
       this.metadata = conn.metadata;
+      AsyncStorage.getItem("userData").then(async (userData) => {
+        let peerId = this.metadata.peerId;
+        userData = JSON.parse(userData);
+        let user = userData[peerId] || {};
+        let info = this.metadata;
+        user["info"] = info;
+        userData[peerId] = user;
+        await AsyncStorage.setItem("userData", JSON.stringify(userData));
+      });
       console.log("Local peer has received connection.");
       conn.on("error", (err) => {
         console.log("peer", err);
@@ -201,7 +221,7 @@ class PeerClient {
       global.config.fireCallsNotification();
       this.playRingtone();
       setTimeout(() => {
-        if (this.state.data.connStatus === "inComing") {
+        if (this.state.data.connStatus === "incoming") {
           store.dispatch(setConnStatus(null));
           this.conn.send({ operation: "call", action: "decline" });
           whoosh.stop();
@@ -228,12 +248,31 @@ class PeerClient {
     this.call.answer(this.stream);
     // Receive data
     this.call.on("stream", (stream) => {
+      //save call log here -
+      AsyncStorage.getItem("userData").then(async (userData) => {
+        userData = JSON.parse(userData);
+        let logs = userData["calls"] || [];
+        logs.push({ ...this.metadata, date: Date.now() });
+        userData["calls"] = logs;
+        await AsyncStorage.setItem("userData", JSON.stringify(userData));
+      });
       store.dispatch(setConnStatus("inCall"));
       this.call.answer(this.stream);
       console.log("call answer", stream);
       store.dispatch(setAVStream(stream));
     });
-    this.call.on("close", function() {
+    this.call.on("close", async function() {
+      //save call logs here
+      await AsyncStorage.getItem("userData").then(async (userData) => {
+        userData = JSON.parse(userData);
+        let logs = userData["calls"] || [];
+        if (logs.length == 0) return;
+        let call = logs.splice(-1)[0];
+        call["time"] = Date.now() - call.date;
+        logs.push(call);
+        userData["calls"] = logs;
+        await AsyncStorage.setItem("userData", JSON.stringify(userData));
+      });
       store.dispatch(setConnStatus(null));
       console.log("The call is closed");
     });
@@ -396,15 +435,36 @@ class PeerClient {
 
     // store.dispatch(setAVStream(stream));
 
-    this.call.on("stream", function(stream) {
+    this.call.on("stream", async function(stream) {
+      //save call log here
+      await AsyncStorage.getItem("userData").then(async (userData) => {
+        userData = JSON.parse(userData);
+        let logs = userData["calls"] || [];
+        logs.push({ ...this.connection, date: Date.now() });
+        userData["calls"] = logs;
+        await AsyncStorage.setItem("userData", JSON.stringify(userData));
+      });
+
       console.log("peer is streaming", this.peerId, stream);
       store.dispatch(setAVStream(stream));
       store.dispatch(setConnStatus("inCall")); //change to picked-up status
       // onReceiveStream(stream, "peer-camera");
     });
-    this.call.on("close", function() {
+    this.call.on("close", async function() {
       store.dispatch(setConnStatus(null));
       console.log("The call is closed");
+      //save call logs here
+      await AsyncStorage.getItem("userData").then(async (userData) => {
+        userData = JSON.parse(userData);
+        let logs = userData["calls"] || [];
+        if (logs.length == 0) return;
+        let call = logs.splice(-1)[0];
+        call["time"] = Date.now() - call.date;
+        logs.push(call);
+        userData["logs"] = logs;
+        console.log(userData["logs"]);
+        await AsyncStorage.setItem("userData", JSON.stringify(userData));
+      });
     });
   };
   initChat = () => {
@@ -437,7 +497,14 @@ class PeerClient {
       peerId: this.localPeerId,
     };
     console.log("sending", data);
-    store.dispatch(addMessage(this.frameMessage(data)));
+    store.dispatch(
+      addMessage({
+        senderId: this.connection
+          ? this.connection.peerId
+          : this.metadata.peerId,
+        ...this.frameMessage(data),
+      })
+    );
     this.conn.send({
       ...data,
       operation: "chat",
@@ -456,11 +523,18 @@ class PeerClient {
       return;
     }
     global.config.fireMessageNotification();
-    store.dispatch(addMessage(this.frameMessage(data)));
+    store.dispatch(
+      addMessage({
+        senderId: this.connection
+          ? this.connection.peerId
+          : this.metadata.peerId,
+        ...this.frameMessage(data),
+      })
+    );
   };
-  endChat() {
+  chatEnd = () => {
     this.conn.send({ operation: "chat", message: "intralan-chat-end" });
-  }
+  };
   connect = (type) => {
     this.conn = this.peer.connect(this.connection.peerId, {
       metadata: { ...this.authInfo, ip: this.myIp },

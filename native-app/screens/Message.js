@@ -55,9 +55,9 @@ class Message extends React.Component {
             }
             subtitle={`PeerId : ${
               this.props.chatInit
-                ? this.props.remotePeer?.connection.uid ||
+                ? this.props.remotePeer?.connection.peerId ||
                   "<Username not available>"
-                : this.props.localPeer?.metadata.uid
+                : this.props.localPeer?.metadata.peerId
             }`}
             style={{
               alignItems: "center",
@@ -68,8 +68,8 @@ class Message extends React.Component {
             onPress={() => {
               this.props.setConnStatus(null);
               this.props.chatInit
-                ? this.props.remotePeer?.chatEnd()
-                : this.props.localPeer?.chatEnd();
+                ? this.props.remotePeer.chatEnd()
+                : this.props.localPeer.chatEnd();
             }}
           />
         </Appbar.Header>
@@ -77,7 +77,7 @@ class Message extends React.Component {
           messages={this.props.messages}
           onSend={this.onSend}
           user={{
-            _id: global.config.authInfo.uid,
+            _id: global.config.authInfo.peerId,
           }}
         />
       </>

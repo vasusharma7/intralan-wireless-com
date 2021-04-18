@@ -13,6 +13,7 @@ import InCall from "./InCall";
 import { FileTransfer } from "./FileTransfer";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { Chats } from "./Chats";
+import { CallLog } from "./CallLog";
 
 class Home extends Component {
   constructor(props) {
@@ -28,10 +29,10 @@ class Home extends Component {
           icon: "network",
         },
         {
-          key: "playback",
-          screen: Playback,
-          title: "File Select",
-          icon: "file",
+          key: "calls",
+          screen: CallLog,
+          title: "Call Log",
+          icon: "phone",
         },
         {
           key: "chat",

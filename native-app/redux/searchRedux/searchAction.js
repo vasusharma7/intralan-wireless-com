@@ -54,7 +54,8 @@ export const startSearch = () => {
         .then(async (res) => {
           console.log("success", res.length);
           await new Promise((r) => setTimeout(r, 20000));
-          dispatch(startSearch());
+          dispatch(toggleSearch());
+          // dispatch(startSearch());
         })
         .catch((ips) => console.log(ips));
     }, 0);
@@ -71,7 +72,7 @@ handleConnectionChange = (connections) => {
     connections[ip].on("broadcast", (data) => {
       console.log("receiving broadcast data", data);
       handleInfoChnage({ ...state.data.info, [ip]: data });
-      // connections[ip].off("broadcast");
+      connections[ip].off("broadcast");
     });
   }
 };

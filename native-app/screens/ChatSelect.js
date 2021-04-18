@@ -2,37 +2,50 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert, View } from "react-native";
-import { List, Text } from "react-native-paper";
+import { List, Text, Appbar } from "react-native-paper";
 
 export class ChatSelect extends Component {
   constructor(props) {
     super(props);
     this.state = {
       userData: {},
-      users: [],
+      peerIds: [],
     };
   }
   async componentDidMount() {
     await AsyncStorage.getItem("userData").then((userData) => {
       if (!userData) return;
       userData = JSON.parse(userData);
-      const users = Object.keys(userData);
+      const peerIds = Object.keys(userData);
       this.setState({ userData: userData });
-      this.setState({ users: Object.keys(userData) });
-      console.log(userData, users);
+      this.setState({ peerIds: peerIds });
+      console.log(userData);
     });
   }
   render() {
     return (
       <View>
-        {this.state.users.length ? (
-          this.state.users.map((key) => {
-            return (
+        <Appbar.Header
+          style={{
+            backgroundColor: "#04045B",
+          }}
+        >
+          <Appbar.Content
+            title={"Chats"}
+            style={{
+              alignItems: "center",
+            }}
+          />
+        </Appbar.Header>
+        {this.state.peerIds.length ? (
+          this.state.peerIds.map((key) => {
+            return this.state.userData[key]["info"] &&
+              this.state.userData[key]["messages"] ? (
               <List.Item
                 key={key}
-                title={this.state.userData[key]["messages"][0].user.name}
+                title={this.state.userData[key]["info"].username}
                 description={`PeerId : ${
-                  this.state.userData[key]["messages"][0].user._id
+                  this.state.userData[key]["info"].peerId
                 }`}
                 left={(props) => <List.Icon {...props} icon="chat" />}
                 onPress={() => {
@@ -45,6 +58,8 @@ export class ChatSelect extends Component {
                   });
                 }}
               />
+            ) : (
+              <></>
             );
           })
         ) : (

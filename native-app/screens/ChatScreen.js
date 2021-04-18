@@ -17,29 +17,16 @@ export class ChatScreen extends Component {
   }
   render() {
     return (
-      <View>
-        {this.state.messages.length ? (
-          <>
-            <GiftedChat
-              key={this.state.messages.length}
-              messages={[
-                {
-                  _id: 1618665868445,
-                  createdAt: "2021-04-17T13:24:28.445Z",
-                  text: "Save this message",
-                  user: { _id: 1618559790276, name: "Vasu" },
-                },
-              ]}
-              onSend={() => {}}
-              user={{
-                _id: global.config.authInfo.uid,
-              }}
-            />
-          </>
-        ) : (
-          <></>
-        )}
-      </View>
+      <>
+        <GiftedChat
+          messages={this.state.messages}
+          onSend={() => {}}
+          renderComposer={() => <></>}
+          user={{
+            _id: global.config.authInfo.peerId,
+          }}
+        />
+      </>
     );
   }
 }

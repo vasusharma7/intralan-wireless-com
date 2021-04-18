@@ -202,7 +202,7 @@ class Settings extends Component {
             style={styles.button}
             onPress={async () => {
               await AsyncStorage.getAllKeys().then(async (keys) => {
-                keys = keys.filter((val) => val !== "userData");
+                // keys = keys.filter((val) => val !== "userData");
                 Promise.all(
                   keys.map(async (key) => await AsyncStorage.removeItem(key))
                 ).then(() => this.props.navigation.navigate("Splash"));

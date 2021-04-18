@@ -26,24 +26,28 @@ export class Auth extends Component {
   }
 
   onClickListener = () => {
-    if (
-      Object.keys(this.state).filter((val) => this.state[val].length === 0)
-        .length
-    ) {
-      Alert.alert("Please enter all details");
+    // if (
+    //   Object.keys(this.state).filter((val) => this.state[val].length === 0)
+    //     .length
+    // ) {
+    //   Alert.alert("Please enter all details");
+    //   return;
+    // }
+    if (this.state.username.length === 0) {
+      Alert.alert("Please enter Name");
       return;
     }
     console.log(this.state);
-    let uid = new Date().getTime();
-    Alert.alert("IntraLANCom ID", `Your Unique ID is ${uid}`, [
+    let peerId = new Date().getTime();
+    Alert.alert("IntraLANCom ID", `Your Unique ID is ${peerId}`, [
       {
         text: "Proceed",
         onPress: async () => {
           await AsyncStorage.setItem(
             "auth",
-            JSON.stringify({ uid: uid, ...this.state })
+            JSON.stringify({ peerId: peerId, ...this.state })
           ).then(() => {
-            global.config.authInfo = { uid: uid, ...this.state };
+            global.config.authInfo = { peerId: peerId, ...this.state };
             this.props.navigation.navigate({
               name: "Splash",
               key: "Splash",
@@ -75,9 +79,7 @@ export class Auth extends Component {
           />
           <View style={styles.container2}>
             <View style={styles.inputContainer}>
-              <Image
-                style={styles.inputIcon}
-              />
+              <Image style={styles.inputIcon} />
               <TextInput
                 style={styles.inputs}
                 placeholder="Name"
@@ -88,9 +90,7 @@ export class Auth extends Component {
               />
             </View>
             <View style={styles.inputContainer}>
-              <Image
-                style={styles.inputIcon}
-              />
+              <Image style={styles.inputIcon} />
               <TextInput
                 style={styles.inputs}
                 value={this.state.contact}
@@ -101,9 +101,7 @@ export class Auth extends Component {
               />
             </View>
             <View style={styles.inputContainer}>
-              <Image
-                style={styles.inputIcon}
-              />
+              <Image style={styles.inputIcon} />
               <TextInput
                 style={styles.inputs}
                 value={this.state.email}

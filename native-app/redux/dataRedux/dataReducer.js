@@ -24,7 +24,8 @@ export const dataReducer = (state = initalState, action) => {
     case METADATA:
       return {
         ...state,
-        info: { ...state.info, ...action.payload },
+        info:
+          action.payload === null ? {} : { ...state.info, ...action.payload },
       };
     case TOGGLE_SEARCH:
       return {
