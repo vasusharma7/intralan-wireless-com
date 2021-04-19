@@ -89,7 +89,9 @@ connect = async (ip) => {
     return;
   }
   return new Promise(async (resolve, reject) => {
-    const socket = await socketIOClient(`http://${ip}:5000`);
+    const socket = await socketIOClient(`http://${ip}:5000`, {
+      reconnectionAttempts: 2,
+    });
     socket.on("connect", () => {
       console.log(socket.id, socket.connected);
       !Object.keys(state.data.connections).includes(ip) &&

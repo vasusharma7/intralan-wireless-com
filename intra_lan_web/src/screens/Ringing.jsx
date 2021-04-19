@@ -11,7 +11,9 @@ class Ringing extends Component {
     this.state = { ...store.getState() };
     console.log(this.props);
   }
-  handleReject = () => {
+  handleReject = (e) => {
+    e.preventDefault();
+
     // try {
     //   this.props.localPeer.endCall();
     //   this.props.remotePeer?.endCall();
