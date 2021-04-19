@@ -53,18 +53,6 @@ class InCall extends Component {
           src="https://api.adorable.io/avatars/285/10@adorable.io.png"
         ></Avatar>
         <Timer></Timer>
-        <video
-          style={{
-            borderWidth: 1,
-            display: "none",
-            borderColor: "black",
-            height: 100,
-            width: 100,
-          }}
-          controls
-          ref={global.config.videoRef}
-          autoPlay
-        ></video>
         <Button
           onClick={this.handleEnd}
           style={{

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Avatar } from "baseui/avatar";
 import { Button } from "baseui/button";
-import { Display2 } from "baseui/typography";
+import { Display2, HeadingXLarge } from "baseui/typography";
 import { connect } from "react-redux";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { store } from "../redux/store";
@@ -13,11 +13,13 @@ class Incoming extends Component {
     this.state = { ...store.getState() };
     console.log(this.props);
   }
-  handleReject = () => {
-    // try {
-    this.props.localPeer.rejectCall();
-    this.props.remotePeer?.rejectCall();
-    // } catch {}
+  handleReject = (e) => {
+    e.preventDefault();
+    try {
+      this.props.localPeer.rejectCall();
+    } catch (err) {
+      console.log("something is fishy in dev");
+    }
   };
   handlleAccept = () => {
     this.props.setConnStatus(null);

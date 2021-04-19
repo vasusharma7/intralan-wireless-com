@@ -153,10 +153,8 @@ export default class PeerClient {
       this.call.answer(this.stream);
       console.log("call answer", stream);
       store.dispatch(setAVStream(stream));
-      setTimeout(() => {
-        //see some workaround for this - the inCall component is rendered late and it gives undefined
-        global.config.videoRef.current.srcObject = stream;
-      }, 1000);
+
+      global.config.videoRef.current.srcObject = stream;
     });
   }
   async receiveFile() {
@@ -166,10 +164,7 @@ export default class PeerClient {
     // store.dispatch(setConnStatus("fileTransfer"));
     // this.recieveFile(data);
   }
-  async rejectFile() {
-    this.conn.send({ operation: "file", fileReceive: false });
-    store.dispatch(setConnStatus(null));
-  }
+
   async setFile(file) {
     this.file = file;
   }
@@ -286,7 +281,15 @@ export default class PeerClient {
     console.log("endCall");
     this?.call && this.call.close();
   };
+  rejectCall = () => {
+    this.conn.send({ operation: "call", action: "decline" });
+    store.dispatch(setConnStatus(null));
+  };
 
+  async rejectFile() {
+    this.conn.send({ operation: "file", fileReceive: false });
+    store.dispatch(setConnStatus(null));
+  }
   getPeerId = () => {
     return this.peerId;
   };
@@ -307,12 +310,9 @@ export default class PeerClient {
     this.call.on("stream", function (stream) {
       console.log("peer is streaming", this.peerId, stream);
       store.dispatch(setAVStream(stream));
-      setTimeout(() => {
-        //see some workaround for this - the inCall component is rendered late and it gives undefined
-        global.config.videoRef.current.srcObject = stream;
-      }, 1000);
+
       //see some workaround for this - the inCall component is rendered late and it gives undefined
-      // global.config.videoRef.current.srcObject = stream;
+      global.config.videoRef.current.srcObject = stream;
       store.dispatch(setConnStatus("inCall")); //change to picked-up status
       // onReceiveStream(stream, "peer-camera");
     });
@@ -322,10 +322,6 @@ export default class PeerClient {
     });
   };
 
-  rejectCall = () => {
-    this.conn.send({ operation: "call", data: "decline" });
-    store.dispatch(setConnStatus(null));
-  };
   initChat = () => {
     store.dispatch(chatInit(true));
     this.conn.send({
@@ -402,7 +398,7 @@ export default class PeerClient {
       if (data?.operation === "call") {
         if (data.action === "decline") {
           store.dispatch(setConnStatus(null));
-          console.log("Declined");
+          console.log("Call Disconnected !");
         }
       }
       if (data?.operation === "call") {

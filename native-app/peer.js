@@ -559,14 +559,14 @@ class PeerClient {
       }
     });
     this.conn.on("data", (data) => {
-      console.log(data);
+      console.log("data", data);
       if (data?.operation === "chat") {
         this.recieveMessage(data);
       }
       if (data?.operation === "call") {
         if (data.action === "decline") {
           store.dispatch(setConnStatus(null));
-          Alert.alert("User declined your call !");
+          Alert.alert("Call Disconnected !");
         }
       }
       if (data?.operation === "file") {

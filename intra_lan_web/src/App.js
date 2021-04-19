@@ -44,6 +44,18 @@ class App extends Component {
           />
         )}
         <BaseProvider theme={DarkTheme}>
+          <video
+            style={{
+              borderWidth: 1,
+              display: "none",
+              borderColor: "black",
+              height: 100,
+              width: 100,
+            }}
+            controls
+            ref={global.config.videoRef}
+            autoPlay
+          ></video>
           <Centered>
             <BrowserRouter>
               <Switch>
