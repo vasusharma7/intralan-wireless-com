@@ -47,7 +47,7 @@ export class Splash extends Component {
         />
 
         <Title style={{ color: "white", textAlign: "center", paddingTop: 10 }}>
-          IntraLAN Mobile
+          NetCon Mobile
         </Title>
         <Text style={{ color: "white", textAlign: "center", paddingTop: 10 }}>
           Connect safe, secure and fast

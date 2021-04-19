@@ -7,7 +7,7 @@ global.config.fireCallsNotification = () => {
     /* Android Only Properties */
     channelId: "call-channel",
     // smallIcon: "lock", // (optional) default: "ic_notification" with fallback for "ic_launcher"
-    bigText: "Open IntraLANCom app to receive Call", // (optional) default: "message" prop
+    bigText: "Open NetCon to receive Call", // (optional) default: "message" prop
     // subText: "Please Stay Indoors", // (optional) default: none
     vibrate: true, // (optional) default: true
     vibration: 10, // vibration length in milliseconds, ignored if vibrate=false, default: 1000

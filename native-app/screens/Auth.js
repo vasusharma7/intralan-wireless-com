@@ -39,7 +39,7 @@ export class Auth extends Component {
     }
     console.log(this.state);
     let peerId = new Date().getTime();
-    Alert.alert("IntraLANCom ID", `Your Unique ID is ${peerId}`, [
+    Alert.alert("NetCon ID", `Your Unique ID is ${peerId}`, [
       {
         text: "Proceed",
         onPress: async () => {
@@ -67,7 +67,7 @@ export class Auth extends Component {
     return (
       <ScrollView style={styles.container}>
         <Title style={{ color: "white", textAlign: "center", paddingTop: 10 }}>
-          IntraLAN Mobile
+          NetCon Mobile
         </Title>
         <Text style={{ color: "white", textAlign: "center", paddingTop: 10 }}>
           Connect safe, secure and fast

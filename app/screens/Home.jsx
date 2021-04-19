@@ -23,7 +23,7 @@ export default class Home extends Component {
       <>
         <Appbar.Header>
           <Appbar.Content
-            title="IntraLAN Wireless Communication"
+            title="NetCon - Keeps you connected."
             subtitle="Under Developement :)"
           />
         </Appbar.Header>

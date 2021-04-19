@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert, View } from "react-native";
 import { Appbar, List, Text } from "react-native-paper";
+const dateFormat = require("dateformat");
 export class CallLog extends Component {
   constructor(props) {
     super(props);
@@ -39,11 +40,24 @@ export class CallLog extends Component {
             return (
               <List.Item
                 key={call.date}
-                title={call.username}
-                description={`PeerId : ${call.peerId}\nTime:${(
-                  call.time / 1000
-                ).toFixed(2)}(sec)\t|\tDate:${new Date(call.date)}`}
-                left={(props) => <List.Icon {...props} icon="phone" />}
+                titleStyle={{ fontSize: 30 }}
+                title={call.username === undefined ? "User" : call.username}
+                descriptionNumberOfLines={3}
+                description={`PeerId : ${
+                  call.peerId === undefined ? "Anonymous" : call.peerId
+                }\nDuration:${(call.time / 1000).toFixed(
+                  2
+                )}(sec)\nDate: ${dateFormat(
+                  call.date,
+                  "dddd, mmmm dS, yyyy, h:MM:ss TT"
+                )}`}
+                left={(props) => (
+                  <List.Icon
+                    {...props}
+                    style={{ height: 60, width: 40 }}
+                    icon="phone"
+                  />
+                )}
                 onPress={() => {}}
               />
             );

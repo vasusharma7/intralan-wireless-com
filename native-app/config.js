@@ -5,7 +5,7 @@ NetworkInfo.getIPV4Address().then((ip) => {
   info["ip"] = ip;
 });
 global.config = {
-  appTitle: "IntraLAN Communication",
+  appTitle: "NetCon",
   info: info,
   authInfo: {
     username: "",

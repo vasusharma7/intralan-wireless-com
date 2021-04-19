@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Text, View, Image } from "react-native";
+import { Text, View, Image } from "react-native";
 import { store } from "../redux/store";
 import Modal from "react-native-modal";
 import { connect } from "react-redux";
@@ -8,6 +8,7 @@ import {
   updateInfo,
   setConnStatus,
 } from "../redux/dataRedux/dataAction";
+import { Button } from "react-native-paper";
 import { stopSearch } from "../redux/searchRedux/searchAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
 import wifi from "../assets/wifi.gif";
@@ -34,14 +35,17 @@ class Stream extends React.Component {
                 }}
               />
               <Text
-                style={{ color: "white", fontSize: 20, textAlign: "center" }}
+                style={{ color: "white", fontSize: 20, textAlign: "center", marginBottom : 30 }}
               >
                 Connecting....
               </Text>
               <Button
                 onPress={() => this.props.setConnStatus(null)}
-                title={"Cancel"}
-              />
+                mode="contained"
+                icon="cancel"
+              >
+                Cancel
+              </Button>
             </View>
           </>
         );
@@ -89,13 +93,17 @@ class Stream extends React.Component {
 
             <Button
               onPress={() => this.props.stopSearch()}
-              title={"Stop Search"}
-            />
+              mode="contained"
+              icon="cancel"
+              color="#A80E0E"
+            >
+              Stop Searching
+            </Button>
             <Text
               style={{
-                marginTop: 10,
+                marginTop: 20,
                 color: "white",
-                fontSize: 10,
+                fontSize: 12,
                 marginBottom: 4,
                 textAlign: "center",
               }}

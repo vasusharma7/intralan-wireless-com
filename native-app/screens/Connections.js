@@ -1,15 +1,14 @@
 import { FAB, Text } from "react-native-paper";
 import React, { Component } from "react";
 import {
-  Button,
   Platform,
   View,
   Alert,
   StyleSheet,
-  FlatList,
+  Image,
   Dimensions,
 } from "react-native";
-import { Appbar, List } from "react-native-paper";
+import { Appbar, List, Button } from "react-native-paper";
 import { connect } from "react-redux";
 import Modal from "react-native-modal";
 import {
@@ -22,6 +21,9 @@ import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
 import { startSearch, stopSearch } from "../redux/searchRedux/searchAction";
 import { PeerClient } from "../peer";
 import Stream from "./Stream";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { color } from "react-native-reanimated";
+import Icon from "react-native-vector-icons/FontAwesome5";
 const { width, height } = Dimensions.get("screen");
 class Connections extends Component {
   constructor(props) {
@@ -29,12 +31,26 @@ class Connections extends Component {
     this.state = {
       modalOpen: false,
       connection: null,
+      userData: {},
     };
   }
   exec = (connection, operation) => {
     const remotePeer = new PeerClient({ ...connection, operation: operation });
     this.props.setRemotePeer(remotePeer);
     this.setState({ modalOpen: false });
+  };
+
+  componentDidMount = async () => {
+    await AsyncStorage.getItem("auth")
+      .then((data) => {
+        data = JSON.parse(data);
+        this.setState({
+          userData: data,
+        });
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
   render() {
@@ -46,7 +62,7 @@ class Connections extends Component {
           }}
         >
           <Appbar.Content
-            title="IntraLAN Mobile"
+            title="NetCon Mobile"
             subtitle="Connect fast, safe and secure"
             style={{
               alignItems: "center",
@@ -60,40 +76,85 @@ class Connections extends Component {
             }}
           />
           <Button
-            title="Call"
             icon="phone"
+            mode="contained"
+            style={{ margin: 10 }}
             onPress={() => {
               this.exec(this.state.connection, "call");
             }}
-          />
-          <View style={{ margin: 10 }} />
+          >
+            Call
+          </Button>
           <Button
-            title="File Transfer"
             icon="file"
+            mode="contained"
+            style={{ margin: 10 }}
             onPress={() => {
               this.exec(this.state.connection, "file");
             }}
-          />
-          <View style={{ margin: 10 }} />
+          >
+            File Transfer
+          </Button>
           <Button
-            title="Chat"
             icon="message"
+            mode="contained"
+            style={{ margin: 10 }}
             onPress={() => {
               this.exec(this.state.connection, "message");
             }}
-          />
-          <View style={{ margin: 10 }} />
+          >
+            Chat
+          </Button>
           <Button
             color="gray"
-            title="Cancel"
             icon="cancel"
+            mode="contained"
+            style={{ margin: 10 }}
             onPress={() => {
               this.setState({ modalOpen: false });
             }}
-          />
+          >
+            Cancel
+          </Button>
         </Modal>
         {this.props.connStatus !== null && <Stream />}
         <View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              paddingTop: 40,
+              paddingBottom: 40,
+              backgroundColor: "#04066D",
+              borderRadius: 30,
+              marginTop: 20,
+              marginLeft: 7,
+              marginRight: 7,
+            }}
+          >
+            <View style={{ marginRight: 30 }}>
+              <Icon size={50} color="white" name="user" />
+            </View>
+            <View>
+              <Text
+                style={{
+                  fontSize: 30,
+                  fontWeight: "bold",
+                  color: "white",
+                  marginBottom: 10,
+                }}
+              >
+                Welcome {this.state.userData.username}
+              </Text>
+              <Text style={{ color: "white" }}>
+                My Peer ID: {this.state.userData.uid}
+              </Text>
+              <Text style={{ color: "white" }}>
+                E-mail: {this.state.userData.email}
+              </Text>
+            </View>
+          </View>
           <Text
             style={{
               fontSize: 25,
@@ -102,19 +163,52 @@ class Connections extends Component {
               marginTop: 30,
             }}
           >
-            Available Connections
+            {"Available Connections\n"}
+            {this.props?.info && Object.keys(this.props?.info).length === 0 && (
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ marginTop: 30, fontSize: 17 }}>
+                  Tap on the search button to look for connections
+                </Text>
+                <Image
+                  source={require("../assets/search.gif")}
+                  style={{ width: width / 2, height: height / 3 }}
+                />
+              </View>
+            )}
           </Text>
           {this.props?.info &&
             Object.keys(this.props?.info).map((ip) => {
               return (
                 <List.Item
                   key={ip}
-                  title={this.props.info[ip]["username"]}
+                  titleStyle={{ fontSize: 30 }}
+                  title={
+                    this.props.info[ip]["username"] === undefined
+                      ? "User"
+                      : this.props.info[ip]["username"]
+                  }
+                  descriptionStyle={{ fontSize: 15, fontWeight: "bold" }}
                   description={`IP: ${this.props.info[ip]["ip"]}\nPeerId: ${
-                    this.props.info[ip]["peerId"]
+                    this.props.info[ip]["peerId"] === ""
+                      ? "Anonymous"
+                      : this.props.info[ip]["peerId"]
                   }`}
                   rippleColor="#00f"
-                  left={(props) => <List.Icon {...props} icon="network" />}
+                  left={(props) => (
+                    <List.Icon
+                      {...props}
+                      icon="network"
+                      color="#2B139D"
+                      style={{ height: 60, width: 60 }}
+                    />
+                  )}
                   onPress={() =>
                     this.setState({ connection: this.props.info[ip] }, () =>
                       this.setState({ modalOpen: true })

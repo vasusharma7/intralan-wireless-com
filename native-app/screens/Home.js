@@ -14,6 +14,7 @@ import { FileTransfer } from "./FileTransfer";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { Chats } from "./Chats";
 import { CallLog } from "./CallLog";
+import { View } from "react-native";
 
 class Home extends Component {
   constructor(props) {
@@ -73,7 +74,7 @@ class Home extends Component {
               activeColor="#99EFF8"
               inactiveColor="#fff"
               barStyle={{ backgroundColor: this.state.color }}
-            >
+           >
               {this.state.routes.map(({ key, screen, title, icon }) => (
                 <Tab.Screen
                   name={title}
