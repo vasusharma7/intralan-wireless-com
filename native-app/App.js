@@ -206,7 +206,7 @@ class App extends Component {
     this.netInfoUnsubscribe = NetInfo.addEventListener((state) => {
       console.log("Connection type", state.type);
       console.log("Is connected?", state.isConnected);
-      state.isConnected
+      state.isConnected && state.type === "wifi"
         ? ""
         : Alert.alert(
             "You are not connected to Wifi !",
@@ -218,6 +218,15 @@ class App extends Component {
         await AsyncStorage.setItem("userData", JSON.stringify({}));
       }
     });
+    await AsyncStorage.getItem("range").then(async (range) => {
+      if (!range || range === "small") {
+        this.props.initSearch(global.config.info.smallBlock);
+        await AsyncStorage.setItem("range", "small");
+      } else {
+        this.props.initSearch(global.config.info.mediumBlock);
+        await AsyncStorage.setItem("range", "large");
+      }
+    });
     this.createChannels();
     // AsyncStorage.clear();
 
@@ -227,7 +236,7 @@ class App extends Component {
     await BackgroundService.start(veryIntensiveTask, options);
     this.props.echoNode();
     // this.connectWithPeerJS();
-    this.props.initSearch(global.config.info.smallBlock);
+
     global.config.background = false;
     AppState.addEventListener("change", this._handleAppStateChange);
     // setInterval(() => global.config.fireMessageNotification(), 5000);

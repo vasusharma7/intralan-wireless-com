@@ -51,7 +51,11 @@ export class CallLog extends Component {
             );
           })
         ) : (
-          <></>
+          <>
+            <Text style={{ textAlign: "center", fontSize: 18 }}>
+              No Recent Calls
+            </Text>
+          </>
         )}
       </ScrollView>
     );

@@ -51,7 +51,11 @@ export class ChatSelect extends Component {
             );
           })
         ) : (
-          <></>
+          <>
+            <Text style={{ textAlign: "center", fontSize: 18 }}>
+              No Recent Chats
+            </Text>
+          </>
         )}
       </ScrollView>
     );
