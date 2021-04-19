@@ -171,15 +171,7 @@ export default class PeerClient {
   async setRes(res) {
     this.res = res;
   }
-  downloadPDF() {
-    const linkSource = this.file;
-    const downloadLink = document.createElement("a");
-    const fileName = this.res.name;
 
-    downloadLink.href = linkSource;
-    downloadLink.download = fileName;
-    downloadLink.click();
-  }
   async saveFile(res, conn) {
     console.log("saving", res.chunk);
     if (res.file === "EOF") {
