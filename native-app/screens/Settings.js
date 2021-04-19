@@ -26,41 +26,20 @@ import NodeService from "../Service";
 import BackgroundService from "react-native-background-actions";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { openNotificationSettings } from "nodejs-mobile-react-native";
-const veryIntensiveTask = async (taskDataArguments) => {
-  // Example of an infinite loop task
-  const { delay } = taskDataArguments;
-  await new Promise(async (resolve) => {
-    for (let i = 0; BackgroundService.isRunning(); i++) {
-      // console.log("running", i);
-      await sleep(delay);
-    }
-  });
-};
-
-const options = {
-  taskName: "IntraLAN Comm",
-  taskTitle: "IntraLAN Communication",
-  taskDesc: "Fast, Reliable, Secure",
-  taskIcon: {
-    name: "ic_launcher",
-    type: "mipmap",
-  },
-  color: "#ffffff",
-  linkingURI: "intralancom://call",
-  parameters: {
-    delay: 10000,
-  },
-};
 
 class Settings extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: AsyncStorage.getItem("node"),
+      node: false,
     };
-    console.log(this.state.items);
   }
-
+  async componentDidMount() {
+    await AsyncStorage.getItem("node").then((data) => {
+      let node = JSON.parse(data).node;
+      this.setState({ node });
+    });
+  }
   startConnection = () => {
     // console.log(this.props.connections);
     // const remotePeer = new PeerClient(
@@ -84,12 +63,22 @@ class Settings extends Component {
             backgroundColor: "black",
             color: "white",
             fontSize: 40,
-            paddingTop: 0.1 * height,
-            paddingBottom: 10,
+            paddingTop: 0.09 * height,
+            paddingBottom: 5,
             height: 0.2 * height,
           }}
         >
           Settings
+        </Text>
+        <Text
+          style={{
+            color: "white",
+            paddingBottom: 5,
+            backgroundColor: "black",
+            textAlign: "center",
+          }}
+        >
+          {"My IP : " + (global.config.info.ip || "Not Avaialble")}
         </Text>
         <View
           style={{
@@ -112,15 +101,16 @@ class Settings extends Component {
             </Text>
           </View>
           <TouchableOpacity
+            disabled={this.state.node}
             style={styles.button}
             onPress={async () => {
               this.props.startNode();
-
               await AsyncStorage.getItem("node").then(async (res) => {
                 await AsyncStorage.setItem(
                   "node",
                   JSON.stringify({ node: true })
                 );
+                this.setState({ node: true });
                 await BackgroundService.updateNotification({
                   taskDesc: "Discoverable in the network..",
                 });
@@ -140,6 +130,7 @@ class Settings extends Component {
             </Text>
           </TouchableOpacity> */}
           <TouchableOpacity
+            disabled={!this.state.node}
             style={styles.button}
             onPress={async () => {
               Alert.alert("Stopping broadcast..");
@@ -147,7 +138,9 @@ class Settings extends Component {
                 "node",
                 JSON.stringify({ node: false })
               );
+
               NodeService.stopService();
+              this.setState({ node: false });
               BackgroundService.stop();
               await AsyncStorage.removeItem("localPeer");
             }}

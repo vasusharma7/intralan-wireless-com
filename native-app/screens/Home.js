@@ -69,7 +69,8 @@ class Home extends Component {
         return (
           <>
             <Tab.Navigator
-              initialRouteName="Connections"
+              // initialRouteName="Connections"
+              initialRouteName="Settings"
               activeColor="#99EFF8"
               inactiveColor="#fff"
               barStyle={{ backgroundColor: this.state.color }}
