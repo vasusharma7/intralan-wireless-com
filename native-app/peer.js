@@ -201,6 +201,7 @@ class PeerClient {
         conn.on("data", (data) => {
           if (data?.operation === "file") {
             if (data.permission === true) {
+              store.dispatch(streamInit(false));
               global.config.fireFileNotification();
               store.dispatch(setStreamMetaData(data));
               store.dispatch(setConnStatus("fileTransfer"));
@@ -210,6 +211,12 @@ class PeerClient {
           } else if (data?.operation === "chat") {
             this.conn = conn;
             this.recieveMessage(data);
+          } else if (data?.operation === "call") {
+            if (data.action === "decline") {
+              whoosh.stop();
+              store.dispatch(setConnStatus(null));
+              Alert.alert("Call Disconnected !");
+            }
           } else {
             console.log("Local peer sending some data.");
             conn.send("Hello, this is the LOCAL peer!");
@@ -308,6 +315,12 @@ class PeerClient {
       if (res.chunk == 0) {
         this.res = res;
         store.dispatch(setConnStatus("fileTransfer"));
+        store.dispatch(
+          setStreamMetaData({
+            ...this.res,
+            permission: null,
+          })
+        );
         store.dispatch(streamInit(false));
         RNFetchBlob.fs.isDir(this.dirLocation).then(async (isDir) => {
           if (!isDir) {

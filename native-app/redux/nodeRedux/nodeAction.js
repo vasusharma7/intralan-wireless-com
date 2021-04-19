@@ -11,7 +11,10 @@ const handleNodeEvents = (msg) => {
   const event = Object.keys(msg)[0];
   switch (event) {
     case "firedUp": {
-      Alert.alert("Broadcasting started successfully.");
+      Alert.alert(
+        "Broadcasting started successfully.",
+        "Welcome Back " + (global.config.authInfo.username || "")
+      );
       echoNode();
       return;
     }
@@ -26,9 +29,9 @@ const handleNodeEvents = (msg) => {
     }
     default: {
       console.log(msg[event]);
-      if (msg[event].username) {
-        Alert.alert("Welcome Back " + msg[event].username);
-      }
+      // if (msg[event].username) {
+      //   Alert.alert("Welcome Back " + msg[event].username);
+      // }
     }
   }
 };

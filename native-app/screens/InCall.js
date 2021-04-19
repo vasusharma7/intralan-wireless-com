@@ -95,16 +95,19 @@ export class InCall extends Component {
               }}
               onPress={() => {
                 // this.props.setConnStatus(null);
-                try {
-                  this.props.localPeer?.endCall();
-                } catch (err) {
-                  console.log("Something is fishy in development !", err);
-                }
-                try {
-                  this.props.remotePeer?.endCall();
-                } catch (err) {
-                  console.log("Something is fishy in development !", err);
-                }
+                // try {
+                //   this.props.localPeer?.endCall();
+                // } catch (err) {
+                //   console.log("Something is fishy in development !", err);
+                // }
+                // try {
+                //   this.props.remotePeer?.endCall();
+                // } catch (err) {
+                //   console.log("Something is fishy in development !", err);
+                // }
+
+                this.props.remotePeer.rejectCall();
+
                 // try {
                 //   this.props.remotePeer.endCall();
                 //   this.props.localPeer.endCall();
@@ -133,6 +136,7 @@ const mapStateToProps = (state) => ({
   localPeer: state.stream.localPeer,
   connStatus: state.data.connStatus,
   stream: state.stream.stream,
+  streamInit: state.stream.streamInit,
 });
 
 const mapDispatchToProps = (dispatch) => {

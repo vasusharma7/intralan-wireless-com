@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import { Appbar, List, Button } from "react-native-paper";
 import { connect } from "react-redux";
@@ -118,7 +119,7 @@ class Connections extends Component {
           </Button>
         </Modal>
         {this.props.connStatus !== null && <Stream />}
-        <View>
+        <ScrollView>
           <View
             style={{
               flexDirection: "row",
@@ -148,7 +149,7 @@ class Connections extends Component {
                 Welcome {this.state.userData.username}
               </Text>
               <Text style={{ color: "white" }}>
-                My Peer ID: {this.state.userData.uid}
+                My Peer ID: {this.state.userData.peerId}
               </Text>
               <Text style={{ color: "white" }}>
                 E-mail: {this.state.userData.email}
@@ -217,7 +218,7 @@ class Connections extends Component {
                 />
               );
             })}
-        </View>
+        </ScrollView>
         {JSON.stringify(this.props.info) !== JSON.stringify({}) ? (
           <FAB
             style={styles.fab1}

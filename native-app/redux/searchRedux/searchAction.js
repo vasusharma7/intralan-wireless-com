@@ -86,7 +86,7 @@ connect = async (ip) => {
   const state = store.getState();
   if (ip === global.config.info.ip) {
     console.log("self IP");
-    // return;
+    return;
   }
   return new Promise(async (resolve, reject) => {
     const socket = await socketIOClient(`http://${ip}:5000`, {
