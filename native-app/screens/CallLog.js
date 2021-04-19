@@ -23,18 +23,6 @@ export class CallLog extends Component {
   render() {
     return (
       <View>
-        <Appbar.Header
-          style={{
-            backgroundColor: "#04045B",
-          }}
-        >
-          <Appbar.Content
-            title={"Call Logs"}
-            style={{
-              alignItems: "center",
-            }}
-          />
-        </Appbar.Header>
         {this.state.calls.length ? (
           this.state.calls.map((call) => {
             return (

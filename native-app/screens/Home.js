@@ -32,7 +32,7 @@ class Home extends Component {
         {
           key: "calls",
           screen: CallLog,
-          title: "Call Log",
+          title: "Call Logs",
           icon: "phone",
         },
         {
@@ -75,7 +75,7 @@ class Home extends Component {
               activeColor="#99EFF8"
               inactiveColor="#fff"
               barStyle={{ backgroundColor: this.state.color }}
-           >
+            >
               {this.state.routes.map(({ key, screen, title, icon }) => (
                 <Tab.Screen
                   name={title}
@@ -99,20 +99,7 @@ class Home extends Component {
     }
   }
   render() {
-    return (
-      <>
-        <Appbar.Header>
-          <Appbar.Content
-            title={global.config.appTitle}
-            subtitle={this.state.title}
-            style={{
-              alignItems: "center",
-            }}
-          />
-        </Appbar.Header>
-        {this.paintTheScreen()}
-      </>
-    );
+    return <>{this.paintTheScreen()}</>;
   }
 }
 

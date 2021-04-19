@@ -1,6 +1,12 @@
 import React, { Component } from "react";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-import { PermissionsAndroid, AppState, Linking, Alert } from "react-native";
+import {
+  PermissionsAndroid,
+  AppState,
+  Linking,
+  Alert,
+  Text,
+} from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 import { connect } from "react-redux";
 import { updateConnections, updateInfo } from "./redux/dataRedux/dataAction";
@@ -22,6 +28,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import PushNotification from "react-native-push-notification";
 import { Splash } from "./screens/Splash";
+import { Appbar } from "react-native-paper";
 const { PeerClient } = require("./peer.js");
 const Stack = createStackNavigator();
 
@@ -263,7 +270,27 @@ class App extends Component {
       <Stack.Navigator
         initialRouteName="Splash"
         screenOptions={{
-          headerShown: false,
+          header: () => (
+            <Appbar.Header>
+              <Appbar.Content
+                title={
+                  global.config.appTitle +
+                  (global.config.navigationRef.current &&
+                  global.config.navigationRef.current.getCurrentRoute().name !==
+                    "Auth" &&
+                  global.config.navigationRef.current.getCurrentRoute().name !==
+                    "Splash"
+                    ? " | " +
+                      global.config.navigationRef.current.getCurrentRoute().name
+                    : "")
+                }
+                subtitle="Connect fast, safe and secure"
+                style={{
+                  alignItems: "center",
+                }}
+              />
+            </Appbar.Header>
+          ),
         }}
       >
         <Stack.Screen name="Splash" component={Splash} />

@@ -25,18 +25,6 @@ export class ChatSelect extends Component {
   render() {
     return (
       <View>
-        <Appbar.Header
-          style={{
-            backgroundColor: "#04045B",
-          }}
-        >
-          <Appbar.Content
-            title={"Chats"}
-            style={{
-              alignItems: "center",
-            }}
-          />
-        </Appbar.Header>
         {this.state.peerIds.length ? (
           this.state.peerIds.map((key) => {
             return this.state.userData[key]["info"] &&

@@ -56,7 +56,7 @@ class Connections extends Component {
   render() {
     return (
       <>
-        <Appbar.Header
+        {/* <Appbar.Header
           style={{
             backgroundColor: "#04045B",
           }}
@@ -68,7 +68,7 @@ class Connections extends Component {
               alignItems: "center",
             }}
           />
-        </Appbar.Header>
+        </Appbar.Header> */}
         <Modal isVisible={this.state.modalOpen}>
           <View
             style={{
@@ -200,7 +200,7 @@ class Connections extends Component {
                       ? "Anonymous"
                       : this.props.info[ip]["peerId"]
                   }`}
-                  rippleColor="#00f"
+                  rippleColor="#002"
                   left={(props) => (
                     <List.Icon
                       {...props}
@@ -233,7 +233,7 @@ class Connections extends Component {
         <FAB
           style={styles.fab2}
           icon="magnify"
-          onPress={() => {
+          onPress={async () => {
             this.props.setConnStatus("searching");
             setTimeout(() => this.props.startSearch(), 1000);
           }}

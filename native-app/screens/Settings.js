@@ -36,40 +36,41 @@ class Settings extends Component {
   }
   async componentDidMount() {
     await AsyncStorage.getItem("node").then((data) => {
+      if (!data) return;
       let node = JSON.parse(data).node;
       this.setState({ node });
     });
   }
-  startConnection = () => {
-    // console.log(this.props.connections);
-    // const remotePeer = new PeerClient(
-    //   this.props.connections[Object.keys(this.props.connections)[0]]
-    // );
-    //testing
-    const remotePeer = new PeerClient({
-      ip: "192.168.1.207",
-      username: "Vasu",
-      peerId: "peer8",
-    });
-
-    this.props.setRemotePeer(remotePeer);
-  };
   render() {
     return (
       <ScrollView style={styles.container}>
-        <Text
+        <View
           style={{
-            textAlign: "center",
+            ...styles.view,
             backgroundColor: "black",
-            color: "white",
-            fontSize: 40,
-            paddingTop: 0.09 * height,
-            paddingBottom: 5,
-            height: 0.2 * height,
+            flex: 0.4,
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "space-around",
           }}
         >
-          Settings
-        </Text>
+          <Image
+            source={require("../assets/ic_launcher.png")}
+            style={{ height: width * 0.25, width: width * 0.25, margin: 10 }}
+          />
+          <Text
+            style={{
+              textAlign: "center",
+              backgroundColor: "black",
+              color: "white",
+              fontSize: 40,
+              // paddingTop: 0.09 * height,
+              height: 0.1 * height,
+            }}
+          >
+            Settings
+          </Text>
+        </View>
         <Text
           style={{
             color: "white",
@@ -102,7 +103,10 @@ class Settings extends Component {
           </View>
           <TouchableOpacity
             disabled={this.state.node}
-            style={styles.button}
+            style={{
+              ...styles.button,
+              backgroundColor: this.state.node ? "gray" : "white",
+            }}
             onPress={async () => {
               this.props.startNode();
               await AsyncStorage.getItem("node").then(async (res) => {
@@ -120,18 +124,12 @@ class Settings extends Component {
             <Icon size={25} style={styles.inputIcon} name="near-me" />
             <Text style={styles.instructions}>Enable Network Discovery</Text>
           </TouchableOpacity>
-
-          {/* <TouchableOpacity
-            style={styles.button}
-            onPress={() => this.props.stopSearch()}
-          >
-            <Text style={styles.instructions}>
-              {this.props.search ? "Stop Search" : "Start Search"}
-            </Text>
-          </TouchableOpacity> */}
           <TouchableOpacity
             disabled={!this.state.node}
-            style={styles.button}
+            style={{
+              ...styles.button,
+              backgroundColor: !this.state.node ? "gray" : "white",
+            }}
             onPress={async () => {
               Alert.alert("Stopping broadcast..");
               await AsyncStorage.setItem(

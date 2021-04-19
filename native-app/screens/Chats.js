@@ -12,12 +12,12 @@ export class Chats extends Component {
   render() {
     return (
       <ChatStack.Navigator
-        initialRouteName="ChatSelect"
+        initialRouteName="Chats "
         screenOptions={{
           headerShown: false,
         }}
       >
-        <ChatStack.Screen name="ChatSelect" component={ChatSelect} />
+        <ChatStack.Screen name="Chats " component={ChatSelect} />
         <ChatStack.Screen name="ChatScreen" component={ChatScreen} />
       </ChatStack.Navigator>
     );
