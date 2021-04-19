@@ -16,7 +16,8 @@ import {
   updateInfo,
   setScreenStatus,
 } from "../redux/dataRedux/dataAction";
-import { stopSearch } from "../redux/searchRedux/searchAction";
+import { Menu, Divider, Button } from "react-native-paper";
+import { initSearch, stopSearch } from "../redux/searchRedux/searchAction";
 import { setLocalPeer, setRemotePeer } from "../redux/streamRedux/streamAction";
 import { PeerClient } from "../peer";
 import { startNode } from "../redux/nodeRedux/nodeAction";
@@ -26,19 +27,37 @@ import NodeService from "../Service";
 import BackgroundService from "react-native-background-actions";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { openNotificationSettings } from "nodejs-mobile-react-native";
-
+const numBlocks = 2;
+const Filler = () => (
+  <View
+    style={{
+      borderRightColor: "white",
+      borderWidth: 1,
+      height: width / 7,
+    }}
+  />
+);
 class Settings extends Component {
   constructor(props) {
     super(props);
     this.state = {
       node: false,
+      visible: true,
+      range: "small",
     };
   }
+  openMenu = () => this.setState({ visible: true });
+
+  closeMenu = () => this.setState({ visible: false });
   async componentDidMount() {
     await AsyncStorage.getItem("node").then((data) => {
       if (!data) return;
       let node = JSON.parse(data).node;
       this.setState({ node });
+    });
+    await AsyncStorage.getItem("range").then((range) => {
+      if (!range) return;
+      this.setState({ range: range });
     });
   }
   render() {
@@ -141,6 +160,7 @@ class Settings extends Component {
               this.setState({ node: false });
               BackgroundService.stop();
               await AsyncStorage.removeItem("localPeer");
+              Alert.alert("Success", "It is recommended to restart the app");
             }}
           >
             <Icon size={25} style={styles.inputIcon} name="near-me-disabled" />
@@ -158,6 +178,87 @@ class Settings extends Component {
               Show/Hide Tray Notifications
             </Text>
           </TouchableOpacity>
+        </View>
+        <View style={styles.view}>
+          <View>
+            <Text
+              style={{
+                paddingLeft: 15,
+                fontSize: 20,
+                paddingTop: 10,
+                marginBottom: 5,
+                fontWeight: "bold",
+                color: "white",
+              }}
+            >
+              Search Range
+            </Text>
+          </View>
+        </View>
+        <View style={styles.wrap}>
+          <TouchableOpacity
+            onPress={async () => {
+              this.props.initSearch(global.config.info.smallBlock);
+              await AsyncStorage.setItem("range", "small");
+              this.setState({ range: "small" });
+            }}
+          >
+            <View
+              style={{
+                ...styles.options,
+                borderTopLeftRadius: 10,
+                borderLeftColor: "white",
+                borderLeftWidth: 1,
+                borderBottomLeftRadius: 10,
+                backgroundColor:
+                  this.state.range === "small" ? "#00203f" : "transparent",
+              }}
+            >
+              <Text style={styles.optionsText}>Small</Text>
+              <Text style={{ ...styles.optionsText, fontSize: width / 50 }}>
+                Small Home Networks
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <Filler />
+          <TouchableOpacity
+            onPress={async () => {
+              this.props.initSearch(global.config.info.mediumBlock);
+              await AsyncStorage.setItem("range", "large");
+              this.setState({ range: "large" });
+              Alert.alert("Note !", "Searching Peers will take longer time");
+            }}
+          >
+            <View
+              style={{
+                ...styles.options,
+                borderTopRightRadius: 10,
+                borderRightColor: "white",
+                borderRightWidth: 1,
+                borderBottomRightRadius: 10,
+                backgroundColor:
+                  this.state.range === "large" ? "#00203f" : "transparent",
+              }}
+            >
+              <Text style={styles.optionsText}>Large</Text>
+              <Text style={{ ...styles.optionsText, fontSize: width / 50 }}>
+                Fairly Large Newtorks
+              </Text>
+            </View>
+          </TouchableOpacity>
+          {/* <Filler />
+          <TouchableOpacity
+            onPress={() => {
+              this.props.initSearch(global.config.info.largeBlock);
+            }}
+          >
+            <View style={styles.options}>
+              <Text style={styles.optionsText}>High</Text>
+              <Text style={{ ...styles.optionsText, fontSize: width / 70 }}>
+                Entire Network
+              </Text>
+            </View>
+          </TouchableOpacity> */}
         </View>
         <View style={styles.view}>
           <View>
@@ -187,8 +288,15 @@ class Settings extends Component {
             }}
           >
             <Icon size={25} style={styles.inputIcon} name="restore" />
-            <Text style={styles.instructions}>Reset Discovery Settings</Text>
+            <Text style={styles.instructions}>
+              Reset Network Discovery Settings
+            </Text>
           </TouchableOpacity>
+          <Text
+            style={{ color: "white", marginLeft: 10, fontSize: width / 40 }}
+          >
+            ( Reset discovery settings if not working as expected )
+          </Text>
           <TouchableOpacity
             style={styles.button}
             onPress={async () => {
@@ -229,6 +337,7 @@ const mapDispatchToProps = (dispatch) => {
     setRemotePeer: (peer) => dispatch(setRemotePeer(peer)),
     setScreenStatus: (status) => dispatch(setScreenStatus(status)),
     startNode: () => dispatch(startNode()),
+    initSearch: (data) => dispatch(initSearch(data)),
   };
 };
 
@@ -241,6 +350,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#2C2C2F",
+  },
+  options: {
+    color: "white",
+    width: width / 3,
+    height: width / 7,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignContent: "center",
+  },
+  optionsText: {
+    textAlign: "center",
+    color: "white",
+  },
+  wrap: {
+    alignSelf: "center",
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: (width / 3) * numBlocks,
+    borderWidth: 1,
+    borderColor: "#fff",
+    borderRadius: 10,
   },
   view: {
     flex: 0.6,

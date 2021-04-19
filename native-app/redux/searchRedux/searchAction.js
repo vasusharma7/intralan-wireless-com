@@ -28,7 +28,7 @@ export const initSearch = (block) => {
   const ips = [];
   const generator = new Netmask(block);
   generator.forEach((ip) => ips.push(ip));
-
+  console.log("INIT SEARCH", block, ips.length);
   return {
     type: INIT,
     payload: { block: block, ips: ips },
@@ -86,11 +86,12 @@ connect = async (ip) => {
   const state = store.getState();
   if (ip === global.config.info.ip) {
     console.log("self IP");
-    return;
+    // return;
   }
   return new Promise(async (resolve, reject) => {
     const socket = await socketIOClient(`http://${ip}:5000`, {
-      reconnectionAttempts: 2,
+      // reconnectionAttempts: 2,
+      reconnection: false,
     });
     socket.on("connect", () => {
       console.log(socket.id, socket.connected);

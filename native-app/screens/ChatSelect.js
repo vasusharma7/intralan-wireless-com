@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Alert, View } from "react-native";
+import { Alert, ScrollView, View } from "react-native";
 import { List, Text, Appbar } from "react-native-paper";
 
 export class ChatSelect extends Component {
@@ -24,7 +24,7 @@ export class ChatSelect extends Component {
   }
   render() {
     return (
-      <View>
+      <ScrollView>
         {this.state.peerIds.length ? (
           this.state.peerIds.map((key) => {
             return this.state.userData[key]["info"] &&
@@ -53,7 +53,7 @@ export class ChatSelect extends Component {
         ) : (
           <></>
         )}
-      </View>
+      </ScrollView>
     );
   }
 }

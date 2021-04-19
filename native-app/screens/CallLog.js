@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Alert, View } from "react-native";
+import { Alert, ScrollView, View } from "react-native";
 import { Appbar, List, Text } from "react-native-paper";
 const dateFormat = require("dateformat");
 export class CallLog extends Component {
@@ -22,7 +22,7 @@ export class CallLog extends Component {
   }
   render() {
     return (
-      <View>
+      <ScrollView>
         {this.state.calls.length ? (
           this.state.calls.map((call) => {
             return (
@@ -53,7 +53,7 @@ export class CallLog extends Component {
         ) : (
           <></>
         )}
-      </View>
+      </ScrollView>
     );
   }
 }

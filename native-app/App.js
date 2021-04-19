@@ -227,7 +227,7 @@ class App extends Component {
     await BackgroundService.start(veryIntensiveTask, options);
     this.props.echoNode();
     // this.connectWithPeerJS();
-    this.props.initSearch(rangeString);
+    this.props.initSearch(global.config.info.smallBlock);
     global.config.background = false;
     AppState.addEventListener("change", this._handleAppStateChange);
     // setInterval(() => global.config.fireMessageNotification(), 5000);
