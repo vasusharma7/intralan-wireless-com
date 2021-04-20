@@ -1,19 +1,8 @@
-import React, { Component } from "react";
-import {
-  SafeAreaView,
-  Text,
-  Dimensions,
-  TextInput,
-  Button,
-  View,
-  StyleSheet,
-} from "react-native";
-const { width, height } = Dimensions.get("screen");
+import React from "react";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { connect } from "react-redux";
 import { GiftedChat } from "react-native-gifted-chat";
-import { Appbar, List } from "react-native-paper";
-import { Icon } from "react-native-vector-icons/MaterialIcons";
+import { Appbar } from "react-native-paper";
 
 class Message extends React.Component {
   constructor(props) {
@@ -50,13 +39,13 @@ class Message extends React.Component {
             title={
               this.props.chatInit
                 ? this.props.remotePeer?.connection.username ||
-                  "<Username not available>"
+                  "User"
                 : this.props.localPeer?.metadata.username
             }
             subtitle={`PeerId : ${
               this.props.chatInit
                 ? this.props.remotePeer?.connection.peerId ||
-                  "<Username not available>"
+                  "Anonymous"
                 : this.props.localPeer?.metadata.peerId
             }`}
             style={{
