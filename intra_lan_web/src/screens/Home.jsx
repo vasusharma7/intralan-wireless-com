@@ -19,7 +19,7 @@ import axios from "axios";
 import Ringing from "./Ringing";
 import "react-notifications-component/dist/theme.css";
 import ReactNotification from "react-notifications-component";
-import Mesaage from "./Message";
+import Message from "./Message";
 
 class Home extends Component {
   constructor(props) {
@@ -84,7 +84,7 @@ class Home extends Component {
         return <Ringing></Ringing>;
       case "fileSelect":
       case "chatWindow":
-        return <Mesaage></Mesaage>;
+        return <Message></Message>;
       case "fileSave":
         return (
           <Files
