@@ -82,10 +82,9 @@ class Home extends Component {
         return <Stream />;
       case "ringing":
         return <Ringing></Ringing>;
-      case "fileSelect":
       case "chatWindow":
         return <Message></Message>;
-      case "fileSave":
+      case "fileSelect":
         return (
           <Files
             open={this.props.connStatus}

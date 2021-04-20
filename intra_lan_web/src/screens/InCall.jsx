@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Avatar } from "baseui/avatar";
 import { Button } from "baseui/button";
 import Timer from "../components/Timer";
+import { Display2, Display4 } from "baseui/typography";
 import { connect } from "react-redux";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { store } from "../redux/store";
@@ -47,6 +48,17 @@ class InCall extends Component {
           width: "100vw",
         }}
       >
+        <Display2 style={{ marginBottom: 40 }}>Ongoing call</Display2>
+        <Display4 style={{ marginBottom: 20 }}>
+          {this.props.localPeer?.metadata.username !== undefined
+            ? this.props.localPeer?.metadata.username
+            : "User"}
+        </Display4>
+        <Display4 style={{ marginBottom: 40 }}>
+          {this.props.localPeer?.metadata.ip !== undefined
+            ? this.props.localPeer?.metadata.ip
+            : ""}
+        </Display4>
         <Avatar
           name={localStorage.getItem("name")}
           size="250px"

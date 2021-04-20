@@ -8,6 +8,7 @@ import { store as NotifStore } from "react-notifications-component";
 const axios = require("axios");
 
 export default class PeerClient {
+
   constructor(connection, localPeerId) {
     console.log(connection);
     this.connection = connection;
@@ -20,13 +21,11 @@ export default class PeerClient {
     this.state = store.getState();
     this.offset = 0;
     this.getMediaSource();
-    // this.localPeerId = localPeerId ? this.authInfo.uid : null;
-    // this.dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
-    // this.cacheLocation = `${RNFetchBlob.fs.dirs.CacheDir}/temp`;
+    this.localPeerId = localPeerId ? this.authInfo.uid : null;
   }
+
+  // Event Listener Handlers
   establishConnection = () => {
-    //gey my ip
-    // this.ip = this.connection?.ip ? this.connection.ip : ip;
     if (this.connection) store.dispatch(setConnStatus("connecting"));
     this.peer = new Peer(this.connection ? null : this.localPeerId, {
       host: this.connection ? this.connection.ip : "127.0.0.1", //replace with ip
@@ -39,28 +38,13 @@ export default class PeerClient {
     console.log("firing listeners");
     this.fireEventListeners();
   };
-  disconnectSelf = () => {
-    // nodejs.channel.send(JSON.stringify({ clearId: this.localPeerId }));
-  };
-  getMediaSource = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      console.log(stream);
-      this.stream = stream;
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   fireEventListeners = () => {
     this.peer.on("error", (err) => {
       if (this.localPeerId) this.disconnectSelf();
       if (this.maxRetries--) this.establishConnection();
       console.log("listen", err);
     });
-    // this.peer.on("signal", (data) => {
-    //   if (data.renegotiate || data.transceiverRequest) return;
-    // });
+
     this.peer.on("open", async (peerId) => {
       this.peerId = peerId;
       console.log("Local peer open with ID", peerId, this.connection);
@@ -114,10 +98,6 @@ export default class PeerClient {
         conn.on("data", (data) => {
           if (data?.operation === "file") {
             if (data.permission === true) {
-              console.log("in permission true");
-              // global.config.fireFileNotification();
-              // store.dispatch(setStreamMetaData(data));
-              // store.dispatch(setConnStatus("fileTransfer"));
               this.res = data;
               this.receiveFile();
             } else {
@@ -144,6 +124,23 @@ export default class PeerClient {
       // this.answerCall();
     });
   };
+  disconnectSelf = () => {
+
+  }
+
+  // Get the audio media stream 
+  getMediaSource = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log(stream);
+      this.stream = stream;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  
+
+  // Calling related functions
   async answerCall() {
     store.dispatch(setConnStatus("inCall"));
     this.call.answer(this.stream);
@@ -157,6 +154,48 @@ export default class PeerClient {
       global.config.videoRef.current.srcObject = stream;
     });
   }
+  startCall = () => {
+    console.log("console media", this.stream, this.connection.peerId);
+
+    this.call = this.peer.call(this.connection.peerId, this.stream);
+    store.dispatch(setConnStatus("ringing"));
+    setTimeout(() => {
+      if (this.state.data.connStatus === "ringing") {
+        store.dispatch(setConnStatus(null));
+        alert("User declined your call or went offline :(");
+      }
+    }, 20000);
+    this.call.on("stream", function (stream) {
+      console.log("peer is streaming", this.peerId, stream);
+      store.dispatch(setAVStream(stream));
+
+      //see some workaround for this - the inCall component is rendered late and it gives undefined
+      global.config.videoRef.current.srcObject = stream;
+      store.dispatch(setConnStatus("inCall")); //change to picked-up status
+    });
+    this.call.on("close", function () {
+      store.dispatch(setConnStatus(null));
+      console.log("The call is closed");
+    });
+  };
+  endCall = () => {
+    this.conn.send({ operation: "call", action: "decline" });
+    store.dispatch(setConnStatus(null));
+    console.log("endCall");
+    this?.call && this.call.close();
+  };
+  rejectCall = () => {
+    this.conn.send({ operation: "call", action: "decline" });
+    store.dispatch(setConnStatus(null));
+  };
+
+  // File Transfer functions
+  async setFile(file) {
+    this.file = file;
+  }
+  async setRes(res) {
+    this.res = res;
+  }
   async receiveFile() {
     console.log(this.res);
     console.log("receiving....");
@@ -164,32 +203,17 @@ export default class PeerClient {
     // store.dispatch(setConnStatus("fileTransfer"));
     // this.recieveFile(data);
   }
-
-  async setFile(file) {
-    this.file = file;
-  }
-  async setRes(res) {
-    this.res = res;
-  }
-
   async saveFile(res, conn) {
     console.log("saving", res.chunk);
     if (res.file === "EOF") {
       console.log(this.file);
       store.dispatch(setConnStatus(null));
-      // console.log(
-      //   "Success",
-      //   `File Saved Successfully to location ${this.fileLocation}`
-      // );
-      console.log("EOF received");
-      // alert("File Saved Successfully");
       NotifStore.addNotification({
         title: "Success",
         message: `File saved successfully to ${localStorage.getItem(
           "download"
         )}`,
         type: "success",
-        // insert: "top",
         container: "top-center",
         animationIn: ["animated", "fadeIn"],
         animationOut: ["animated", "fadeOut"],
@@ -198,10 +222,6 @@ export default class PeerClient {
           pauseOnHover: true,
         },
       });
-
-      // store.dispatch(setConnStatus("fileSave"));
-      // saveAs(this.file, this.res.name);
-      // this.downloadPDF();
     } else {
       // store
       //   .dispatch
@@ -211,10 +231,8 @@ export default class PeerClient {
       // ();
       // store.dispatch(setConnStatus("fileTransfer"));
       if (res.chunk === 0) {
-        // data:image/jpeg;base64,
         this.file = "";
       }
-      // this.file += res.file;
       axios
         .post("http://localhost:5000/saveFile", {
           data: res.file,
@@ -266,54 +284,16 @@ export default class PeerClient {
       this.offset += this.chunksize;
     }
   }
-
-  endCall = () => {
-    this.conn.send({ operation: "call", action: "decline" });
-    store.dispatch(setConnStatus(null));
-    console.log("endCall");
-    this?.call && this.call.close();
-  };
-  rejectCall = () => {
-    this.conn.send({ operation: "call", action: "decline" });
-    store.dispatch(setConnStatus(null));
-  };
-
   async rejectFile() {
     this.conn.send({ operation: "file", fileReceive: false });
     store.dispatch(setConnStatus(null));
   }
+
   getPeerId = () => {
     return this.peerId;
   };
-  startCall = () => {
-    console.log("console media", this.stream, this.connection.peerId);
-
-    this.call = this.peer.call(this.connection.peerId, this.stream);
-    store.dispatch(setConnStatus("ringing"));
-    setTimeout(() => {
-      if (this.state.data.connStatus === "ringing") {
-        store.dispatch(setConnStatus(null));
-        alert("User declined your call or went offline :(");
-      }
-    }, 20000);
-
-    // store.dispatch(setAVStream(stream));
-
-    this.call.on("stream", function (stream) {
-      console.log("peer is streaming", this.peerId, stream);
-      store.dispatch(setAVStream(stream));
-
-      //see some workaround for this - the inCall component is rendered late and it gives undefined
-      global.config.videoRef.current.srcObject = stream;
-      store.dispatch(setConnStatus("inCall")); //change to picked-up status
-      // onReceiveStream(stream, "peer-camera");
-    });
-    this.call.on("close", function () {
-      store.dispatch(setConnStatus(null));
-      console.log("The call is closed");
-    });
-  };
-
+  
+  // Chat functions
   initChat = () => {
     store.dispatch(chatInit(true));
     this.conn.send({
@@ -388,6 +368,10 @@ export default class PeerClient {
   chatEnd = () => {
     this.conn.send({ operation: "chat", message: "intralan-chat-end" });
   };
+
+
+
+  // Connection Handler
   connect = (type) => {
     this.conn = this.peer.connect(this.connection.peerId, {
       metadata: this.authInfo,

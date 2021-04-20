@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import FileBase64 from "react-file-base64";
-import Base64Downloader from "react-base64-downloader";
 import { Modal } from "baseui/modal";
 export default class Files extends Component {
   constructor(props) {
