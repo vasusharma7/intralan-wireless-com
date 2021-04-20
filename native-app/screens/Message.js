@@ -49,14 +49,12 @@ class Message extends React.Component {
           <Appbar.Content
             title={
               this.props.chatInit
-                ? this.props.remotePeer?.connection.username ||
-                  "<Username not available>"
+                ? this.props.remotePeer?.connection.username || "Annonymous"
                 : this.props.localPeer?.metadata.username
             }
             subtitle={`PeerId : ${
               this.props.chatInit
-                ? this.props.remotePeer?.connection.peerId ||
-                  "<Username not available>"
+                ? this.props.remotePeer?.connection.peerId || "Annonymous"
                 : this.props.localPeer?.metadata.peerId
             }`}
             style={{

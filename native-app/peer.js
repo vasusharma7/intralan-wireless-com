@@ -73,7 +73,7 @@ class PeerClient {
     this.offset = 0;
     this.res = {};
     this.getMediaSource();
-    this.dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/intraLANcom`;
+    this.dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/NetCon`;
     this.cacheLocation = `${RNFetchBlob.fs.dirs.CacheDir}/temp`;
     if (this.connection) store.dispatch(setConnStatus("connecting"));
   }
