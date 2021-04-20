@@ -1,6 +1,6 @@
 import Peer from "peerjs";
 import { store } from "./redux/store";
-import { setAVStream, setLocalPeer } from "./redux/streamRedux/streamAction";
+import { setAVStream, setLocalPeer, streamInit } from "./redux/streamRedux/streamAction";
 import { setConnStatus } from "./redux/dataRedux/dataAction";
 import { addMessage, chatInit } from "./redux/messageRedux/messageAction";
 import "react-notifications-component/dist/theme.css";
@@ -322,16 +322,31 @@ export default class PeerClient {
       message: "intralan-chat-init",
       time: new Date(),
     });
+    store.dispatch(setConnStatus("chatWindow"));
   };
   frameMessage = (data) => {
     return {
       _id: new Date().getTime(),
       text: data.message,
       createdAt: data.time,
+      title : data.username,
+      position : 'right',
+      date : new Date(),
       user: {
         _id: data.peerId,
         name: data.username,
       },
+    };
+  };
+
+  frameRecievedMessage = (data) => {
+    return {
+      id: new Date().getTime(),
+      text: data.message,
+      createdAt: data.time,
+      title : data.username,
+      date: new Date(),
+      position : 'left',
     };
   };
   sendMessage = (message) => {
@@ -349,16 +364,30 @@ export default class PeerClient {
       operation: "chat",
     });
   };
-
   recieveMessage = (data) => {
     console.log("receiving", data);
     if (data.message === "intralan-chat-init") {
-      store.dispatch(chatInit(false));
+      store.dispatch(streamInit(false));
+      store.dispatch(setConnStatus("chatWindow"));
+      return;
+    } else if (data.message === "intralan-chat-end") {
+      store.dispatch(setConnStatus(null));
+      // this.conn.close();
       return;
     }
-    store.dispatch(addMessage(this.frameMessage(data)));
+    store.dispatch(
+      addMessage({
+        senderId: this.connection
+          ? this.connection.peerId
+          : this.metadata.peerId,
+        ...this.frameRecievedMessage(data),
+      })
+    );
   };
 
+  chatEnd = () => {
+    this.conn.send({ operation: "chat", message: "intralan-chat-end" });
+  };
   connect = (type) => {
     this.conn = this.peer.connect(this.connection.peerId, {
       metadata: this.authInfo,
@@ -376,7 +405,6 @@ export default class PeerClient {
         this.selectFile();
       } else if (type === "message") {
         console.log("Sending message");
-
         this.initChat();
       }
     });

@@ -18,7 +18,9 @@ import { FiPhoneCall, FiFilePlus, FiMessageSquare } from "react-icons/fi";
 import axios from "axios";
 import Ringing from "./Ringing";
 import "react-notifications-component/dist/theme.css";
-import ReactNotification, { store } from "react-notifications-component";
+import ReactNotification from "react-notifications-component";
+import Mesaage from "./Message";
+
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -81,6 +83,8 @@ class Home extends Component {
       case "ringing":
         return <Ringing></Ringing>;
       case "fileSelect":
+      case "chatWindow":
+        return <Mesaage></Mesaage>;
       case "fileSave":
         return (
           <Files
@@ -168,7 +172,7 @@ class Home extends Component {
                 </Button>
                 <Button
                   onClick={() => {
-                    this.exec(this.state.connection, "chat");
+                    this.exec(this.state.connection, "chatWindow");
                   }}
                   kind="secondary"
                   style={{ width: "20vw" }}
@@ -265,6 +269,7 @@ class Home extends Component {
   };
 
   render() {
+    console.log(this.props.connStatus);
     return this.setScreen();
   }
 }
