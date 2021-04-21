@@ -18,7 +18,7 @@ export default class Landing extends Component {
     const authInfo = {};
     authInfo["name"] = localStorage.getItem("name");
     authInfo["email"] = localStorage.getItem("email");
-    authInfo["uid"] = localStorage.getItem("id");
+    authInfo["peerId"] = localStorage.getItem("peerId");
     localStorage.setItem("authInfo", JSON.stringify(authInfo));
     // global.config.authInfo = authInfo;
   }
@@ -41,7 +41,10 @@ export default class Landing extends Component {
           <Display1>Welcome to IntraLAN web</Display1>
           <Button onClick={this.gotoLogin}>Get Started</Button>
         </div>
-        <img alt="lan" src="https://i.pinimg.com/originals/1c/aa/40/1caa406fbe764228551a30045e0ec271.gif"></img>
+        <img
+          alt="lan"
+          src="https://i.pinimg.com/originals/1c/aa/40/1caa406fbe764228551a30045e0ec271.gif"
+        ></img>
       </div>
     );
   }

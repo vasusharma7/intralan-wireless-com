@@ -171,7 +171,7 @@ class Home extends Component {
                 </Button>
                 <Button
                   onClick={() => {
-                    this.exec(this.state.connection, "chatWindow");
+                    this.exec(this.state.connection, "message");
                   }}
                   kind="secondary"
                   style={{ width: "20vw" }}

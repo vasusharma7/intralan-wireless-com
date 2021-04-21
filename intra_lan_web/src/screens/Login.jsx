@@ -35,18 +35,18 @@ export default class Login extends Component {
 
   handleReg = () => {
     console.log(this.state);
-    let uid = Date.now();
+    let peerId = Date.now();
     localStorage.setItem("name", this.state.name);
     localStorage.setItem("email", this.state.email);
     localStorage.setItem("phone", this.state.phone);
-    localStorage.setItem("uid", uid);
+    localStorage.setItem("peerId", peerId);
     localStorage.setItem(
       "authInfo",
       JSON.stringify({
         name: this.state.name,
         email: this.state.email,
         phone: this.state.phone,
-        uid: localStorage.getItem("uid"),
+        peerId: localStorage.getItem("peerId"),
       })
     );
     store.addNotification({

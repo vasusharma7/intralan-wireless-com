@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import { Avatar } from "baseui/avatar";
 import { Button } from "baseui/button";
-import { Display2 } from "baseui/typography";
+import { Display2, Display4 } from "baseui/typography";
 import { connect } from "react-redux";
 import { setConnStatus } from "../redux/dataRedux/dataAction";
 import { store } from "../redux/store";
+import bg from "../assets/ripple2.gif";
+
 class Ringing extends Component {
   constructor(props) {
     super(props);
@@ -37,21 +39,38 @@ class Ringing extends Component {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "black",
+          backgroundColor: "#323332",
           height: "100vh",
           width: "100vw",
         }}
       >
         <Display2 style={{ marginBottom: 40 }}>Calling...</Display2>
-        <Avatar
+        <Display4 style={{ marginBottom: 20 }}>
+          {this.props.remotePeer?.connection?.username !== undefined
+            ? this.props.remotePeer?.connection?.username
+            : "User"}
+        </Display4>
+        <Display4 style={{ marginBottom: 40 }}>
+          {this.props.remotePeer?.connection?.ip !== undefined
+            ? this.props.remotePeer?.connection?.ip
+            : ""}
+        </Display4>
+        {/* <Avatar
           name={localStorage.getItem("name")}
           size="250px"
           src="https://api.adorable.io/avatars/285/10@adorable.io.png"
-        ></Avatar>
+        ></Avatar> */}
+        <img
+          src={bg}
+          alt="ring"
+          style={{
+            height: "40vh",
+          }}
+        />
         <Button
           onClick={this.handleReject}
           style={{
-            marginTop: 20,
+            marginTop: 60,
             borderRadius: 20,
             backgroundColor: "red",
             color: "white",

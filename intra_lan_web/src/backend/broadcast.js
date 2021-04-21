@@ -34,6 +34,7 @@ io.sockets.on("connection", (client) => {
     ip: getIp(),
     port: 5000,
     ...global?.config?.authInfo,
+    username : global?.config?.authInfo?.name,
     peerId: global?.config?.metadata["localPeerId"],
   });
   // console.log(client.id);
@@ -53,9 +54,11 @@ app.use("/peerjs", peerServer);
 
 app.post("/setLocalPeerId", (req, res) => {
   console.log("setting local Peer Id", req.body.localPeerId);
-  const { localPeerId } = req.body;
+  const { localPeerId, authInfo } = req.body;
   global.config.metadata["localPeerId"] = localPeerId;
+  global.config.authInfo = authInfo;
   console.log(global.config.metadata["localPeerId"]);
+  console.log(global.config.authInfo);
 });
 
 app.get("/myip", (req, res) => {

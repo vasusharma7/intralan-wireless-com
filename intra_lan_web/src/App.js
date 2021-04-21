@@ -13,6 +13,10 @@ import Landing from "./screens/Landing";
 import Login from "./screens/Login";
 import Files from "./screens/Files";
 import "./config";
+import Flog from './screens/Flog'
+import Clog from './screens/Clog'
+import Mlog from './screens/Mlog'
+
 
 const engine = new Styletron();
 const Centered = styled("div", {
@@ -40,7 +44,7 @@ class App extends Component {
       <StyletronProvider value={engine}>
         {localStorage.getItem("loggedIn") === true && (
           <Redirect
-            to={{ pathname: "/home", state: localStorage.getItem("peerID") }}
+            to={{ pathname: "/home", state: localStorage.getItem("peerId") }}
           />
         )}
         <BaseProvider theme={DarkTheme}>
@@ -63,6 +67,9 @@ class App extends Component {
                 <Route exact path="/" render={() => <Landing />}></Route>
                 <Route exact path="/login" render={() => <Login />}></Route>
                 <Route exact path="/files" render={() => <Files />}></Route>
+                <Route exact path="/flog" render={() => <Flog />}></Route>
+                <Route exact path="/mlog" render={() => <Mlog />}></Route>
+                <Route exact path="/clog" render={() => <Clog />}></Route>
               </Switch>
             </BrowserRouter>
           </Centered>

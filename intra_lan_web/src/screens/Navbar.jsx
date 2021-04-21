@@ -29,9 +29,9 @@ export default () => {
 
   return (
     <>
-      {selected === "File Transfer" && <Redirect push to="/files"></Redirect>}
-      {selected === "Calls" && <Redirect push to="/files"></Redirect>}
-      {selected === "Chat" && <Redirect push to="/files"></Redirect>}
+      {selected === "File Transfer" && <Redirect push to="/flog"></Redirect>}
+      {selected === "Calls" && <Redirect push to="/clog"></Redirect>}
+      {selected === "Chat" && <Redirect push to="/mlog"></Redirect>}
       {status && <Redirect to="/"></Redirect>}
       <AppNavBar
         title="IntraLan Web"

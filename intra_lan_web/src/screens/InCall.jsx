@@ -50,13 +50,13 @@ class InCall extends Component {
       >
         <Display2 style={{ marginBottom: 40 }}>Ongoing call</Display2>
         <Display4 style={{ marginBottom: 20 }}>
-          {this.props.localPeer?.metadata.username !== undefined
-            ? this.props.localPeer?.metadata.username
+          {this.props.localPeer?.metadata?.username !== undefined
+            ? this.props.localPeer?.metadata?.username
             : "User"}
         </Display4>
         <Display4 style={{ marginBottom: 40 }}>
-          {this.props.localPeer?.metadata.ip !== undefined
-            ? this.props.localPeer?.metadata.ip
+          {this.props.localPeer?.metadata?.ip !== undefined
+            ? this.props.localPeer?.metadata?.ip
             : ""}
         </Display4>
         <Avatar

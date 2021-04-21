@@ -13,7 +13,6 @@ export default class PeerClient {
     console.log(connection);
     this.connection = connection;
     this.authInfo = JSON.parse(localStorage.getItem("authInfo"));
-    this.localPeerId = localStorage.getItem("uid");
     this.establishConnection();
     this.fileBuffer = [];
     this.maxRetries = 5;
@@ -21,7 +20,7 @@ export default class PeerClient {
     this.state = store.getState();
     this.offset = 0;
     this.getMediaSource();
-    this.localPeerId = localPeerId ? this.authInfo.uid : null;
+    this.localPeerId =  localStorage.getItem("peerId");
   }
 
   // Event Listener Handlers
@@ -38,9 +37,11 @@ export default class PeerClient {
     console.log("firing listeners");
     this.fireEventListeners();
   };
+
+
   fireEventListeners = () => {
     this.peer.on("error", (err) => {
-      if (this.localPeerId) this.disconnectSelf();
+      if (this.localPeerId) this.disconnectSelf();  
       if (this.maxRetries--) this.establishConnection();
       console.log("listen", err);
     });
@@ -70,9 +71,11 @@ export default class PeerClient {
           }
         }
       } else {
+        console.log('setting broadcast info')
         axios
           .post(`http://localhost:5000/setLocalPeerId`, {
-            localPeerId: this.peerId,
+            localPeerId: peerId,
+            authInfo: this.authInfo
           })
           .then((res) => {
             console.log(res);
@@ -311,6 +314,9 @@ export default class PeerClient {
       createdAt: data.time,
       title : data.username,
       position : 'right',
+      senderId: this.connection
+      ? this.connection.peerId
+      : this.metadata.peerId,
       date : new Date(),
       user: {
         _id: data.peerId,
@@ -335,16 +341,17 @@ export default class PeerClient {
     const data = {
       message: message,
       time: new Date(),
-      username: this.authInfo.username,
-      peerId: this.localPeerId,
+      username: localStorage.getItem("authInfo").username,
+      peerId: localStorage.getItem("peerId"),
     };
     store.dispatch(addMessage(this.frameMessage(data)));
-    this.conn.send({
+    this.conn?.send({
       ...data,
       operation: "chat",
     });
   };
   recieveMessage = (data) => {
+    console.log(this.localPeerId)
     console.log("receiving", data);
     if (data.message === "intralan-chat-init") {
       store.dispatch(streamInit(false));
@@ -355,6 +362,7 @@ export default class PeerClient {
       // this.conn.close();
       return;
     }
+    console.log(this.connection)
     store.dispatch(
       addMessage({
         senderId: this.connection
