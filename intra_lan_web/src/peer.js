@@ -149,12 +149,33 @@ export default class PeerClient {
     this.call.answer(this.stream);
     // Receive data
     this.call.on("stream", (stream) => {
+      let userData = localStorage.getItem("userCalls")
+      if(!userData){
+        userData = {}
+        userData["calls"] = [{...this.metadata, date : Date.now()}]
+        localStorage.setItem("userCalls", JSON.stringify(userData));
+      } else{
+        userData = JSON.parse(userData)
+        userData["calls"].push({...this.metadata, date : Date.now()})
+        localStorage.setItem("userCalls",JSON.stringify(userData))
+      }
+
       store.dispatch(setConnStatus("inCall"));
       this.call.answer(this.stream);
       console.log("call answer", stream);
       store.dispatch(setAVStream(stream));
 
       global.config.videoRef.current.srcObject = stream;
+
+      this.call.on("close", function () {
+        const userData = localStorage.getItem("userCalls")
+        const logs = userData.calls
+        logs[logs.length - 1].time = Date.now() - logs[logs.length - 1].date
+        userData.calls = logs 
+        localStorage.setItem("userCalls",JSON.stringify(userData))     
+        store.dispatch(setConnStatus(null));
+        console.log("The call is closed", userData);
+      });
     });
   }
   startCall = () => {
@@ -169,14 +190,33 @@ export default class PeerClient {
       }
     }, 20000);
     this.call.on("stream", function (stream) {
+
+      let userData = localStorage.getItem("userCalls")
+      if(!userData){
+        userData = {}
+        userData["calls"] = [{...this.metadata, date : new Date.now()}]
+        localStorage.setItem("userCalls", JSON.stringify(userData));
+      }
+      else{
+        userData = JSON.parse(userData)
+        userData["calls"].push({...this.metadata, date : new Date.now()})
+        localStorage.setItem("userCalls",JSON.stringify(userData))
+      }
+
       console.log("peer is streaming", this.peerId, stream);
       store.dispatch(setAVStream(stream));
+      console.log("user data ", userData)
 
       //see some workaround for this - the inCall component is rendered late and it gives undefined
       global.config.videoRef.current.srcObject = stream;
       store.dispatch(setConnStatus("inCall")); //change to picked-up status
     });
     this.call.on("close", function () {
+      const userData = localStorage.getItem("userCalls")
+      const logs = userData.calls
+      logs[logs.length - 1].time = Date.now() - logs[logs.length - 1].date
+      userData.calls = logs 
+      localStorage.setItem("userCalls",JSON.stringify(userData))     
       store.dispatch(setConnStatus(null));
       console.log("The call is closed");
     });

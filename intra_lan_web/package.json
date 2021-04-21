@@ -10,6 +10,7 @@
     "axios": "^0.21.1",
     "baseui": "^9.112.0",
     "cors": "^2.8.5",
+    "dateformat": "^4.5.1",
     "material-ui": "^0.20.2",
     "material-ui-community-icons": "^0.15.0",
     "netmask": "^2.0.1",
