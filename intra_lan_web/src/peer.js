@@ -27,8 +27,8 @@ export default class PeerClient {
   establishConnection = () => {
     if (this.connection) store.dispatch(setConnStatus("connecting"));
     this.peer = new Peer(this.connection ? null : this.localPeerId, {
-      host: this.connection ? this.connection.ip : "127.0.0.1", //replace with ip
-      // host: "192.168.1.6", //replace with ip
+      // host: this.connection ? this.connection.ip : "127.0.0.1", //replace with ip
+      host: "192.168.1.6", //replace with ip
       port: 5000,
       path: "/peerjs",
       secure: false,
