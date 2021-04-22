@@ -3,6 +3,7 @@ import "react-chat-elements/dist/main.css";
 import { SideBar, MessageList } from "react-chat-elements";
 import { Redirect } from "react-router-dom";
 import { Button } from "baseui/button";
+import Navbar from "./Navbar";
 export default class Mlog extends Component {
   constructor(props) {
     super(props);
@@ -50,6 +51,7 @@ export default class Mlog extends Component {
     this.getChats();
     return (
       <>
+        <Navbar></Navbar>
         {this.state && this.state.back && (
           <Redirect push to={{ pathname: "/home" }} />
         )}
@@ -57,11 +59,12 @@ export default class Mlog extends Component {
           style={{
             display: "flex",
             flexDirection: "row",
-            height: "100vh",
+            height: "86vh",
           }}
         >
           <div style={{ width: "30vw" }}>
             <SideBar
+              type="light"
               top={
                 <div
                   style={{
@@ -69,15 +72,19 @@ export default class Mlog extends Component {
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-                    color: "white",
+                    color: "black",
                   }}
                 >
-                  My Chats
+                  <Button kind="secondary" onClick={() => this.goback()}>
+                    Back
+                  </Button>
+                  <h3>My Chats</h3>
                   {Object.keys(this.state.data).map((val) => {
                     return (
                       <div>
                         <Button
-                          style={{ width: "25vw", margin: 20 }}
+                          kind="secondary"
+                          style={{ width: "25vw", margin: 10 }}
                           onClick={() => this.setChat(val)}
                         >
                           Peer ID {val}
@@ -87,11 +94,7 @@ export default class Mlog extends Component {
                   })}
                 </div>
               }
-              bottom={
-                <div>
-                  <Button onClick={() => this.goback()}>Back</Button>
-                </div>
-              }
+              bottom={<div></div>}
             />
           </div>
           <div
@@ -101,7 +104,7 @@ export default class Mlog extends Component {
               flexDirection: "column",
               width: "80vw",
               justifyContent: "flex-end",
-              backgroundColor: "black",
+              backgroundColor: "#C5CAC5",
               padding: 20,
             }}
           >

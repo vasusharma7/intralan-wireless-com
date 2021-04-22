@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import { Card, StyledBody, StyledAction } from "baseui/card";
 import { Button } from "baseui/button";
-import { Display1, Display4 } from "baseui/typography";
+import { Display3 } from "baseui/typography";
 import { Avatar } from "baseui/avatar";
+import Navbar from "./Navbar";
 
 const dateformat = require("dateformat");
 export default class Clog extends Component {
@@ -32,6 +33,7 @@ export default class Clog extends Component {
   render() {
     return (
       <>
+        <Navbar></Navbar>
         {this.state?.back && <Redirect push to="/home"></Redirect>}
         <div
           style={{
@@ -41,11 +43,13 @@ export default class Clog extends Component {
             alignItems: "center",
           }}
         >
-          <Display1 color="black" style={{ textAlign: "center" }}>
+          <Display3 color="black" style={{ textAlign: "center" }}>
             Call Logs
-          </Display1>
+          </Display3>
           <hr></hr>
-          <Button onClick={() => this.goback()}>Go back</Button>
+          <Button kind="secondary" onClick={() => this.goback()}>
+            Go back
+          </Button>
         </div>
         <div
           style={{
@@ -68,13 +72,30 @@ export default class Clog extends Component {
                       alignItems: "center",
                     }}
                   >
-                    <Avatar name={val.username} size="160px" />
-                    {`Username : ${val.username}\nPeerID: ${
-                      val.peerId
-                    }\nIP address: ${val.ip}\nTime: ${dateformat(
-                      val.date,
-                      "dddd, mmmm dS, yyyy, h:MM:ss TT"
-                    )}\n`}
+                    <Avatar
+                      name={val.username}
+                      src="https://images.vexels.com/media/users/3/137415/isolated/preview/0e475bb9b17b3fa4f94f31fba1635b8f-telephone-call-icon-logo-by-vexels.png"
+                      size="160px"
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <h4>Username : {val.username}</h4>
+                      <h4>PeerID: {val.peerId}</h4>
+                      <h4>IP address: {val.ip}</h4>
+                      <h4>
+                        Time :{" "}
+                        {dateformat(
+                          val.date,
+                          "dddd, mmmm dS, yyyy, h:MM:ss TT"
+                        )}
+                      </h4>
+                    </div>
                   </div>
                 </StyledBody>
                 <StyledAction></StyledAction>

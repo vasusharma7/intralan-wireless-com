@@ -210,7 +210,7 @@ class Home extends Component {
                 size="320px"
                 src="https://ambitioustracks.com/wp-content/uploads/2017/01/1.-fundadores.png"
               />
-              <Display2 marginBottom="scale500">
+              <Display2 color="black" marginBottom="scale500">
                 Welcome {this.state && this.state.userName}
               </Display2>
               <p>My IP : {localStorage.getItem("myip")}</p>

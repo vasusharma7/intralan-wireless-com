@@ -13,9 +13,9 @@ import Landing from "./screens/Landing";
 import Login from "./screens/Login";
 import Files from "./screens/Files";
 import "./config";
-import Flog from './screens/Flog'
 import Clog from './screens/Clog'
 import Mlog from './screens/Mlog'
+import Settings from "./screens/Settings";
 
 
 const engine = new Styletron();
@@ -67,9 +67,9 @@ class App extends Component {
                 <Route exact path="/" render={() => <Landing />}></Route>
                 <Route exact path="/login" render={() => <Login />}></Route>
                 <Route exact path="/files" render={() => <Files />}></Route>
-                <Route exact path="/flog" render={() => <Flog />}></Route>
                 <Route exact path="/mlog" render={() => <Mlog />}></Route>
                 <Route exact path="/clog" render={() => <Clog />}></Route>
+                <Route exact path="/settings" render={() => <Settings />}></Route>
               </Switch>
             </BrowserRouter>
           </Centered>
