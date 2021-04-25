@@ -19,6 +19,7 @@ export default class Clog extends Component {
   componentDidMount = async () => {
     console.log(localStorage.getItem("userCalls"));
     let calls = await JSON.parse(localStorage.getItem("userCalls"));
+    if (!calls) return;
     this.setState({
       calls: calls.calls,
     });

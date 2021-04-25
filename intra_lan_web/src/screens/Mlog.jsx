@@ -14,6 +14,7 @@ export default class Mlog extends Component {
   }
   componentDidMount = async () => {
     const data = await JSON.parse(localStorage.getItem("userData"));
+    if (!data) return;
     this.setState({
       data: data,
       curMessages: [],
