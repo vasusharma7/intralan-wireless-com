@@ -9,23 +9,10 @@ const {
   globalShortcut,
 } = electron;
 const path = require("path");
-require("../backend/broadcast");
-let tray = null;
-var manage = {
-  state: -1,
-  stateListener: function (val) {},
-  set trigger(val) {
-    this.state = val;
-    this.stateListener(val);
-  },
-  get trigger() {
-    return this.state;
-  },
-  registerListener: function (listener) {
-    this.stateListener = listener;
-  },
-};
+require("./backend/broadcast");
 
+let tray = null;
+const isDev = require("electron-is-dev");
 require("electron-reload")(__dirname, {
   electron: require(`${__dirname}/../node_modules/electron`),
 });
@@ -46,9 +33,15 @@ app.on("ready", async (_) => {
   });
 
   // mainWindow.setAlwaysOnTop(true);
-  mainWindow.loadURL(`http://localhost:3000`);
+  // mainWindow.loadURL(`http://localhost:3000`);
 
-  tray = new Tray(path.join(__dirname, "assets/ic_launcher.png"));
+  mainWindow.loadURL(
+    isDev
+      ? "http://localhost:3000"
+      : `file://${path.join(__dirname, "../build/index.html")}`
+  );
+
+  tray = new Tray(path.join(__dirname, "../assets/ic_launcher.png"));
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "IntraLANCom",
@@ -97,6 +90,5 @@ app.on("before-quit", () => {
   }
 });
 ipc.on("min", (evt) => {
-  mode = "sleep";
   mainWindow.hide();
 });
