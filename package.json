@@ -1,0 +1,19 @@
+{
+  "name": "intralancom",
+  "version": "1.0.0",
+  "productName": "IntraLAN Communication",
+  "description": "",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "rimraf EVA-* && electron-packager . --platform=win32 --arch=x64  --icon=bot"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {},
+  "dependencies": {
+    "electron": "^8.2.5",
+    "electron-reload": "^1.5.0"
+  }
+}
