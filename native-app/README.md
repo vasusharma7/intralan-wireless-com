@@ -1,7 +1,7 @@
-<h1 style="text-align:center"> NetCon</h1>
-<h4 style="text-align:center"> Connect Fast, Secure, and Reliable</h4>
+<h1 align="center"> NetCon</h1>
+<h4 align="center"> Connect Fast, Secure, and Reliable</h4>
 
-Share files, voice call and text message users connected to the same WiFi network.
+<h5 align="center">Share files, voice call and text message users connected to the same WiFi network.</h5>
 
 # About
 
