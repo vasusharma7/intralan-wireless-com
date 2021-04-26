@@ -16,15 +16,20 @@
 
 <b>IntraLAN Wireless Com</b> or <b>NetCon</b> is a communication and data sharing application that can be used for effective communication over local area networks without having to route data via the public internet. This serves significant benefits in comparison to traditional networking in the form of speed, security and connectivity, The solution is a cross platform client that can be used across devices and operating systems in an easy and convenient manner.
 
+<div align="center">
+<b>Find it live  <a href="https://play.google.com/store/apps/details?id=com.vasusharma7.intralancom">here</a></b>  
+</div>
+
 ## Demo Video for the project
 
 https://user-images.githubusercontent.com/40715071/116125931-b175b380-a6e3-11eb-922d-00540561be80.mp4
 
-## Contents
+## Contents :dart:
 
 - [Project Structure](#project-structure)
 - [Features](#features)
 - [Building](#building)
+- [Authors](#authors)
 - [Contributing](#contributing)
 
 - ### Project Structure :pushpin:
@@ -109,6 +114,12 @@ https://user-images.githubusercontent.com/40715071/116125931-b175b380-a6e3-11eb-
 
     - After successfully completing the above steps, the application should be up locally on port `3000` and the peer server should be up on port `5000`
     - Additionally, the electron window should start in case the last command was run.
+
+- ### Authors :pencil2:
+
+  1. [Vasu Sharma](https://github.com/vasusharma7)
+  2. [Anup Nair](https://github.com/AnupNair08)
+  3. [Tanaya Jadhav](https://github.com/tanayajadhav1105)
 
 - ### Contributing :memo:
 
