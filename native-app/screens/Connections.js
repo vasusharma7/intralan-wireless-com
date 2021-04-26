@@ -122,6 +122,7 @@ class Connections extends Component {
         <ScrollView>
           <View
             style={{
+              flex: 1,
               flexDirection: "row",
               justifyContent: "center",
               alignItems: "center",
@@ -134,16 +135,16 @@ class Connections extends Component {
               marginRight: 7,
             }}
           >
-            <View style={{ marginRight: 30 }}>
+            <View style={{ flex: 0.2, alignItems: "center" }}>
               <Icon size={50} color="white" name="user" />
             </View>
-            <View>
+            <View style={{ flex: 0.8, flexDirection: "column" }}>
               <Text
                 style={{
-                  fontSize: 30,
                   fontWeight: "bold",
                   color: "white",
                   marginBottom: 10,
+                  fontSize: width / 20,
                 }}
               >
                 Welcome {this.state.userData.username}
@@ -174,9 +175,17 @@ class Connections extends Component {
                   alignItems: "center",
                 }}
               >
-                <Text style={{ marginTop: 30, fontSize: 17 }}>
+                <Text
+                  style={{
+                    marginTop: 30,
+                    fontSize: width / 25,
+                    width: width,
+                    textAlign: "center",
+                  }}
+                >
                   Tap on the search button to look for connections
                 </Text>
+
                 <Image
                   source={require("../assets/search.gif")}
                   style={{ width: width / 2, height: height / 3 }}
@@ -225,6 +234,7 @@ class Connections extends Component {
             icon="delete"
             onPress={() => {
               this.props.updateInfo(null);
+              this.props.updateConnections(null);
             }}
           />
         ) : (
@@ -262,6 +272,7 @@ const mapDispatchToProps = (dispatch) => {
     startSearch: () => dispatch(startSearch()),
     setConnStatus: (status) => dispatch(setConnStatus(status)),
     updateInfo: (data) => dispatch(updateInfo(data)),
+    updateConnections: (data) => dispatch(updateConnections(data)),
   };
 };
 
