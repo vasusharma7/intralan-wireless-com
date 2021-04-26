@@ -15,3 +15,9 @@ https://user-images.githubusercontent.com/40715071/116125931-b175b380-a6e3-11eb-
 ### Developement Setup
 
 [Android Development Setup](https://github.com/vasusharma7/intralan-wireless-com/blob/master/MOBILE.md)
+
+
+### Developers
+
+1. [Anup Nair](https://github.com/AnupNair08)
+2. [Vasu Sharma](https://github.com/vasusharma7)
