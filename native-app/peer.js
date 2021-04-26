@@ -73,7 +73,7 @@ class PeerClient {
     this.offset = 0;
     this.res = {};
     this.getMediaSource();
-    this.dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/NetCon`;
+    this.dirLocation = `${RNFetchBlob.fs.dirs.DownloadDir}/netcon`;
     this.cacheLocation = `${RNFetchBlob.fs.dirs.CacheDir}/temp`;
     if (this.connection) store.dispatch(setConnStatus("connecting"));
   }
@@ -325,13 +325,13 @@ class PeerClient {
         RNFetchBlob.fs.isDir(this.dirLocation).then(async (isDir) => {
           if (!isDir) {
             try {
-              await RNFetchBlob.fs.mkdir(dirLocation);
-            } catch {
-              Alert.alert(
-                "Oops !",
-                "Could not create App Directory in Downloads folder"
-              );
-              console.log("something went wrong in creating folder");
+              await RNFetchBlob.fs.mkdir(this.dirLocation);
+            } catch (err) {
+              // Alert.alert(
+              //   "Oops !",
+              //   "Could not create App Directory in Downloads folder"
+              // );
+              console.log("something went wrong in creating folder", err);
             }
           }
         });
