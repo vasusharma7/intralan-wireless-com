@@ -5,7 +5,10 @@ IntraLAN Wireless Com is a communication and data sharing application that can b
 ## Demo Video for the project
 
 
-https://user-images.githubusercontent.com/40715071/116125749-82f7d880-a6e3-11eb-8ace-9d84c8a8e774.mp4
+
+https://user-images.githubusercontent.com/40715071/116125931-b175b380-a6e3-11eb-922d-00540561be80.mp4
+
+
 
 
 
