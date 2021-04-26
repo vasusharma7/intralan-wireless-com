@@ -21,3 +21,4 @@ https://user-images.githubusercontent.com/40715071/116125931-b175b380-a6e3-11eb-
 
 1. [Anup Nair](https://github.com/AnupNair08)
 2. [Vasu Sharma](https://github.com/vasusharma7)
+3. [Tanaya Jadhav](https://github.com/tanayajadhav1105)
