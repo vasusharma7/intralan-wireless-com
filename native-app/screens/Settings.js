@@ -179,7 +179,7 @@ class Settings extends Component {
             </Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.view}>
+        {/* <View style={styles.view}>
           <View>
             <Text
               style={{
@@ -194,8 +194,8 @@ class Settings extends Component {
               Search Range
             </Text>
           </View>
-        </View>
-        <View style={styles.wrap}>
+        </View> */}
+        {/* <View style={styles.wrap}>
           <TouchableOpacity
             onPress={async () => {
               this.props.initSearch(global.config.info.smallBlock);
@@ -245,8 +245,8 @@ class Settings extends Component {
                 Fairly Large Newtorks
               </Text>
             </View>
-          </TouchableOpacity>
-          {/* <Filler />
+          </TouchableOpacity> */}
+        {/* <Filler />
           <TouchableOpacity
             onPress={() => {
               this.props.initSearch(global.config.info.largeBlock);
@@ -259,7 +259,7 @@ class Settings extends Component {
               </Text>
             </View>
           </TouchableOpacity> */}
-        </View>
+        {/* </View> */}
         <View style={styles.view}>
           <View>
             <Text
@@ -301,7 +301,7 @@ class Settings extends Component {
             style={styles.button}
             onPress={async () => {
               await AsyncStorage.getAllKeys().then(async (keys) => {
-                keys = keys.filter((val) => val !== "userData");
+                // keys = keys.filter((val) => val !== "userData");
                 Promise.all(
                   keys.map(async (key) => await AsyncStorage.removeItem(key))
                 ).then(() => this.props.navigation.navigate("Splash"));

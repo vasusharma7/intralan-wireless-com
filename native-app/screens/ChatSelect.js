@@ -38,8 +38,8 @@ export class ChatSelect extends Component {
                 left={(props) => <List.Icon {...props} icon="chat" />}
                 onPress={() => {
                   this.props.navigation.navigate({
-                    name: "ChatScreen",
-                    key: "ChatScreen",
+                    name: "Chat History",
+                    key: "Chat History",
                     params: {
                       messages: this.state.userData[key]["messages"],
                     },

@@ -18,7 +18,7 @@ export class Chats extends Component {
         }}
       >
         <ChatStack.Screen name="Chats " component={ChatSelect} />
-        <ChatStack.Screen name="ChatScreen" component={ChatScreen} />
+        <ChatStack.Screen name="Chat History" component={ChatScreen} />
       </ChatStack.Navigator>
     );
   }

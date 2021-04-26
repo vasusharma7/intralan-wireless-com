@@ -19,7 +19,10 @@ export const dataReducer = (state = initalState, action) => {
     case CONNECTION:
       return {
         ...state,
-        connections: { ...state.connections, ...action.payload },
+        connections:
+          action.payload === null
+            ? {}
+            : { ...state.connections, ...action.payload },
       };
     case METADATA:
       return {

@@ -218,15 +218,16 @@ class App extends Component {
         await AsyncStorage.setItem("userData", JSON.stringify({}));
       }
     });
-    await AsyncStorage.getItem("range").then(async (range) => {
-      if (!range || range === "small") {
-        this.props.initSearch(global.config.info.smallBlock);
-        await AsyncStorage.setItem("range", "small");
-      } else {
-        this.props.initSearch(global.config.info.mediumBlock);
-        await AsyncStorage.setItem("range", "large");
-      }
-    });
+    this.props.initSearch(global.config.info.smallBlock);
+    // await AsyncStorage.getItem("range").then(async (range) => {
+    //   if (!range || range === "small") {
+    //     this.props.initSearch(global.config.info.smallBlock);
+    //     await AsyncStorage.setItem("range", "small");
+    //   } else {
+    //     this.props.initSearch(global.config.info.mediumBlock);
+    //     await AsyncStorage.setItem("range", "large");
+    //   }
+    // });
     this.createChannels();
     // AsyncStorage.clear();
 

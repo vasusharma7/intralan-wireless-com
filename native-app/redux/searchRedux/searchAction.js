@@ -38,11 +38,11 @@ export const startSearch = () => {
   return (dispatch) => {
     const state = store.getState();
 
-    if (!state.search.search) {
-      console.log("stopping search");
-      dispatch(toggleSearch());
-      return;
-    }
+    // if (!state.search.search) {
+    //   console.log("stopping search");
+    //   dispatch(toggleSearch());
+    //   return;
+    // }
 
     if (!state.search.searchData.ips.length) return;
     setTimeout(async () => {
@@ -53,7 +53,7 @@ export const startSearch = () => {
       )
         .then(async (res) => {
           console.log("success", res.length);
-          await new Promise((r) => setTimeout(r, 20000));
+          // await new Promise((r) => setTimeout(r, 20000));
           dispatch(toggleSearch());
           // dispatch(startSearch());
         })
@@ -90,8 +90,8 @@ connect = async (ip) => {
   }
   return new Promise(async (resolve, reject) => {
     const socket = await socketIOClient(`http://${ip}:5000`, {
-      // reconnectionAttempts: 2,
-      reconnection: false,
+      reconnectionAttempts: 2,
+      // reconnection: false,
     });
     socket.on("connect", () => {
       console.log(socket.id, socket.connected);
