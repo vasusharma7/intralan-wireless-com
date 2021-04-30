@@ -194,12 +194,12 @@ export default class PeerClient {
       let userData = localStorage.getItem("userCalls")
       if(!userData){
         userData = {}
-        userData["calls"] = [{...this.metadata, date : new Date.now()}]
+        userData["calls"] = [{...this.metadata, date :  Date.now()}]
         localStorage.setItem("userCalls", JSON.stringify(userData));
       }
       else{
         userData = JSON.parse(userData)
-        userData["calls"].push({...this.metadata, date : new Date.now()})
+        userData["calls"].push({...this.metadata, date : Date.now()})
         localStorage.setItem("userCalls",JSON.stringify(userData))
       }
 
@@ -356,7 +356,7 @@ export default class PeerClient {
       position : 'right',
       senderId: this.connection
       ? this.connection.peerId
-      : this.metadata.peerId,
+      : this.metadata?.peerId,
       date : new Date(),
       user: {
         _id: data.peerId,
