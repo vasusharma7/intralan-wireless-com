@@ -20,9 +20,11 @@
 <b>Find it live  <a href="https://play.google.com/store/apps/details?id=com.vasusharma7.intralancom">here</a></b>  
 </div>
 
-## Demo Video for the project
+<!-- ## Demo Video for the project
 
-https://user-images.githubusercontent.com/40715071/116125931-b175b380-a6e3-11eb-922d-00540561be80.mp4
+https://user-images.githubusercontent.com/40715071/116125931-b175b380-a6e3-11eb-922d-00540561be80.mp4 
+
+-->
 
 ## Contents :dart:
 
